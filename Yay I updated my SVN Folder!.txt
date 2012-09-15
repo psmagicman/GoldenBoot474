@@ -1,0 +1,5 @@
+Now try Committing.
+
+1. Create a random .txt file
+2. Right-Click new file > TortoiseSVN > Add
+3. Right-Click GoldenBoot474 folder > SVN Commit...
