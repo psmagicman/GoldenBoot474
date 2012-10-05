@@ -1,0 +1,4 @@
+The new folder named "opencv and qt compatibility example" was taken straight off a website. 
+
+I didn't make any citations yet, but I plan to learn the code properly and implement it to the GUI
+
