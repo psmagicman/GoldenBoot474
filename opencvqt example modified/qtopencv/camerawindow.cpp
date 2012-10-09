@@ -51,7 +51,7 @@ void CameraWindow::savePicture(void)
 
     QPixmap photo = m_cvwidget->toPixmap(image);
 
-    if (photo.save("/home/rborges/Desktop/picture" + QString::number(m_photoCounter) + ".jpg")) {
+    if (photo.save(QString::number(m_photoCounter) + ".jpg")) {
         qDebug("Picture successfully saved!");
         m_photoCounter++;
     } else {
