@@ -44,8 +44,8 @@ int main() {
 	//CvScalar hsv_max = cvScalar(120, 240, 30, 0);
 
 	// Detect a green ball
-	CvScalar hsv_min = cvScalar(0, 50, 170, 0);
-	CvScalar hsv_max = cvScalar(10, 180, 256, 0);
+	CvScalar hsv_min = cvScalar(30, 100, 100, 0);
+	CvScalar hsv_max = cvScalar(40, 255, 255, 0);
 
 	IplImage* hsv_frame = cvCreateImage(size, IPL_DEPTH_8U, 3);
 	IplImage* thresholded = cvCreateImage(size, IPL_DEPTH_8U, 1);
