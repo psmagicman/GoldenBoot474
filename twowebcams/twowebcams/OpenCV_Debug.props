@@ -5,10 +5,10 @@
   <PropertyGroup />
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\opencv\build\install\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(OPENCV_DIR)%\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>C:\opencv\build\install\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>%(OPENCV_DIR)%\lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>opencv_core242d.lib;opencv_imgproc242d.lib;opencv_highgui242d.lib;opencv_ml242d.lib;opencv_video242d.lib;opencv_features2d242d.lib;opencv_calib3d242d.lib;opencv_objdetect242d.lib;opencv_contrib242d.lib;opencv_legacy242d.lib;opencv_flann242d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
