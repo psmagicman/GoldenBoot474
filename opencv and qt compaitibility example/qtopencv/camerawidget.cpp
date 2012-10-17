@@ -21,40 +21,39 @@ CameraWidget::CameraWidget(QWidget *parent)
     setLayout(m_layout);
 }
 
-CameraWidget::~CameraWidget(void)
-{
-    
-}
+CameraWidget::~CameraWidget(void){}
 
 void CameraWidget::putFrame(IplImage *image)
 {
-    m_imageLabel->setPixmap(toPixmap(image));
+	IplImage *frame = image;
+
+    m_imageLabel->setPixmap(toPixmap(frame));
 }
 
-QPixmap CameraWidget::toPixmap(IplImage *cvimage) {
+QPixmap CameraWidget::toPixmap(IplImage *cvimage1) {
     int cvIndex, cvLineStart;
 
-    switch (cvimage->depth) {
+    switch (cvimage1->depth) {
         case IPL_DEPTH_8U:
-            switch (cvimage->nChannels) {
+            switch (cvimage1->nChannels) {
                 case 3:
-                    if ( (cvimage->width != m_image.width()) || (cvimage->height != m_image.height()) ) {
-                        QImage temp(cvimage->width, cvimage->height, QImage::Format_RGB32);
+                    if ( (cvimage1->width != m_image.width()) || (cvimage1->height != m_image.height()) ) {
+                        QImage temp(cvimage1->width, cvimage1->height, QImage::Format_RGB32);
                         m_image = temp;
                     }
                     cvIndex = 0; cvLineStart = 0;
-                    for (int y = 0; y < cvimage->height; y++) {
+                    for (int y = 0; y < cvimage1->height; y++) {
                         unsigned char red,green,blue;
                         cvIndex = cvLineStart;
-                        for (int x = 0; x < cvimage->width; x++) {
-                            red = cvimage->imageData[cvIndex+2];
-                            green = cvimage->imageData[cvIndex+1];
-                            blue = cvimage->imageData[cvIndex+0];
+                        for (int x = 0; x < cvimage1->width; x++) {
+                            red = cvimage1->imageData[cvIndex+2];
+                            green = cvimage1->imageData[cvIndex+1];
+                            blue = cvimage1->imageData[cvIndex+0];
                             
                             m_image.setPixel(x,y,qRgb(red, green, blue));
                             cvIndex += 3;
                         }
-                        cvLineStart += cvimage->widthStep;                        
+                        cvLineStart += cvimage1->widthStep;                        
                     }
                     break;
                 default:
