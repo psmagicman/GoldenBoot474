@@ -4,7 +4,7 @@
 const int _numOfWebcams = 2;
 
 // GREEN
-const double greenHueMin = 30;
+const double greenHueMin = 32;
 const double greenSatMin = 75;
 const double greenValMin = 75;
 
