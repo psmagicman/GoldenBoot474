@@ -4,6 +4,7 @@
 struct Robot {
 	int x;
 	int y;
+	double angle;
 };
 
 struct Ball {

@@ -24,6 +24,8 @@ int main() {
 	cin >> robot.x;
 	cout << "Enter the y coordinate of the robot: ";
 	cin >> robot.y;
+	cout << "Enter the angle the robot is facing: ";
+	cin >> robot.angle;
 	cout << "Enter the x coordinate of the ball: ";
 	cin >> ball.x;
 	cout << "Enter the y coordinate of the ball: ";
@@ -59,6 +61,15 @@ int main() {
 	}*/
 
 	MovementAlgorithm algo = MovementAlgorithm(robot, ball, obstacle);
+	cout << endl << "Robot distance to ball: " << algo.returnBallDist() << endl;
+	cout << "Robot distance to obstacle: " << algo.returnObsDist() << endl;
+	cout << "Obstacle Range: " << algo.returnObsRange() << endl;
+	cout << "Robot old angle: " << robot.angle << endl;
+	cout << "Robot new angle (facing ball angle): " << algo.returnBotAngle() << endl;
+	if(algo.returnMoveFlag())
+		cout << "Move robot..." << endl;
+	else
+		cout << "Robot is still turning..." << endl;
 
 /*	vector<double> ballDist;
 	ballDist.resize(numBalls);
