@@ -11,8 +11,8 @@ MovementAlgorithm::MovementAlgorithm(Robot robot, Ball ball, Obstacle obstacle) 
 	algoObs = obstacle;
 	calcBallDist();
 	calcObsRange();
+	calcball2obs();
 	turnRobot2Ball();
-	algoRobot.angle = angle;
 	checkAngle(algoRobot.angle);
 }
 
@@ -38,6 +38,10 @@ bool MovementAlgorithm::returnMoveFlag() {
 	return moveFlag;
 }
 
+double MovementAlgorithm::returnball2obs() {
+	return ball2obs;
+}
+
 void MovementAlgorithm::calcBallDist() {
 	double tempX, tempY;
 	tempX = algoBall.x - algoRobot.x;
@@ -61,10 +65,21 @@ void MovementAlgorithm::turnRobot2Ball() {
 }
 
 void MovementAlgorithm::checkAngle(double botAngle) {
-	if(angle == botAngle)
+	if(angle == botAngle){
 		moveFlag = 1;
-	else
+		turnFlag = 0;
+	}
+	else {
 		moveFlag = 0;
+		turnFlag = 1;
+	}
+}
+
+void MovementAlgorithm::calcball2obs() {
+	double tempX, tempY;
+	tempX = algoBall.x - algoObs.x;
+	tempY = algoBall.y - algoObs.y;
+	ball2obs = sqrt(pow(tempX,2)+pow(tempY,2));
 }
 /*vector<double> MovementAlgorithm::returnBallDist() {
 	return ballDist;

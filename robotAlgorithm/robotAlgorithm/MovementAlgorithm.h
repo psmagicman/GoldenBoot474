@@ -21,6 +21,7 @@ public:
 	double returnObsDist();
 	double returnObsRange();
 	double returnBotAngle();
+	double returnball2obs();
 	bool returnMoveFlag();
 	/*vector<double> returnBallDist();
 	vector<double> returnObsDist();*/
@@ -33,7 +34,9 @@ private:
 	double obsDist;
 	double obsRange;
 	double angle;
+	double ball2obs;
 	bool moveFlag;
+	bool turnFlag;
 	/*vector<Ball> algoBall;
 	vector<Obstacle> algoObstacle;
 	vector<double> ballDist;
@@ -44,6 +47,7 @@ private:
 	void calcObsRange();
 	void turnRobot2Ball();
 	void checkAngle(double);
+	void calcball2obs();
 };
 
 #endif MOVEMENTALGORITHM_H_
