@@ -18,29 +18,16 @@ MovementAlgorithm::MovementAlgorithm(Robot robot, Ball ball, Obstacle obstacle) 
 
 MovementAlgorithm::~MovementAlgorithm() {}
 
-double MovementAlgorithm::returnBallDist() {
-	return ballDist;
-}
-
-double MovementAlgorithm::returnObsDist() {
-	return obsDist;
-}
-
-double MovementAlgorithm::returnObsRange() {
-	return obsRange;
-}
-
-double MovementAlgorithm::returnBotAngle() {
-	return algoRobot.angle;
-}
-
-bool MovementAlgorithm::returnMoveFlag() {
-	return moveFlag;
-}
-
-double MovementAlgorithm::returnball2obs() {
-	return ball2obs;
-}
+/* Getter Functions */
+double MovementAlgorithm::returnBallDist() { return ballDist; }
+double MovementAlgorithm::returnObsDist() { return obsDist; }
+double MovementAlgorithm::returnObsRange() { return obsRange; }
+double MovementAlgorithm::returnBotAngle() { return algoRobot.angle; }
+double MovementAlgorithm::returnball2obs() { return ball2obs; }
+bool MovementAlgorithm::returnMoveFlag() { return moveFlag; }
+bool MovementAlgorithm::returnTurnFlag() { return turnFlag; }
+int MovementAlgorithm::returnRightMotor() { return rightMotor; }
+int MovementAlgorithm::returnLeftMotor() { return leftMotor; }
 
 void MovementAlgorithm::calcBallDist() {
 	double tempX, tempY;
@@ -51,6 +38,7 @@ void MovementAlgorithm::calcBallDist() {
 
 void MovementAlgorithm::calcObsRange() {
 	double tempX, tempY;
+	algoObs.rad = 10;
 	tempX = algoObs.x - algoRobot.x;
 	tempY = algoObs.y - algoRobot.x;
 	obsDist = sqrt(pow(tempX,2)+pow(tempY,2));
@@ -68,6 +56,8 @@ void MovementAlgorithm::checkAngle(double botAngle) {
 	if(angle == botAngle){
 		moveFlag = 1;
 		turnFlag = 0;
+		rightMotor = 3;
+		leftMotor = 3;
 	}
 	else {
 		moveFlag = 0;

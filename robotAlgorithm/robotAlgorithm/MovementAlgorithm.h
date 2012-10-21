@@ -23,6 +23,9 @@ public:
 	double returnBotAngle();
 	double returnball2obs();
 	bool returnMoveFlag();
+	bool returnTurnFlag();
+	int returnRightMotor();
+	int returnLeftMotor();
 	/*vector<double> returnBallDist();
 	vector<double> returnObsDist();*/
 	
@@ -37,6 +40,9 @@ private:
 	double ball2obs;
 	bool moveFlag;
 	bool turnFlag;
+
+	int rightMotor;
+	int leftMotor;
 	/*vector<Ball> algoBall;
 	vector<Obstacle> algoObstacle;
 	vector<double> ballDist;

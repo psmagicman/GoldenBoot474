@@ -17,8 +17,8 @@ int main() {
 	Robot robot;
 	Ball ball;
 	Obstacle obstacle;
-	/*vector<Ball> ball;
-	vector<Obstacle> obstacle;*/
+	//vector<Ball> balls;
+	//vector<Obstacle> obstacle;
 
 	cout << "Enter the x coordinate of the robot: ";
 	cin >> robot.x;
@@ -38,51 +38,33 @@ int main() {
 	/*int numBalls;
 	cout << "Enter the number of balls: ";
 	cin >> numBalls;
-	ball.resize(numBalls);
-	for(int i = 0; i < ball.size(); i++) {
+	balls.resize(numBalls);
+	for(int i = 0; i < balls.size(); i++) {
 		cout << "Coordinate of Ball" << i << " X: ";
-		cin >> ball[i].x;
+		cin >> balls[i].x;
 		cout << " Y: ";
-		cin >> ball[i].y;
+		cin >> balls[i].y;
 		cout << endl;
-		ball[i].rad = 5;
-	}
-	int numObs;
-	cout << "Enter the number of obstacles: ";
-	cin >> numObs;
-	obstacle.resize(numObs);
-	for(int i = 0; i < obstacle.size(); i++ ) {
-		cout << "Coordinate of Obstacle" << i << " X: ";
-		cin >> obstacle[i].x;
-		cout << " Y: ";
-		cin >> obstacle[i].y;
-		cout << endl << endl;
-		obstacle[i].rad = 10;
+		balls[i].rad = 5;
 	}*/
+
 
 	MovementAlgorithm algo = MovementAlgorithm(robot, ball, obstacle);
 	cout << endl << "Robot distance to ball: " << algo.returnBallDist() << endl;
 	cout << "Robot distance to obstacle: " << algo.returnObsDist() << endl;
+	cout << "Obstacle distance to ball: " << algo.returnball2obs() << endl;
 	cout << "Obstacle Range: " << algo.returnObsRange() << endl;
 	cout << "Robot old angle: " << robot.angle << endl;
 	cout << "Robot new angle (facing ball angle): " << algo.returnBotAngle() << endl;
-	if(algo.returnMoveFlag())
-		cout << "Move robot..." << endl;
-	else
-		cout << "Robot is still turning..." << endl;
-
-/*	vector<double> ballDist;
-	ballDist.resize(numBalls);
-	ballDist = algo.returnBallDist();
-	for(int i = 0; i < ball.size(); i++) {
-		cout << "Ball" << i << " Distance to: " << ballDist[i] << endl;
+	if(algo.returnMoveFlag() && !algo.returnTurnFlag()) {
+		cout << "Sending move signal to left and right motors..." << endl;
+		cout << "Right motor value: " << algo.returnRightMotor() << endl;
+		cout << "Left motor value: " << algo.returnLeftMotor() << endl;
+		cout << "Robot will move straight..." << endl;
 	}
-	vector<double> obsDist;
-	obsDist.resize(numObs);
-	obsDist = algo.returnObsDist();
-	for(int i = 0; i < obstacle.size(); i++) {
-		cout << "Obstacle" << i << " Distance to: " << obsDist[i] << endl;
-	}*/
+	else {
+		cout << "Robot is still turning ";
+	}
 	
 	cout << endl << "Press ESC to exit...";
 	while(1) {
