@@ -17,7 +17,7 @@ int main() {
 	Robot robot;
 	Ball ball;
 	Obstacle obstacle;
-	//vector<Ball> balls;
+	vector<Ball> balls;
 	//vector<Obstacle> obstacle;
 
 	cout << "Enter the x coordinate of the robot: ";
@@ -26,31 +26,33 @@ int main() {
 	cin >> robot.y;
 	cout << "Enter the angle the robot is facing: ";
 	cin >> robot.angle;
-	cout << "Enter the x coordinate of the ball: ";
+	/*cout << "Enter the x coordinate of the ball: ";
 	cin >> ball.x;
 	cout << "Enter the y coordinate of the ball: ";
 	cin >> ball.y;
 	cout << "Enter the x coordinate of the obstacle: ";
 	cin >> obstacle.x;
 	cout << "Enter the y coordinate of the obstacle: ";
-	cin >> obstacle.y;
+	cin >> obstacle.y;*/
 
-	/*int numBalls;
+	int numBalls;
 	cout << "Enter the number of balls: ";
 	cin >> numBalls;
 	balls.resize(numBalls);
 	for(int i = 0; i < balls.size(); i++) {
-		cout << "Coordinate of Ball" << i << " X: ";
+		cout << "Coordinate of Ball" << i+1 << ": " << endl;
+		cout << "X: ";
 		cin >> balls[i].x;
-		cout << " Y: ";
+		cout << "Y: ";
 		cin >> balls[i].y;
 		cout << endl;
 		balls[i].rad = 5;
-	}*/
+	}
 
+	MovementAlgorithm algos = MovementAlgorithm(robot, balls);
 
-	MovementAlgorithm algo = MovementAlgorithm(robot, ball, obstacle);
-	cout << endl << "Robot distance to ball: " << algo.returnBallDist() << endl;
+	//MovementAlgorithm algo = MovementAlgorithm(robot, ball, obstacle);
+	/*cout << endl << "Robot distance to ball: " << algo.returnBallDist() << endl;
 	cout << "Robot distance to obstacle: " << algo.returnObsDist() << endl;
 	cout << "Obstacle distance to ball: " << algo.returnball2obs() << endl;
 	cout << "Obstacle Range: " << algo.returnObsRange() << endl;
@@ -64,7 +66,7 @@ int main() {
 	}
 	else {
 		cout << "Robot is still turning ";
-	}
+	}*/
 	
 	cout << endl << "Press ESC to exit...";
 	while(1) {

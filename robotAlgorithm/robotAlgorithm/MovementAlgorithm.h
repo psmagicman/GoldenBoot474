@@ -15,6 +15,7 @@ public:
 	/* Constructor */
 	//MovementAlgorithm(Robot, vector<Ball>, vector<Obstacle>);
 	MovementAlgorithm(Robot, Ball, Obstacle);
+	MovementAlgorithm(Robot, vector<Ball>);
 	~MovementAlgorithm();
 
 	double returnBallDist();
@@ -43,10 +44,10 @@ private:
 
 	int rightMotor;
 	int leftMotor;
-	/*vector<Ball> algoBall;
-	vector<Obstacle> algoObstacle;
-	vector<double> ballDist;
-	vector<double> obsDist;
+	vector<Ball> algoBalls;
+	//vector<Obstacle> algoObstacle;
+	vector<double> ballsDist;
+	/*vector<double> obsDist;
 	vector<double> obsRange;*/
 
 	void calcBallDist();

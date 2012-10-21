@@ -16,6 +16,21 @@ MovementAlgorithm::MovementAlgorithm(Robot robot, Ball ball, Obstacle obstacle) 
 	checkAngle(algoRobot.angle);
 }
 
+MovementAlgorithm::MovementAlgorithm(Robot robot, vector<Ball> balls) {
+	int numBalls = balls.size();
+	algoBalls.resize(numBalls);
+	for(int i = 0; i < balls.size(); i++) {
+		algoBalls[i].x = balls[i].x;
+		algoBalls[i].y = balls[i].y;
+		algoBalls[i].rad = balls[i].rad;
+	}
+	for(int j = 0; j < algoBalls.size(); j++) {
+		cout << "Ball" << j << ": ";
+		cout << "X: " << algoBalls[j].x << " Y: " << algoBalls[j].y;
+		cout << " Rad: " << algoBalls[j].rad << endl;
+	}
+}
+
 MovementAlgorithm::~MovementAlgorithm() {}
 
 /* Getter Functions */
