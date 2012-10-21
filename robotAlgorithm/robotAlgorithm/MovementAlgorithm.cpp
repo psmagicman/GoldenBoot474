@@ -17,6 +17,7 @@ MovementAlgorithm::MovementAlgorithm(Robot robot, Ball ball, Obstacle obstacle) 
 }
 
 MovementAlgorithm::MovementAlgorithm(Robot robot, vector<Ball> balls) {
+	algoRobot = robot;
 	int numBalls = balls.size();
 	algoBalls.resize(numBalls);
 	for(int i = 0; i < balls.size(); i++) {
@@ -24,12 +25,13 @@ MovementAlgorithm::MovementAlgorithm(Robot robot, vector<Ball> balls) {
 		algoBalls[i].y = balls[i].y;
 		algoBalls[i].rad = balls[i].rad;
 	}
-	for(int j = 0; j < algoBalls.size(); j++) {
+	/*for(int j = 0; j < algoBalls.size(); j++) {
 		cout << "Ball" << j << ": ";
 		cout << "X: " << algoBalls[j].x << " Y: " << algoBalls[j].y;
 		cout << " Rad: " << algoBalls[j].rad << endl;
-	}
+	}*/
 	calcMultiBall();
+	compareMultiBallDist();
 }
 
 MovementAlgorithm::~MovementAlgorithm() {}
@@ -97,8 +99,22 @@ void MovementAlgorithm::calcMultiBall() {
 		tempX = (double)algoBalls[i].x - (double)algoRobot.x;
 		tempY = (double)algoBalls[i].y - (double)algoRobot.y;
 		ballsDist[i] = (double)sqrt(pow(tempX,2)+pow(tempY,2));
-		cout << "Ball" << i << ": " << ballsDist[i] << endl;
+		cout << "Ball" << i+1 << ": " << ballsDist[i] << endl;
 	}
+}
+
+void MovementAlgorithm::compareMultiBallDist() {
+	double temp;
+	int ballNum = 1;
+	temp = ballsDist[0];
+	for(int i = 0; i < ballsDist.size(); i++) {
+		if(temp > ballsDist[i]) {
+			temp = ballsDist[i];
+			ballNum = i+1;
+		}
+	}
+	cout << "Ball closest to the robot is ball" << ballNum << endl;
+	cout << "Ball" << ballNum << " has a distance of " << temp << " units." << endl;
 }
 /*vector<double> MovementAlgorithm::returnBallDist() {
 	return ballDist;

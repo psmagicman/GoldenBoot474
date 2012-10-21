@@ -56,6 +56,7 @@ private:
 	void checkAngle(double);
 	void calcball2obs();
 	void calcMultiBall();
+	void compareMultiBallDist();
 };
 
 #endif MOVEMENTALGORITHM_H_
