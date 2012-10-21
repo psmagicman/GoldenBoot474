@@ -29,6 +29,7 @@ MovementAlgorithm::MovementAlgorithm(Robot robot, vector<Ball> balls) {
 		cout << "X: " << algoBalls[j].x << " Y: " << algoBalls[j].y;
 		cout << " Rad: " << algoBalls[j].rad << endl;
 	}
+	calcMultiBall();
 }
 
 MovementAlgorithm::~MovementAlgorithm() {}
@@ -85,6 +86,19 @@ void MovementAlgorithm::calcball2obs() {
 	tempX = algoBall.x - algoObs.x;
 	tempY = algoBall.y - algoObs.y;
 	ball2obs = sqrt(pow(tempX,2)+pow(tempY,2));
+}
+
+// This method will calculate the distances of the balls from the robot
+// and save it into the ballsDist vector
+void MovementAlgorithm::calcMultiBall() {
+	double tempX, tempY;
+	ballsDist.resize(algoBalls.size());
+	for(int i = 0; i < ballsDist.size(); i++) {
+		tempX = (double)algoBalls[i].x - (double)algoRobot.x;
+		tempY = (double)algoBalls[i].y - (double)algoRobot.y;
+		ballsDist[i] = (double)sqrt(pow(tempX,2)+pow(tempY,2));
+		cout << "Ball" << i << ": " << ballsDist[i] << endl;
+	}
 }
 /*vector<double> MovementAlgorithm::returnBallDist() {
 	return ballDist;

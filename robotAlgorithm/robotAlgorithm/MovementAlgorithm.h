@@ -47,14 +47,15 @@ private:
 	vector<Ball> algoBalls;
 	//vector<Obstacle> algoObstacle;
 	vector<double> ballsDist;
-	/*vector<double> obsDist;
-	vector<double> obsRange;*/
+	//vector<double> obsDist;
+	//vector<double> obsRange;
 
 	void calcBallDist();
 	void calcObsRange();
 	void turnRobot2Ball();
 	void checkAngle(double);
 	void calcball2obs();
+	void calcMultiBall();
 };
 
 #endif MOVEMENTALGORITHM_H_
