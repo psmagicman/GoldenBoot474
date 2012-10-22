@@ -10,6 +10,26 @@
 #include <opencv\highgui.h>
 #include <opencv\cxcore.h>
 
+/* 
+	sending data to xbee masking
+	int i;
+	char bytes1[2];
+	bytes1[0] = i & 0xFF;
+	bytes1[1] = (i >> 8) & 0xFF;
+
+	int j;
+	char bytes2[2];
+	bytes2[0] = j & 0xFF;
+	bytes2[1] = (j >> 8) & 0xFF;
+
+	reassembling data in arduino
+	char bytes1[2];
+	char bytes2[2];
+	
+	int i = (bytes1[0] & (bytes1[1] << 8));
+	int j = (bytes2[0] & (bytes2[1] << 8));
+
+*/
 
 using namespace std;
 
