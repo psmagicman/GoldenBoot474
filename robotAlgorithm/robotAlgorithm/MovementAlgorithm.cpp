@@ -1,29 +1,30 @@
 /* MovementAlgorithm.cpp */
 /*
 	each rotation consists of 64 ticks
-	radius of wheel is 3.5cm
+	radius of wheel is 3.4cm
 	circumference of wheel / 64 will get me 1 tick
 	i.e. distance of ball to robot needs to be converted to ticks
 			FOR STRAIGHT DISTANCE
-			1 tick is approx. 0.34611696cm
-			if distance is 100cm then 288.91967 ticks
-			round this number up by 1 will get 289 ticks => 288.919967 + 1 then truncate to integer value
+			1 tick is approx. 0.333794219
+			if distance is 100cm then 299.5857756 ticks
+			round this number up by 1 will get 300 ticks => 299.5857756 + 1 then truncate to integer value
 
 			FOR TURNING DISTANCE with prototype build (12cm width from motor to motor)
 			3pi distance to turn 90 degrees total with both motors
-			to turn 90 degrees: 3pi/0.34611696 ticks are needed for right motor = 27.2300 => 28 ticks 
-								-3pi/0.34611696 ticks are needed for the left motor = -27.2300 => -28 ticks
+			to turn 90 degrees: 3pi/0.333794219 ticks are needed for right motor = 27.2300 => 28 ticks 
+								-3pi/0.333794219 ticks are needed for the left motor = -27.2300 => -28 ticks
 							if angle is negative give positive ticks to the left motor and negative ticks to the right motor
 							if angle is positive give positive ticks to the right motor and negative ticks to the left motor
-			to turn 5 degrees:	(pi/3)/0.34611696 ticks are needed for the right motor = 3.025559774 => 4 ticks
-								-(pi/3)/0.34611696 ticks are needed for the left motor = -3.025559774 => -4 ticks
+			to turn 5 degrees:	(pi/6)/0.333794219 ticks are needed for the right motor = 1.568627453 => 2 ticks
+								-(pi/6)/0.333794219 ticks are needed for the left motor = -1.568627453 => -2 ticks
 
 */
 #include "MovementAlgorithm.h"
 
 #define PI 3.14159265
-#define ONE_TICK 0.34611696
+#define ONE_TICK 0.333794219
 #define BOT_WIDTH 6
+//#define STOP_DISTANCE_CM 2
 
 /* Constructor */
 /*MovementAlgorithm::MovementAlgorithm(Robot robot, Ball ball, Obstacle obstacle) {
@@ -110,7 +111,11 @@ int MovementAlgorithm::calcForwardTicks() {
 
 int MovementAlgorithm::calcTurnTicks() {
 	double tempTick;
-	tempTick = (angle * (PI/180) * 2 * BOT_WIDTH) + 1.0;
+	tempTick = 2*PI*BOT_WIDTH;
+	tempTick = tempTick * angle / 360;
+	tempTick = tempTick / ONE_TICK;
+	tempTick = tempTick + 1.0;
+	cout << "tempTick = " << tempTick << endl;
 	if(tempTick > 0)
 		return (int)tempTick;
 	else
