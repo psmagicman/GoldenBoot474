@@ -130,7 +130,7 @@ void MovementAlgorithm::calcMultiBall() {
 		tempX = (double)algoBalls[i].x - (double)algoRobot.x;
 		tempY = (double)algoBalls[i].y - (double)algoRobot.y;
 		ballsDist[i] = (double)sqrt(pow(tempX,2)+pow(tempY,2));
-		cout << "Ball" << i+1 << ": " << ballsDist[i] << "cm."<< endl;
+		//cout << "Ball" << i+1 << ": " << ballsDist[i] << "cm."<< endl;
 	}
 }
 
@@ -145,10 +145,10 @@ void MovementAlgorithm::compareMultiBallDist() {
 		}
 	}
 	finalBallDist = temp;
-	cout << "Ball closest to the robot is ball" << ballNum << endl;
-	cout << "Ball" << ballNum << " has a distance of " << temp << "cm." << endl;
+	//cout << "Ball closest to the robot is ball" << ballNum << endl;
+	//cout << "Ball" << ballNum << " has a distance of " << temp << "cm." << endl;
 	calcMultiBallAngle(ballNum);
-	cout << "Robot needs to turn: " << angle << " degrees..." << endl;
+	//cout << "Robot needs to turn: " << angle << " degrees..." << endl;
 }
 
 void MovementAlgorithm::calcMultiBallAngle(int ballNum) {
