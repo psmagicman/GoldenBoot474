@@ -51,6 +51,8 @@ int main() {
 
 	MovementAlgorithm algos = MovementAlgorithm(robot, balls);
 
+	cout << "Left Ticks: " << algos.returnLeftMotor() << endl;
+	cout << "Right Ticks: " << algos.returnRightMotor() << endl;
 	//MovementAlgorithm algo = MovementAlgorithm(robot, ball, obstacle);
 	/*cout << endl << "Robot distance to ball: " << algo.returnBallDist() << endl;
 	cout << "Robot distance to obstacle: " << algo.returnObsDist() << endl;
