@@ -111,7 +111,10 @@ int MovementAlgorithm::calcForwardTicks() {
 int MovementAlgorithm::calcTurnTicks() {
 	double tempTick;
 	tempTick = (angle * (PI/180) * 2 * BOT_WIDTH) + 1.0;
-	return (int)tempTick;
+	if(tempTick > 0)
+		return (int)tempTick;
+	else
+		return -(int)tempTick;
 }
 
 /*void MovementAlgorithm::calcball2obs() {
@@ -130,7 +133,7 @@ void MovementAlgorithm::calcMultiBall() {
 		tempX = (double)algoBalls[i].x - (double)algoRobot.x;
 		tempY = (double)algoBalls[i].y - (double)algoRobot.y;
 		ballsDist[i] = (double)sqrt(pow(tempX,2)+pow(tempY,2));
-		//cout << "Ball" << i+1 << ": " << ballsDist[i] << "cm."<< endl;
+		cout << "Ball" << i+1 << ": " << ballsDist[i] << "cm."<< endl;
 	}
 }
 
@@ -145,10 +148,10 @@ void MovementAlgorithm::compareMultiBallDist() {
 		}
 	}
 	finalBallDist = temp;
-	//cout << "Ball closest to the robot is ball" << ballNum << endl;
-	//cout << "Ball" << ballNum << " has a distance of " << temp << "cm." << endl;
+	cout << "Ball closest to the robot is ball" << ballNum << endl;
+	cout << "Ball" << ballNum << " has a distance of " << temp << "cm." << endl;
 	calcMultiBallAngle(ballNum);
-	//cout << "Robot needs to turn: " << angle << " degrees..." << endl;
+	cout << "Robot needs to turn: " << angle << " degrees..." << endl;
 }
 
 void MovementAlgorithm::calcMultiBallAngle(int ballNum) {
