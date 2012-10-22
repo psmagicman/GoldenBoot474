@@ -1,5 +1,24 @@
 /* MovementAlgorithm.cpp */
+/*
+	each rotation consists of 64 ticks
+	radius of wheel is 3.5cm
+	circumference of wheel / 64 will get me 1 tick
+	i.e. distance of ball to robot needs to be converted to ticks
+			FOR STRAIGHT DISTANCE
+			1 tick is approx. 0.34611696cm
+			if distance is 100cm then 288.91967 ticks
+			round this number up by 1 will get 289 ticks => 288.919967 + 1 then truncate to integer value
 
+			FOR TURNING DISTANCE with prototype build (12cm width from motor to motor)
+			3pi distance to turn 90 degrees total with both motors
+			to turn 90 degrees: 3pi/0.34611696 ticks are needed for right motor = 27.2300 => 28 ticks 
+								-3pi/0.34611696 ticks are needed for the left motor = -27.2300 => -28 ticks
+							if angle is negative give positive ticks to the left motor and negative ticks to the right motor
+							if angle is positive give positive ticks to the right motor and negative ticks to the left motor
+			to turn 5 degrees:	(pi/3)/0.34611696 ticks are needed for the right motor = 3.025559774 => 4 ticks
+								-(pi/3)/0.34611696 ticks are needed for the left motor = -3.025559774 => -4 ticks
+
+*/
 #include "MovementAlgorithm.h"
 
 #define PI 3.14159265
@@ -25,11 +44,7 @@ MovementAlgorithm::MovementAlgorithm(Robot robot, vector<Ball> balls) {
 		algoBalls[i].y = balls[i].y;
 		algoBalls[i].rad = balls[i].rad;
 	}
-	/*for(int j = 0; j < algoBalls.size(); j++) {
-		cout << "Ball" << j << ": ";
-		cout << "X: " << algoBalls[j].x << " Y: " << algoBalls[j].y;
-		cout << " Rad: " << algoBalls[j].rad << endl;
-	}*/
+
 	calcMultiBall();
 	compareMultiBallDist();
 }
@@ -74,8 +89,6 @@ void MovementAlgorithm::checkAngle(double botAngle) {
 	if(angle == botAngle){
 		moveFlag = 1;
 		turnFlag = 0;
-		rightMotor = 3;
-		leftMotor = 3;
 	}
 	else {
 		moveFlag = 0;
@@ -115,6 +128,16 @@ void MovementAlgorithm::compareMultiBallDist() {
 	}
 	cout << "Ball closest to the robot is ball" << ballNum << endl;
 	cout << "Ball" << ballNum << " has a distance of " << temp << " units." << endl;
+	calcMultiBallAngle(ballNum);
+	cout << "Robot needs to turn: " << angle << " degrees..." << endl;
+}
+
+void MovementAlgorithm::calcMultiBallAngle(int ballNum) {
+	int actualBall = ballNum - 1;
+	double x, y;
+	x = algoBalls[actualBall].x - algoRobot.x;
+	y = algoBalls[actualBall].y - algoRobot.y;
+	angle = atan2(y, x) * 180 / PI;
 }
 /*vector<double> MovementAlgorithm::returnBallDist() {
 	return ballDist;
