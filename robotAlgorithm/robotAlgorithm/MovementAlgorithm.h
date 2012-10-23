@@ -25,8 +25,10 @@ public:
 	//double returnball2obs();
 	bool returnMoveFlag();
 	bool returnTurnFlag();
-	int returnRightMotor();
-	int returnLeftMotor();
+	vector<int> returnRightMotor();
+	vector<int> returnLeftMotor();
+	int returnLeftSize();
+	int returnRightSize();
 	/*vector<double> returnBallDist();
 	vector<double> returnObsDist();*/
 	
@@ -42,8 +44,8 @@ private:
 	bool moveFlag;
 	bool turnFlag;
 
-	int rightMotor;
-	int leftMotor;
+	vector<int> rightMotor;
+	vector<int> leftMotor;
 	int ticks;
 	vector<Ball> algoBalls;
 	//vector<Obstacle> algoObstacle;

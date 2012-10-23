@@ -70,9 +70,16 @@ int main() {
 	}
 
 	MovementAlgorithm algos = MovementAlgorithm(robot, balls);
-
-	cout << "Left Ticks: " << algos.returnLeftMotor() << endl;
-	cout << "Right Ticks: " << algos.returnRightMotor() << endl;
+	int szMotorsLeft = algos.returnLeftSize();
+	int szMotorsRight = algos.returnRightSize();
+	if(szMotorsRight == szMotorsLeft)
+		cout << "szMotorsRight == szMotorsLeft" << endl;
+	else
+		cout << "szMotorsRight =/= szMotorsLeft" << endl;
+	for(int i = 0; i < szMotorsRight; i++) {
+		cout << "Left Ticks: " << algos.returnLeftMotor()[i] << endl;
+		cout << "Right Ticks: " << algos.returnRightMotor()[i] << endl;
+	}
 	//MovementAlgorithm algo = MovementAlgorithm(robot, ball, obstacle);
 	/*cout << endl << "Robot distance to ball: " << algo.returnBallDist() << endl;
 	cout << "Robot distance to obstacle: " << algo.returnObsDist() << endl;

@@ -63,8 +63,10 @@ double MovementAlgorithm::returnBotAngle() { return algoRobot.angle; }
 //double MovementAlgorithm::returnball2obs() { return ball2obs; }
 bool MovementAlgorithm::returnMoveFlag() { return moveFlag; }
 bool MovementAlgorithm::returnTurnFlag() { return turnFlag; }
-int MovementAlgorithm::returnRightMotor() { return rightMotor; }
-int MovementAlgorithm::returnLeftMotor() { return leftMotor; }
+vector<int> MovementAlgorithm::returnRightMotor() { return rightMotor; }
+vector<int> MovementAlgorithm::returnLeftMotor() { return leftMotor; }
+int MovementAlgorithm::returnLeftSize() { return leftMotor.size(); }
+int MovementAlgorithm::returnRightSize() { return rightMotor.size(); }
 
 /*void MovementAlgorithm::calcObsRange() {
 	double tempX, tempY;
@@ -84,8 +86,8 @@ void MovementAlgorithm::checkAngle(double botAngle) {
 
 void MovementAlgorithm::determineForward() {
 	ticks = calcForwardTicks();
-	leftMotor = ticks;
-	rightMotor = ticks;
+	leftMotor.push_back(ticks);
+	rightMotor.push_back(ticks);
 }
 
 // This method will determine which motor will receive positive ticks 
@@ -94,12 +96,12 @@ void MovementAlgorithm::determineTurning() {
 	ticks = calcTurnTicks();
 	if(angle < 0 ) {
 		// left gets positive ticks
-		leftMotor = ticks;
-		rightMotor = -ticks;
+		leftMotor.push_back(ticks);
+		rightMotor.push_back(-ticks);
 	}
 	else {
-		leftMotor = -ticks;
-		rightMotor = ticks;
+		leftMotor.push_back(-ticks);
+		rightMotor.push_back(ticks);
 	}
 }
 
@@ -116,10 +118,7 @@ int MovementAlgorithm::calcTurnTicks() {
 	tempTick = tempTick / ONE_TICK;
 	tempTick = tempTick + 1.0;
 	cout << "tempTick = " << tempTick << endl;
-	if(tempTick > 0)
-		return (int)tempTick;
-	else
-		return -(int)tempTick;
+	return (int)abs(tempTick);
 }
 
 /*void MovementAlgorithm::calcball2obs() {
