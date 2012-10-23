@@ -80,8 +80,10 @@ int MovementAlgorithm::returnRightSize() { return rightMotor.size(); }
 void MovementAlgorithm::checkAngle(double botAngle) {
 	if(botAngle > (angle-3) && botAngle < (angle+3))
 		determineForward();
-	else 
+	else {
 		determineTurning();
+		determineForward();
+	}
 }
 
 void MovementAlgorithm::determineForward() {
