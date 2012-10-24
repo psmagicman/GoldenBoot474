@@ -25,13 +25,14 @@ public:
 	//double returnball2obs();
 	bool returnMoveFlag();
 	bool returnTurnFlag();
-	int returnRightMotor();
-	int returnLeftMotor();
+	vector<int> returnRightMotor();
+	vector<int> returnLeftMotor();
+	int returnLeftSize();
+	int returnRightSize();
 	/*vector<double> returnBallDist();
 	vector<double> returnObsDist();*/
-
-	double getX() {return _closestX;};
-	double getY() {return _closestY;};
+	double getX() {return _X;};
+	double getY() {return _Y;};
 	
 private:
 	Robot algoRobot;
@@ -44,12 +45,11 @@ private:
 	double ball2obs;
 	bool moveFlag;
 	bool turnFlag;
+	double _X;
+	double _Y;
 
-	double _closestX;
-	double _closestY;
-
-	int rightMotor;
-	int leftMotor;
+	vector<int> rightMotor;
+	vector<int> leftMotor;
 	int ticks;
 	vector<Ball> algoBalls;
 	//vector<Obstacle> algoObstacle;

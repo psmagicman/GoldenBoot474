@@ -39,6 +39,7 @@ public:
 	vector<Point2f> getBalls() {return _realBallPts;};
 	vector<Point2f> getObstacles() {return _realObstaclesPts;};
 	vector<Point2f> getRobots() {return _realRobotPts;};
+	double getRobotAngle() {return _robotAngle;};
 	
 	void release();
 
@@ -89,6 +90,7 @@ private:
 	vector<CvPoint> _ballPts;
 	vector<CvPoint> _obstaclesPts;
 	vector<CvPoint> _robotPts;
+	double _robotAngle;
 
 	vector<Point2f> _realBallPts;
 	vector<Point2f> _realObstaclesPts;

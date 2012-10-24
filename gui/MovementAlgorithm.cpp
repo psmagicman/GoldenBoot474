@@ -1,11 +1,11 @@
 /* MovementAlgorithm.cpp */
 /*
 	each rotation consists of 64 ticks
-	radius of wheel is 3.4cm , 0.111549ft
+	radius of wheel is 3.4cm
 	circumference of wheel / 64 will get me 1 tick
 	i.e. distance of ball to robot needs to be converted to ticks
 			FOR STRAIGHT DISTANCE
-			1 tick is approx. 0.333794219cm ; 0.0109513ft
+			1 tick is approx. 0.333794219
 			if distance is 100cm then 299.5857756 ticks
 			round this number up by 1 will get 300 ticks => 299.5857756 + 1 then truncate to integer value
 
@@ -22,8 +22,8 @@
 #include "MovementAlgorithm.h"
 
 #define PI 3.14159265
-#define ONE_TICK 0.0109513
-#define BOT_WIDTH 0.19685
+#define ONE_TICK 0.333794219
+#define BOT_WIDTH 6
 //#define STOP_DISTANCE_CM 2
 
 /* Constructor */
@@ -63,8 +63,10 @@ double MovementAlgorithm::returnBotAngle() { return algoRobot.angle; }
 //double MovementAlgorithm::returnball2obs() { return ball2obs; }
 bool MovementAlgorithm::returnMoveFlag() { return moveFlag; }
 bool MovementAlgorithm::returnTurnFlag() { return turnFlag; }
-int MovementAlgorithm::returnRightMotor() { return rightMotor; }
-int MovementAlgorithm::returnLeftMotor() { return leftMotor; }
+vector<int> MovementAlgorithm::returnRightMotor() { return rightMotor; }
+vector<int> MovementAlgorithm::returnLeftMotor() { return leftMotor; }
+int MovementAlgorithm::returnLeftSize() { return leftMotor.size(); }
+int MovementAlgorithm::returnRightSize() { return rightMotor.size(); }
 
 /*void MovementAlgorithm::calcObsRange() {
 	double tempX, tempY;
@@ -78,14 +80,16 @@ int MovementAlgorithm::returnLeftMotor() { return leftMotor; }
 void MovementAlgorithm::checkAngle(double botAngle) {
 	if(botAngle > (angle-3) && botAngle < (angle+3))
 		determineForward();
-	else 
+	else {
 		determineTurning();
+		determineForward();
+	}
 }
 
 void MovementAlgorithm::determineForward() {
 	ticks = calcForwardTicks();
-	leftMotor = ticks;
-	rightMotor = ticks;
+	leftMotor.push_back(ticks);
+	rightMotor.push_back(ticks);
 }
 
 // This method will determine which motor will receive positive ticks 
@@ -94,12 +98,12 @@ void MovementAlgorithm::determineTurning() {
 	ticks = calcTurnTicks();
 	if(angle < 0 ) {
 		// left gets positive ticks
-		leftMotor = ticks;
-		rightMotor = -ticks;
+		leftMotor.push_back(ticks);
+		rightMotor.push_back(-ticks);
 	}
 	else {
-		leftMotor = -ticks;
-		rightMotor = ticks;
+		leftMotor.push_back(-ticks);
+		rightMotor.push_back(ticks);
 	}
 }
 
@@ -115,8 +119,8 @@ int MovementAlgorithm::calcTurnTicks() {
 	tempTick = tempTick * angle / 360;
 	tempTick = tempTick / ONE_TICK;
 	tempTick = tempTick + 1.0;
-	//cout << "tempTick = " << tempTick << endl;s
-	return abs(tempTick);
+	cout << "tempTick = " << tempTick << endl;
+	return (int)abs(tempTick);
 }
 
 /*void MovementAlgorithm::calcball2obs() {
@@ -135,7 +139,7 @@ void MovementAlgorithm::calcMultiBall() {
 		tempX = (double)algoBalls[i].x - (double)algoRobot.x;
 		tempY = (double)algoBalls[i].y - (double)algoRobot.y;
 		ballsDist[i] = (double)sqrt(pow(tempX,2)+pow(tempY,2));
-		//cout << "Ball" << i+1 << ": " << ballsDist[i] << "cm."<< endl;
+		cout << "Ball" << i+1 << ": " << ballsDist[i] << "cm."<< endl;
 	}
 }
 
@@ -149,13 +153,13 @@ void MovementAlgorithm::compareMultiBallDist() {
 			ballNum = i+1;
 		}
 	}
-	_closestX = algoBalls[ballNum-1].x;
-	_closestY = algoBalls[ballNum-1].y;
+	_X = algoBalls[ballNum-1].x;
+	_Y = algoBalls[ballNum-1].y;
 	finalBallDist = temp;
-	//cout << "Ball closest to the robot is ball" << ballNum << endl;
-	//cout << "Ball" << ballNum << " has a distance of " << temp << "cm." << endl;
+	cout << "Ball closest to the robot is ball" << ballNum << endl;
+	cout << "Ball" << ballNum << " has a distance of " << temp << "cm." << endl;
 	calcMultiBallAngle(ballNum);
-	//cout << "Robot needs to turn: " << angle << " degrees..." << endl;
+	cout << "Robot needs to turn: " << angle << " degrees..." << endl;
 }
 
 void MovementAlgorithm::calcMultiBallAngle(int ballNum) {

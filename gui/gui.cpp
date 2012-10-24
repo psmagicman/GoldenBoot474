@@ -102,17 +102,18 @@ void GUI::display()
 				Robot robotCM;
 				robotCM.x = (double)robotFT[0].x / (double)FINAL_WIDTH * 8.0;
 				robotCM.y = (double)robotFT[0].y / (double)FINAL_HEIGHT * 8.0;
-				robotCM.angle = 0;
+				robotCM.angle = _cam1->getRobotAngle();
 				for (int i = 0; i < ballsFT.size(); i++) {
 					ballsCM[i].x = (double)ballsFT[i].x / (double)400.0 * 8.0;
 					ballsCM[i].y = (double)ballsFT[i].y / (double)FINAL_HEIGHT * 8.0;
 				}
 				MovementAlgorithm _algorithm = MovementAlgorithm(robotCM, ballsCM);
-				int right = _algorithm.returnRightMotor();
-				int left = _algorithm.returnLeftMotor();
 				testX = _algorithm.getX();
 				testY = _algorithm.getY();
 			}
+			_balls = ballsFT;
+			_robot = robotFT;
+			_obstacles = obstaclesFT;
 		
 			// Draw on Main
 			QImage qimage = QImage(FINAL_WIDTH, FINAL_HEIGHT, QImage::Format_RGB888);
@@ -129,9 +130,13 @@ void GUI::display()
 				p.setPen(QPen(QColor(Qt::green),5));
 				p.drawArc(_balls[i].x-_ballRadius, _balls[i].y-_ballRadius, _ballRadius*2, _ballRadius*2, 0, 16*360);
 			}
-			for (int i = 0; i < _robot.size(); i++) {
+			if (_robot.size() > 0) {
 				p.setPen(QPen(QColor(Qt::blue),5));
-				p.drawArc(_robot[i].x-_robotRadius, _robot[i].y-_robotRadius, _robotRadius*2, _robotRadius*2, 0, 16*360);
+				p.drawArc(_robot[0].x-_robotRadius, _robot[0].y-_robotRadius, _robotRadius*2, _robotRadius*2, 0, 16*360);
+				if (_robot.size() > 1) {
+					p.setPen(QPen(QColor(Qt::green),5));
+					p.drawLine(_robot[0].x, _robot[0].y, _robot[1].x, _robot[1].y);
+				}
 			}
 			for (int i = 0; i < _obstacles.size(); i++) {
 				p.setPen(QPen(QColor(Qt::red),5));

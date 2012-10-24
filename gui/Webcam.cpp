@@ -43,8 +43,8 @@ void Webcam::init()
 
 bool Webcam::capture()
 {
-	//_normal = cvQueryFrame(_capture);
-	_normal = cvLoadImage("test.jpg", CV_LOAD_IMAGE_COLOR);
+	_normal = cvQueryFrame(_capture);
+	//_normal = cvLoadImage("test.jpg", CV_LOAD_IMAGE_COLOR);
 	if (_normal) cvCvtColor(_normal, _hsv, CV_BGR2HSV);
 	if (_normal && _hsv) {
 		_storage = cvCreateMemStorage(0);
@@ -247,32 +247,59 @@ void Webcam::calculateNormal(bool arena, bool balls, bool obstacles, bool robot,
 	}
 
 	if (robot) {
-		calculateThreshold(3);
-		CvSeq * contours;
-		cvFindContours(_threshold, _storage, &contours, sizeof(CvContour), CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE, cvPoint(0,0));
 		_robotPts.clear();
-		vector<double> contourCenterX;
-		vector<double> contourCenterY;
-		for (;contours != 0; contours = contours->h_next)
+
+		// Find Front of Robot
+		cvInRangeS(_hsv, _robotMin1, _robotMax1, _threshold);
+		CvSeq * contoursFront;
+		cvFindContours(_threshold, _storage, &contoursFront, sizeof(CvContour), CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE, cvPoint(0,0));
+		vector<double> contourFrontX;
+		vector<double> contourFrontY;
+		for (;contoursFront != 0; contoursFront = contoursFront->h_next)
 		{
-			if (cvContourArea(contours) > 300) {
-				if (draw) cvDrawContours(_normal, contours, CV_RGB(255,0,0), CV_RGB(255,0,0), -1, 1, 8, cvPoint(0,0));
+			if (cvContourArea(contoursFront) > 300) {
+				if (draw) cvDrawContours(_normal, contoursFront, CV_RGB(255,0,0), CV_RGB(255,0,0), -1, 1, 8, cvPoint(0,0));
 				CvMoments moment;
-				cvMoments(contours, &moment, 0);
+				cvMoments(contoursFront, &moment, 0);
 				double m_00 = cvGetSpatialMoment( &moment, 0, 0);
 				double m_10 = cvGetSpatialMoment( &moment, 1, 0);
 				double m_01 = cvGetSpatialMoment( &moment, 0, 1);
-				contourCenterX.push_back(m_10/m_00);
-				contourCenterY.push_back(m_01/m_00);
+				contourFrontX.push_back(m_10/m_00);
+				contourFrontY.push_back(m_01/m_00);
 			}
 		}
-		if (contourCenterX.size() > 1) {
-			for (int i = 0; i < contourCenterX.size(); i++) {
-				for (int j = 0; j < contourCenterX.size(); j++) {
-					double dist = sqrtf(pow(contourCenterX[i] - contourCenterX[j],2) + pow(contourCenterY[i] - contourCenterY[j],2));
-					if ( i != j && dist < 1000) {
-						_robotPts.push_back(cvPoint((contourCenterX[i]+contourCenterX[j])/2, (contourCenterY[i]+contourCenterY[j])/2));
-						if (draw) cvCircle(_normal, _robotPts.back(), 1, CV_RGB(255,0,0));
+		
+		// Find Back of Robot
+		CvSeq * contoursBack;
+		cvInRangeS(_hsv, _robotMin2, _robotMax2, _threshold);
+		cvFindContours(_threshold, _storage, &contoursBack, sizeof(CvContour), CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE, cvPoint(0,0));
+		vector<double> contourBackX;
+		vector<double> contourBackY;
+		for (;contoursBack != 0; contoursBack = contoursBack->h_next)
+		{
+			if (cvContourArea(contoursBack) > 300) {
+				if (draw) cvDrawContours(_normal, contoursBack, CV_RGB(255,0,0), CV_RGB(255,0,0), -1, 1, 8, cvPoint(0,0));
+				CvMoments moment;
+				cvMoments(contoursBack, &moment, 0);
+				double m_00 = cvGetSpatialMoment( &moment, 0, 0);
+				double m_10 = cvGetSpatialMoment( &moment, 1, 0);
+				double m_01 = cvGetSpatialMoment( &moment, 0, 1);
+				contourBackX.push_back(m_10/m_00);
+				contourBackY.push_back(m_01/m_00);
+			}
+		}
+
+		if (contourFrontX.size() && contourBackX.size()) {
+			for (int i = 0; i < contourFrontX.size(); i++) {
+				for (int j = 0; j < contourBackX.size(); j++) {
+					double dist = sqrtf(pow(contourFrontX[i] - contourBackX[j],2) + pow(contourFrontX[i] - contourBackX[j],2));
+					if (dist < 500) {
+						_robotPts.push_back(cvPoint((contourFrontX[i]+contourBackX[j])/2, (contourFrontY[i]+contourBackY[j])/2));
+						_robotPts.push_back(cvPoint(contourFrontX[i], contourFrontY[i]));
+						if (draw) {
+							cvCircle(_normal, _robotPts[0], 1, CV_RGB(255,0,0));
+							cvCircle(_normal, _robotPts[1], 1, CV_RGB(255,0,0));
+						}
 					}
 				}
 			}
@@ -365,8 +392,10 @@ IplImage * Webcam::getFinal()
 			_realRobotPts.push_back(cvPoint(0,0));
 		}
 		perspectiveTransform((Mat)camRobotPts, (Mat)_realRobotPts, _homography);
-		for (int i = 0; i < _realRobotPts.size(); i++) {
-			cvCircle(_final, _realRobotPts[i], _robotRadius, CV_RGB(0,0,255), 2, 8, 0);
+		if (_realRobotPts.size() == 2) {
+			cvCircle(_final, _realRobotPts[0], _robotRadius, CV_RGB(0,0,255), 2, 8, 0);
+			cvCircle(_final, _realRobotPts[1], _robotRadius, CV_RGB(0,0,128), 2, 8, 0);
+			_robotAngle = atan((_realRobotPts[1].y - _realRobotPts[0].y)/(_realRobotPts[1].x - _realRobotPts[0].x)) ;
 		}
 
 		_realObstaclesPts.clear();
