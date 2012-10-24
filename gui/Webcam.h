@@ -21,21 +21,24 @@ public:
 	Webcam(int ID);
 	~Webcam();
 	
-	void undistort();
 	void calibrate(int index);
-	void clearCalibrate();
+	void beginCalibrate();
 	void finishCalibrate();
-	bool isCalibrated();
-	void reset();
+	bool isCalibrated() {return _calibrated;};
+	void resetCalibrate();
 
-	void calculateNormal(bool arena, bool balls, bool obstacles, bool robot);
+	void calculateNormal(bool arena, bool balls, bool obstacles, bool robot, bool draw = false);
 	void calculateThreshold(int type);
 
 	bool capture();
-	IplImage * getNormal();
-	IplImage * getHSV();
-	IplImage * getThreshold();
+	IplImage * getNormal() {return _normal;};
+	IplImage * getHSV() {return _hsv;};
+	IplImage * getThreshold() {return _threshold;};
 	IplImage * getFinal();
+
+	vector<Point2f> getBalls() {return _realBallPts;};
+	vector<Point2f> getObstacles() {return _realObstaclesPts;};
+	vector<Point2f> getRobots() {return _realRobotPts;};
 	
 	void release();
 
@@ -50,22 +53,25 @@ private:
 	IplImage * _normal;
 	IplImage * _hsv;
 	IplImage * _threshold;
-
 	IplImage * _final;
+
+	IplImage * _threshold1;
+	IplImage * _threshold2;
 
 	CvScalar _arenaMin;
 	CvScalar _arenaMax;
 	CvScalar _ballMin;
 	CvScalar _ballMax;
-	CvScalar _obstaclesMin;
-	CvScalar _obstaclesMax;
-	CvScalar _robotMin;
-	CvScalar _robotMax;
+	CvScalar _obstaclesMin1;
+	CvScalar _obstaclesMax1;
+	CvScalar _obstaclesMin2;
+	CvScalar _obstaclesMax2;
+	CvScalar _robotMin1;
+	CvScalar _robotMax1;
+	CvScalar _robotMin2;
+	CvScalar _robotMax2;
 
-	CvMat * _perspectiveMat;
 	Mat _homography;
-	CvPoint2D32f* _c1;
-	CvPoint2D32f* _c2;
 	
 	// Calibration Variables
 	bool _calibrated;
@@ -79,20 +85,16 @@ private:
 	int * botRightYarray;
 	map<string, CvPoint> topPts;
 	map<string, CvPoint> botPts;
-	vector<CvPoint> _ballPts;
 
-	double _topLen;
-	double _Xratio;
-	double _Yratio;
-	double _Y_A;
-	double _Y_B;
-	double _Y_C;
-	int _Xcenter;
-	int _Ycenter;
+	vector<CvPoint> _ballPts;
+	vector<CvPoint> _obstaclesPts;
+	vector<CvPoint> _robotPts;
+
+	vector<Point2f> _realBallPts;
+	vector<Point2f> _realObstaclesPts;
+	vector<Point2f> _realRobotPts;
 
 	void init();
-	int convertX(int X, int Y);
-	int convertY(int Y);
 
 	void QuickSort(int* array, int startIndex, int endIndex);
 	int SplitArray(int* array, int pivotValue, int startIndex, int endIndex);

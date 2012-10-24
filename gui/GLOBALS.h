@@ -6,43 +6,87 @@
 #define FINAL_WIDTH 400
 #define FINAL_HEIGHT 400
 
-const int _numOfWebcams = 2;
-const int calibrationSize = 100;
+#define FT_TO_CM 30.48
+
+#define BAUD_RATE 57600
+
+extern const int _numOfWebcams;
+extern const int calibrationSize;
+
+extern const double _ballRadius;
+extern const double _robotRadius;
+extern const double _obstacleRadius;
 
 // Arena
-const double arenaHmin = 0;
-const double arenaSmin = 0;
-const double arenaVmin = 0;
+extern double arenaHmin;
+extern double arenaSmin;
+extern double arenaVmin;
 
-const double arenaHmax = 256;
-const double arenaSmax = 256;
-const double arenaVmax = 75;
+extern double arenaHmax;
+extern double arenaSmax;
+extern double arenaVmax;
 
 // Ball
-const double ballHmin = 32;
-const double ballSmin = 75;
-const double ballVmin = 75;
+extern double ballHmin;
+extern double ballSmin;
+extern double ballVmin;
 
-const double ballHmax = 40;
-const double ballSmax = 255;
-const double ballVmax = 255;
+extern double ballHmax;
+extern double ballSmax;
+extern double ballVmax;
 
-// Obstacles
-const double obstaclesHmin = 32;
-const double obstaclesSmin = 75;
-const double obstaclesVmin = 75;
+// Obstacles - BLUE
+extern double obstaclesHmin1;
+extern double obstaclesSmin1;
+extern double obstaclesVmin1;
 
-const double obstaclesHmax = 40;
-const double obstaclesSmax = 255;
-const double obstaclesVmax = 255;
+extern double obstaclesHmax1;
+extern double obstaclesSmax1;
+extern double obstaclesVmax1;
 
-// Robot
-const double robotHmin = 32;
-const double robotSmin = 75;
-const double robotVmin = 75;
+// Obstacles - YELLOW
+extern double obstaclesHmin2;
+extern double obstaclesSmin2;
+extern double obstaclesVmin2;
 
-const double robotHmax = 40;
-const double robotSmax = 255;
-const double robotVmax = 255;
+extern double obstaclesHmax2;
+extern double obstaclesSmax2;
+extern double obstaclesVmax2;
+
+// Robot - RED
+extern double robotHmin1;
+extern double robotSmin1;
+extern double robotVmin1;
+
+extern double robotHmax1;
+extern double robotSmax1;
+extern double robotVmax1;
+
+// Robot - GREEN
+extern double robotHmin2;
+extern double robotSmin2;
+extern double robotVmin2;
+
+extern double robotHmax2;
+extern double robotSmax2;
+extern double robotVmax2;
+
+struct Robot {
+	double x;
+	double y;
+	double angle;
+};
+
+struct Ball {
+	double x;
+	double y;
+	int rad;
+};
+
+struct Obstacle {
+	double x;
+	double y;
+	int rad;
+};
 
 #endif

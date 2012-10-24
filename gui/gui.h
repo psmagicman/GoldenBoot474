@@ -9,7 +9,7 @@
 #include <QtGui>
 #include "ui_gui.h"
 
-
+#include "MovementAlgorithm.h"
 #include "Webcam.h"
 
 class GUI : public QMainWindow
@@ -40,9 +40,13 @@ private:
 	IplImage * _image;
 	IplImage * _topImage;
 
+	vector<Point2f> _balls;
+	vector<Point2f> _obstacles;
+	vector<Point2f> _robot;
+
 	void init();
 	void displayImage(IplImage * webcamFeed, QLabel * location, int type = 0);
-	void displayFinal();
+	void displayFinal(IplImage * webcamFeed, QLabel * location);
 	void log(QString text);
 };
 
