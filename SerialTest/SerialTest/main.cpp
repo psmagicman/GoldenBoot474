@@ -1,40 +1,27 @@
 #include "Serial.h"
-#include <iostream>
+#include <stdio.h>
 #include <assert.h>
+#include <Windows.h>
 
-using namespace std;
 
 int main() {
-	/*int i = 100;
-	char bytes1[2];
-	bytes1[0] = i & 0xFF;
-	bytes1[1] = (i >> 8) & 0xFF;*/
-
 	CSerial serial;
-
-	//cout << "3,57600: " << serial.Open(3, 57600) << endl;
-	if(serial.Open(3, 57600)) {
-		int i = 100;
-		char bytes[2];
-		bytes[0] = i & 0xFF;
-		bytes[1] = (i >> 8) & 0xFF;
-		int j = -i;
-		char bytes2[2];
-		bytes2[0] = j & 0xFF;
-		bytes2[1] = (j >> 8) & 0xFF;
-		int nBytesSent = serial.SendData(bytes, strlen(bytes));
-		int nBytesSent2 = serial.SendData(bytes2, strlen(bytes2));
-		assert(nBytesSent == strlen(bytes));
-		assert(nBytesSent2 == strlen(bytes2));
-		cout << "i = " << i << endl;
-		cout << "Number of bytes sent: " << nBytesSent << endl;
-		cout << "bytes[0]: " << bytes[0] << " bytes[1]: " << bytes[1] << endl;
-		cout << "j = " << j << endl;
-		cout << "Number of bytes sent 2: " << nBytesSent2 << endl;
-		cout << "bytes2[0]: " << bytes2[0] << " bytes2[1]: " << bytes2[1] << endl;
+	if(serial.Open(4, 9600)) {
+		const char* buffer = new char[8];
+		buffer = "Hello";
+		int nBytesSent = serial.SendData(buffer, strlen(buffer));
+		assert(nBytesSent == strlen(buffer));
+		printf("buffer = %s\n", buffer);
+		Sleep(10000);
+		char* lpBuffer = new char[8];
+		int nBytesRead = serial.ReadData(lpBuffer, 8);
+		printf("nBytesRead = %d\n", nBytesRead);
+		printf("lpBuffer = %s\n", lpBuffer);
+		delete []lpBuffer;
 	}
 	else
-		cout << "Error" << endl;
+		printf("Error\n");
+
 	system("PAUSE");
 	return 0;
 }
