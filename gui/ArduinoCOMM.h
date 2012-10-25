@@ -1,18 +1,20 @@
 #ifndef ARDUINOCOMM
 #define ARDUINOCOMM
 
-#include "GLOBALS.h"
+#include <QtGui>
 
-using namespace System;
-using namespace System::IO:Ports;
+#include "GLOBALS.h"
 
 class ArduinoCOMM{
 public:
-	ArduinoCOMM();
+	ArduinoCOMM(QString path);
 	~ArduinoCOMM();
 
+	void write(char * output);
+	QString read();
+
 private:
-	
-}
+	QProcess _arduino;
+};
 
 #endif

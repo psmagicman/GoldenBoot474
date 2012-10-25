@@ -212,7 +212,7 @@ void Webcam::calculateNormal(bool arena, bool balls, bool obstacles, bool robot,
 		_ballPts.clear();
 		for (;contours != 0; contours = contours->h_next)
 		{
-			if (cvContourArea(contours) > 200 && cvContourArea(contours) < 1200) {
+			if (cvContourArea(contours) > 400 && cvContourArea(contours) < 1200) {
 				CvMoments moment;
 				cvMoments(contours, &moment, 0);
 				double m_00 = cvGetSpatialMoment( &moment, 0, 0);
@@ -257,7 +257,7 @@ void Webcam::calculateNormal(bool arena, bool balls, bool obstacles, bool robot,
 		vector<double> contourFrontY;
 		for (;contoursFront != 0; contoursFront = contoursFront->h_next)
 		{
-			if (cvContourArea(contoursFront) > 300) {
+			if (cvContourArea(contoursFront) > 100) {
 				if (draw) cvDrawContours(_normal, contoursFront, CV_RGB(255,0,0), CV_RGB(255,0,0), -1, 1, 8, cvPoint(0,0));
 				CvMoments moment;
 				cvMoments(contoursFront, &moment, 0);
@@ -277,7 +277,7 @@ void Webcam::calculateNormal(bool arena, bool balls, bool obstacles, bool robot,
 		vector<double> contourBackY;
 		for (;contoursBack != 0; contoursBack = contoursBack->h_next)
 		{
-			if (cvContourArea(contoursBack) > 300) {
+			if (cvContourArea(contoursBack) > 100) {
 				if (draw) cvDrawContours(_normal, contoursBack, CV_RGB(255,0,0), CV_RGB(255,0,0), -1, 1, 8, cvPoint(0,0));
 				CvMoments moment;
 				cvMoments(contoursBack, &moment, 0);

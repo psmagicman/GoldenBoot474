@@ -22,8 +22,9 @@
 #include "MovementAlgorithm.h"
 
 #define PI 3.14159265
-#define ONE_TICK 0.333794219
-#define BOT_WIDTH 6
+//#define ONE_TICK 0.333794219
+#define ONE_TICK 0.0113
+#define BOT_WIDTH 0.1968504
 //#define STOP_DISTANCE_CM 2
 
 /* Constructor */

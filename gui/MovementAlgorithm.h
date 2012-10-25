@@ -31,6 +31,7 @@ public:
 	int returnRightSize();
 	/*vector<double> returnBallDist();
 	vector<double> returnObsDist();*/
+
 	double getX() {return _X;};
 	double getY() {return _Y;};
 	

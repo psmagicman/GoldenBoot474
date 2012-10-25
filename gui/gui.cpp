@@ -5,14 +5,21 @@ GUI::GUI(QWidget *parent, Qt::WFlags flags)
 {
 	ui.setupUi(this);
 	
-	init();
-
+	/*
+	QStringList arguments;
+	arguments << "-100" << "100";
+	_test.execute("C:/Users/Wilbur/Desktop/GoldenBoot474/Debug/SerialTest.exe", arguments);
+	_test.waitForFinished();
+	_test.close();
+	*/
 	// Start Recording!
+	init();
 	_timer->start(50);
 }
 
 GUI::~GUI()
 {
+	_test.close();
 	_cam1->~Webcam();
 	_cam2->~Webcam();
 }
@@ -43,6 +50,13 @@ void GUI::init()
 	_cam1 = new Webcam(0);
 	_cam2 = new Webcam(1);
 	
+	// Initialize Communication with Arduino
+	//_arduino = new ArduinoCOMM("C:/Users/Wilbur/Desktop/GoldenBoot474/Debug/SerialTest.exe");
+	//_arduino = new ArduinoCOMM("C:/Users/Wilbur/Desktop/GoldenBoot474/Debug/Test.exe");
+	//_test.start("C:/Users/Wilbur/Desktop/GoldenBoot474/Debug/Test.exe");
+
+	bool test = true;
+
 	// Initialize Images
 	_image = cvCreateImage(cvSize(WIDTH, HEIGHT), IPL_DEPTH_8U, 3);
 	_topImage = cvCreateImage(cvSize(FINAL_WIDTH,FINAL_HEIGHT), IPL_DEPTH_8U, 3);
@@ -52,6 +66,7 @@ void GUI::init()
 
 void GUI::display()
 {
+	//_arduino->write("test");
 	if (ui.mainTab->currentIndex() == 0) {
 		if (_cam1->capture()) {
 			if (ui.leftTab->currentIndex() == 0) {
@@ -102,7 +117,7 @@ void GUI::display()
 				Robot robotCM;
 				robotCM.x = (double)robotFT[0].x / (double)FINAL_WIDTH * 8.0;
 				robotCM.y = (double)robotFT[0].y / (double)FINAL_HEIGHT * 8.0;
-				robotCM.angle = _cam1->getRobotAngle();
+				robotCM.angle = _cam1->getRobotAngle()/CV_PI*180;
 				for (int i = 0; i < ballsFT.size(); i++) {
 					ballsCM[i].x = (double)ballsFT[i].x / (double)400.0 * 8.0;
 					ballsCM[i].y = (double)ballsFT[i].y / (double)FINAL_HEIGHT * 8.0;
@@ -110,6 +125,35 @@ void GUI::display()
 				MovementAlgorithm _algorithm = MovementAlgorithm(robotCM, ballsCM);
 				testX = _algorithm.getX();
 				testY = _algorithm.getY();
+				vector<int> leftTicks = _algorithm.returnLeftMotor();
+				vector<int> rightTicks = _algorithm.returnRightMotor();
+				if (test) {
+					for (int i = 0; i < leftTicks.size(); i++) {
+						/*
+						QByteArray data;
+						data = _test.readAllStandardOutput();
+						QString text = QString::fromLocal8Bit(data);
+						log(text);
+						_test.write("test");
+						*/
+						QStringList arguments;
+						arguments << QString::number(leftTicks[i]) << QString::number(rightTicks[i]);
+						//arguments << "-10" << "10";
+						_test.execute("C:/Users/Wilbur/Desktop/GoldenBoot474/Debug/SerialTest.exe", arguments);
+						_test.waitForFinished();
+						_test.close();
+						Sleep(1000);
+						/*
+						arguments.clear();
+						arguments << QString::number(-10) << QString::number(10);
+						_test.start("C:/Users/Wilbur/Desktop/GoldenBoot474/Debug/SerialTest.exe", arguments);
+						Sleep(1000);
+						_test.close();
+						/*/
+					}
+					test = false;
+				}
+
 			}
 			_balls = ballsFT;
 			_robot = robotFT;

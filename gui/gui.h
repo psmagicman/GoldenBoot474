@@ -9,6 +9,7 @@
 #include <QtGui>
 #include "ui_gui.h"
 
+#include "ArduinoCOMM.h"
 #include "MovementAlgorithm.h"
 #include "Webcam.h"
 
@@ -36,7 +37,12 @@ private:
 	QLabel * _progressLabel;
 	QProgressBar * _progressBar;
 	QTimer * _timer;
+
+	ArduinoCOMM * _arduino;
+	QProcess _test;
 	
+	bool test;
+
 	IplImage * _image;
 	IplImage * _topImage;
 
