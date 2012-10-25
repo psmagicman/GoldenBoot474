@@ -21,12 +21,18 @@
     <ClCompile Include="MovementAlgorithm.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\SerialTest\SerialTest\Serial.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MovementAlgorithm.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="global.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SerialTest\SerialTest\Serial.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

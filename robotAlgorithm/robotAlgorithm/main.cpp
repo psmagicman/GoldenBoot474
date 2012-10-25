@@ -6,6 +6,7 @@
 
 #include "MovementAlgorithm.h"
 #include "global.h"
+#include "Serial.h"
 #include <opencv2\opencv.hpp>
 #include <opencv\highgui.h>
 #include <opencv\cxcore.h>
