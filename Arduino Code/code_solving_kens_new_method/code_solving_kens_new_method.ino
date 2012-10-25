@@ -164,6 +164,8 @@ void loop ()
     Serial.println();
     input1done =1;
     input2data=0;
+    enc1_Count = 0;
+    enc2_Count = 0;
 }
   if((Serial.available() == 5) && (input1done == 1)){
   char bytes2[5];
@@ -174,7 +176,7 @@ void loop ()
   bytes2[4] = Serial.read();
  // bytes2[5] = '\0';
   pos_2 = atoi(bytes2);
-  abspos_2 = pos_2;
+  abspos_2 = abs(pos_2);
   Serial.print("pos_2 = ");
   Serial.print(pos_2, DEC);
   Serial.println();
@@ -292,6 +294,7 @@ void Movement()
     }
     else 
     {Stop();
+     state = 0;
      Serial.print("Stop");
     }
    } 
@@ -309,8 +312,8 @@ void Position()
     tempdebug1 = enc1_Count;
     tempdebug2 = enc2_Count; 
     Stop(); 
-    enc1_Count =0;
-    enc2_Count =0;
+ //   enc1_Count =0;
+ //   enc2_Count =0;
     pwm_1 = 255;
     pwm_2 = 255;
     pos_1 = 0;
