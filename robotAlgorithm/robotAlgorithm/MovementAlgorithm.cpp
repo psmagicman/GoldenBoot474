@@ -23,8 +23,8 @@
 
 #define PI 3.14159265
 #define ONE_TICK 0.7008830378306
-#define BOT_WIDTH 6
-//#define STOP_DISTANCE_CM 2
+#define BOT_WIDTH 0.19685
+#define AVOID_DISTANCE 0.0984252
 
 /* Constructor */
 
@@ -45,6 +45,32 @@ MovementAlgorithm::MovementAlgorithm(Robot robot, vector<Ball> balls) {
 	calcMultiBall();
 	compareMultiBallDist();
 	checkAngle(algoRobot.angle);
+}
+
+MovementAlgorithm::MovementAlgorithm(Robot robot, vector<Ball> balls, vector<Obstacle> obstacles) {
+	algoRobot = robot;
+	int numBalls = balls.size();
+	algoBalls.resize(numBalls);
+	for(int i = 0; i < balls.size(); i++) {
+		algoBalls[i].x = balls[i].x;
+		algoBalls[i].y = balls[i].y;
+		algoBalls[i].rad = balls[i].rad;
+	}
+	int numObs = obstacles.size();
+	algoObs.resize(numObs);
+	for(int i = 0; i < obstacles.size(); i++) {
+		algoObs[i].x = obstacles[i].x;
+		algoObs[i].y = obstacles[i].y;
+		algoObs[i].rad = obstacles[i].rad;
+	}
+	calcMultiBall();
+	calcMultiObsDist();
+	obsCirc = calcObsRange();
+	compareMultiBallDist();
+	checkAngle(algoRobot.angle);
+	determineObsPath();
+	if(obsFlag == 1)
+		cout << "Obstacle is in the path" << endl;
 }
 
 MovementAlgorithm::~MovementAlgorithm() {}
@@ -95,6 +121,7 @@ void MovementAlgorithm::determineTurning() {
 int MovementAlgorithm::calcForwardTicks() {
 	double tempTick;
 	tempTick = (finalBallDist / ONE_TICK) + 1.0;
+	cout << "Forward Ticks = " << tempTick << endl;
 	return (int) tempTick;
 }
 
@@ -104,7 +131,7 @@ int MovementAlgorithm::calcTurnTicks() {
 	tempTick = tempTick * angle / 360;
 	tempTick = tempTick / ONE_TICK;
 	tempTick = tempTick + 1.0;
-	cout << "tempTick = " << tempTick << endl;
+	cout << "Turn Ticks = " << tempTick << endl;
 	return (int)abs(tempTick);
 }
 
@@ -117,7 +144,7 @@ void MovementAlgorithm::calcMultiBall() {
 		tempX = (double)algoBalls[i].x - (double)algoRobot.x;
 		tempY = (double)algoBalls[i].y - (double)algoRobot.y;
 		ballsDist[i] = (double)sqrt(pow(tempX,2)+pow(tempY,2));
-		ballsSlope[i] = tempY/tempX;
+		//ballsSlope[i] = tempY/tempX;
 		cout << "Ball" << i+1 << ": " << ballsDist[i] << "feet."<< endl;
 	}
 }
@@ -131,7 +158,7 @@ void MovementAlgorithm::calcMultiObsDist() {
 		tempX = (double)algoObs[i].x - (double)algoRobot.x;
 		tempY = (double)algoObs[i].y - (double)algoRobot.y;
 		obsDist[i] = (double)sqrt(pow(tempX,2)+pow(tempY,2));
-		obsSlope[i] = tempY/tempX;
+		//obsSlope[i] = tempY/tempX;
 		cout << "Obstacle" << i+1 << ": " << obsDist[i] << "feet." << endl;
 	}
 }
@@ -148,13 +175,13 @@ void MovementAlgorithm::compareMultiBallDist() {
 	}
 	finalBallDist = temp;
 	cout << "Ball closest to the robot is ball" << ballNum << endl;
-	cout << "Ball" << ballNum << " has a distance of " << temp << "cm." << endl;
+	cout << "Ball" << ballNum << " has a distance of " << temp << "feet." << endl;
 	calcMultiBallAngle(ballNum);
 	cout << "Robot needs to turn: " << angle << " degrees..." << endl;
 }
 
 void MovementAlgorithm::calcMultiBallAngle(int ballNum) {
-	int actualBall = ballNum - 1;
+	actualBall = ballNum - 1;
 	double x, y;
 	x = algoBalls[actualBall].x - algoRobot.x;
 	y = algoBalls[actualBall].y - algoRobot.y;
@@ -163,6 +190,31 @@ void MovementAlgorithm::calcMultiBallAngle(int ballNum) {
 
 double MovementAlgorithm::calcObsRange() {
 	double temp;
-	temp = 2 * PI * obsRadius;
+	temp = 2 * PI * algoObs[0].rad;
 	return temp;
+}
+
+// Determines if every obstacle that is within the path to the closest ball
+// NOTE: highly inefficient method, will develop a better way to do this later
+// AT THE MOMENT THIS WILL ONLY WORK FOR ONE OBSTACLE.
+void MovementAlgorithm::determineObsPath() {
+	obsFlag = 0;
+	//int tempObsX, tempObsY;
+	int countY = algoRobot.y;
+	for(int x = algoRobot.x; x <= abs(algoBalls[actualBall].x); x++) {
+		for(int i = 0; i < algoObs.size(); i++) {
+			if((double)x >= (double)(algoObs[i].x - algoObs[i].rad - AVOID_DISTANCE) && 
+				(double)x <= (double)(algoObs[i].x + algoObs[i].rad + AVOID_DISTANCE) &&
+				(double)countY >= (double)(algoObs[i].y - algoObs[i].rad - AVOID_DISTANCE) &&
+				(double)countY <= (double)(algoObs[i].y + algoObs[i].rad + AVOID_DISTANCE)) {
+							obsFlag = 1;
+							break;
+			}
+			else
+				obsFlag = 0;
+		}
+		if(obsFlag == 1)
+			break;
+		countY++;
+	}
 }

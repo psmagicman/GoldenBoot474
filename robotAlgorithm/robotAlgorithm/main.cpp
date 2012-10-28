@@ -41,6 +41,7 @@ int main() {
 	Robot robot;
 	vector<Ball> balls;
 	vector<Obstacle> obstacles;
+	MovementAlgorithm algos;
 
 	while(1) {
 		cout << "Enter the x coordinate of the robot: ";
@@ -76,8 +77,11 @@ int main() {
 			cout << endl;
 			obstacles[i].rad = 10;
 		}
+		if(numObs > 0)
+			MovementAlgorithm algos = MovementAlgorithm(robot, balls, obstacles);
+		else
+			MovementAlgorithm algos = MovementAlgorithm(robot, balls);
 
-		MovementAlgorithm algos = MovementAlgorithm(robot, balls);
 		int szMotorsLeft = algos.returnLeftSize();
 		int szMotorsRight = algos.returnRightSize();
 		if(szMotorsRight == szMotorsLeft)

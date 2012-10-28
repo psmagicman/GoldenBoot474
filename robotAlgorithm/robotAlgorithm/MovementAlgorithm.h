@@ -36,15 +36,15 @@ public:
 	
 private:
 	Robot algoRobot;
-	Ball algoBall;
-	Obstacle algoObs;
 	double finalBallDist;
-	double obsDist;
+	//double obsDist;
 	double obsRange;
 	double angle;
 	double ball2obs;
 	bool moveFlag;
 	bool turnFlag;
+	bool obsFlag;
+	int actualBall;
 
 	vector<int> rightMotor;
 	vector<int> leftMotor;
@@ -53,9 +53,9 @@ private:
 	vector<Obstacle> algoObs;
 	vector<double> ballsDist;
 	vector<double> obsDist;
-	vector<double> ballsSlope;
-	vector<double> obsSlope;
-	double obsRadius;
+	//vector<double> ballsSlope;
+	//vector<double> obsSlope;
+	double obsCirc;
 	//vector<double> obsRange;
 
 
@@ -67,6 +67,7 @@ private:
 	void calcMultiObsDist();
 	void determineForward();
 	void determineTurning();
+	void determineObsPath();
 	int calcForwardTicks();
 	int calcTurnTicks();
 	double calcObsRange();
