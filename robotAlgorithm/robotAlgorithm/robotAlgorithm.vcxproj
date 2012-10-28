@@ -62,12 +62,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\SerialTest\SerialTest\Serial.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MovementAlgorithm.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\SerialTest\SerialTest\Serial.h" />
     <ClInclude Include="global.h" />
     <ClInclude Include="MovementAlgorithm.h" />
   </ItemGroup>

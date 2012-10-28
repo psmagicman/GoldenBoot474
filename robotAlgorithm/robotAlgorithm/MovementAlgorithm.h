@@ -15,7 +15,9 @@ public:
 	/* Constructor */
 	//MovementAlgorithm(Robot, vector<Ball>, vector<Obstacle>);
 	//MovementAlgorithm(Robot, Ball, Obstacle);
+	MovementAlgorithm();
 	MovementAlgorithm(Robot, vector<Ball>);
+	MovementAlgorithm(Robot, vector<Ball>, vector<Obstacle>);
 	~MovementAlgorithm();
 
 	double returnBallDist();
@@ -48,22 +50,26 @@ private:
 	vector<int> leftMotor;
 	int ticks;
 	vector<Ball> algoBalls;
-	//vector<Obstacle> algoObstacle;
+	vector<Obstacle> algoObs;
 	vector<double> ballsDist;
-	//vector<double> obsDist;
+	vector<double> obsDist;
+	vector<double> ballsSlope;
+	vector<double> obsSlope;
+	double obsRadius;
 	//vector<double> obsRange;
 
 
-	//void calcObsRange();
+	
 	void checkAngle(double);
-	//void calcball2obs();
 	void calcMultiBall();
 	void compareMultiBallDist();
 	void calcMultiBallAngle(int);
+	void calcMultiObsDist();
 	void determineForward();
 	void determineTurning();
 	int calcForwardTicks();
 	int calcTurnTicks();
+	double calcObsRange();
 };
 
 #endif MOVEMENTALGORITHM_H_

@@ -7,7 +7,7 @@
 
 #include "MovementAlgorithm.h"
 #include "global.h"
-#include "Serial.h"
+//#include "Serial.h"
 
 #include <opencv\cvaux.h>
 #include <opencv2\opencv.hpp>
@@ -39,10 +39,8 @@ using namespace std;
 
 int main() {
 	Robot robot;
-	Obstacle obstacle;
 	vector<Ball> balls;
-	CSerial serial;
-	//vector<Obstacle> obstacle;
+	vector<Obstacle> obstacles;
 
 	while(1) {
 		cout << "Enter the x coordinate of the robot: ";
@@ -51,14 +49,6 @@ int main() {
 		cin >> robot.y;
 		cout << "Enter the angle the robot is facing: ";
 		cin >> robot.angle;
-		/*cout << "Enter the x coordinate of the ball: ";
-		cin >> ball.x;
-		cout << "Enter the y coordinate of the ball: ";
-		cin >> ball.y;
-		cout << "Enter the x coordinate of the obstacle: ";
-		cin >> obstacle.x;
-		cout << "Enter the y coordinate of the obstacle: ";
-		cin >> obstacle.y;*/
 
 		int numBalls;
 		cout << "Enter the number of balls: ";
@@ -73,6 +63,19 @@ int main() {
 			cout << endl;
 			balls[i].rad = 5;
 		}
+		int numObs;
+		cout << "Enter the number of obstacles: ";
+		cin >> numObs;
+		obstacles.resize(numObs);
+		for(int i = 0; i < obstacles.size(); i++) {
+			cout << "Coordinate of Obstacle" << i+1 << ": " << endl;
+			cout << "X: ";
+			cin >> obstacles[i].x;
+			cout << "Y: ";
+			cin >> obstacles[i].y;
+			cout << endl;
+			obstacles[i].rad = 10;
+		}
 
 		MovementAlgorithm algos = MovementAlgorithm(robot, balls);
 		int szMotorsLeft = algos.returnLeftSize();
@@ -82,45 +85,10 @@ int main() {
 		else
 			cout << "szMotorsRight =/= szMotorsLeft" << endl;
 		for(int i = 0; i < szMotorsRight; i++) {
-			cout << "Left Ticks: " << algos.returnLeftMotor()[i] << endl;
-			int testLeft = algos.returnLeftMotor()[i];
-			char* leftDigit = new char[5];
-			if(testLeft > 0) {
-				for(int j = 0; j < 5; j++) {
-					leftDigit[j] = (char)(((int)'0')+testLeft%10);
-					testLeft /= 10;
-				}
-			}
-			else {
-				leftDigit[0] = '-';
-				for(int j = 1; j < 5; j++) {
-					leftDigit[j] = (char)(((int)'0')+testLeft%10);
-					testLeft /= 10;
-				}
-			}
-			cout << "Right Ticks: " << algos.returnRightMotor()[i] << endl;
-			int testRight = algos.returnRightMotor()[i];
-			char* rightDigit = new char[5];
-			if(testRight > 0) {
-				for(int j = 0; j < 5; j++) {
-					rightDigit[j] = (char)(((int)'0')+testRight%10);
-					testRight /= 10;
-				}
-			}
-			else {
-				rightDigit[0] = '-';
-				for(int j = 1; j < 5; j++) {
-					rightDigit[j] = (char)(((int)'0')+testRight%10);
-					testRight /= 10;
-				}
-			}
-			if(serial.Open(3, 57600)) {
-				int leftByteSent = serial.SendData(leftDigit, strlen(leftDigit));
-				int rightByteSent = serial.SendData(rightDigit, strlen(rightDigit));
-			}
-			else
-				cout << "ERROR" << endl;
+			cout << "Left Ticks" << i+1 << ": " << algos.returnLeftMotor()[i] << endl;
+			cout << "Right Ticks" << i+1 << ": " << algos.returnRightMotor()[i] << endl;
 		}
+
 		if((cvWaitKey(10) & 255) == 27)
 			break;
 	}
