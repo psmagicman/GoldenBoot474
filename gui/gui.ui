@@ -25,141 +25,10 @@
         <string>Webcams</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_2">
-        <item row="2" column="0">
-         <widget class="QTabWidget" name="leftTab">
-          <property name="currentIndex">
-           <number>0</number>
-          </property>
-          <widget class="QWidget" name="leftTab_RGB">
-           <attribute name="title">
-            <string>RGB</string>
-           </attribute>
-           <layout class="QGridLayout" name="gridLayout_3">
-            <item row="0" column="0">
-             <widget class="QLabel" name="leftRGB">
-              <property name="text">
-               <string>TextLabel</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="0">
-             <layout class="QHBoxLayout" name="horizontalLayout_2">
-              <item>
-               <widget class="QCheckBox" name="leftArenaCheck">
-                <property name="text">
-                 <string>Arena</string>
-                </property>
-                <property name="checked">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QCheckBox" name="leftBallsCheck">
-                <property name="text">
-                 <string>Tennis Balls</string>
-                </property>
-                <property name="checked">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QCheckBox" name="leftObstaclesCheck">
-                <property name="text">
-                 <string>Obstacles</string>
-                </property>
-                <property name="checked">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QCheckBox" name="leftRobotCheck">
-                <property name="text">
-                 <string>Robot</string>
-                </property>
-                <property name="checked">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-           </layout>
-          </widget>
-          <widget class="QWidget" name="leftTab_HSV">
-           <attribute name="title">
-            <string>HSV</string>
-           </attribute>
-           <layout class="QGridLayout" name="gridLayout_6">
-            <item row="0" column="0">
-             <widget class="QLabel" name="leftHSV">
-              <property name="text">
-               <string>TextLabel</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-          <widget class="QWidget" name="leftTab_Threshold">
-           <attribute name="title">
-            <string>Threshold</string>
-           </attribute>
-           <layout class="QGridLayout" name="gridLayout_7">
-            <item row="0" column="0">
-             <widget class="QLabel" name="leftThreshold">
-              <property name="text">
-               <string>TextLabel</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="0">
-             <layout class="QHBoxLayout" name="leftRadios">
-              <item>
-               <widget class="QRadioButton" name="leftArenaRadio">
-                <property name="text">
-                 <string>Arena</string>
-                </property>
-                <property name="checkable">
-                 <bool>true</bool>
-                </property>
-                <property name="checked">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QRadioButton" name="leftBallsRadio">
-                <property name="text">
-                 <string>Tennis Balls</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QRadioButton" name="leftObstaclesRadio">
-                <property name="text">
-                 <string>Obstacles</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QRadioButton" name="leftRobotRadio">
-                <property name="text">
-                 <string>Robot</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-           </layout>
-          </widget>
-         </widget>
-        </item>
-        <item row="2" column="1">
+        <item row="4" column="1">
          <widget class="QTabWidget" name="rightTab">
           <property name="currentIndex">
-           <number>0</number>
+           <number>2</number>
           </property>
           <widget class="QWidget" name="rightTab_RGB">
            <attribute name="title">
@@ -215,6 +84,20 @@
                 </property>
                </widget>
               </item>
+              <item>
+               <widget class="QPushButton" name="rightCalibrate">
+                <property name="text">
+                 <string>Calibrate</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="rightReset">
+                <property name="text">
+                 <string>Reset</string>
+                </property>
+               </widget>
+              </item>
              </layout>
             </item>
            </layout>
@@ -248,38 +131,186 @@
             <item row="1" column="0">
              <layout class="QHBoxLayout" name="right">
               <item>
-               <widget class="QRadioButton" name="rightArenaRadio">
-                <property name="text">
-                 <string>Arena</string>
-                </property>
-                <property name="checkable">
-                 <bool>true</bool>
-                </property>
-                <property name="checked">
-                 <bool>true</bool>
-                </property>
-               </widget>
+               <layout class="QGridLayout" name="gridLayout_13">
+                <item row="0" column="0">
+                 <widget class="QRadioButton" name="rightArenaRadio">
+                  <property name="text">
+                   <string>Arena</string>
+                  </property>
+                  <property name="checkable">
+                   <bool>true</bool>
+                  </property>
+                  <property name="checked">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QRadioButton" name="rightBallsRadio">
+                  <property name="text">
+                   <string>Tennis Balls</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="1">
+                 <widget class="QRadioButton" name="rightRobot1Radio">
+                  <property name="text">
+                   <string>Robot (Green)</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QRadioButton" name="rightObstacles1Radio">
+                  <property name="text">
+                   <string>Obstacles (Yellow)</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="1">
+                 <widget class="QRadioButton" name="rightRobot2Radio">
+                  <property name="text">
+                   <string>Robot (Red)</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="0">
+                 <widget class="QRadioButton" name="rightObstacles2Radio">
+                  <property name="text">
+                   <string>Obstacles (Blue)</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
               </item>
               <item>
-               <widget class="QRadioButton" name="rightBallsRadio">
-                <property name="text">
-                 <string>Tennis Balls</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QRadioButton" name="rightObstaclesRadio">
-                <property name="text">
-                 <string>Obstacles</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QRadioButton" name="rightRobotRadio">
-                <property name="text">
-                 <string>Robot</string>
-                </property>
-               </widget>
+               <layout class="QGridLayout" name="gridLayout_12">
+                <item row="0" column="5">
+                 <widget class="QSpinBox" name="spinRightAreaMin">
+                  <property name="maximum">
+                   <number>10000</number>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="0">
+                 <widget class="QLabel" name="label_11">
+                  <property name="text">
+                   <string>VAL Min</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="3">
+                 <widget class="QSpinBox" name="spinRightValMax">
+                  <property name="maximum">
+                   <number>256</number>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="2">
+                 <widget class="QLabel" name="label_13">
+                  <property name="text">
+                   <string>SAT Max</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="4">
+                 <widget class="QLabel" name="label_15">
+                  <property name="text">
+                   <string>Area Min</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="2">
+                 <widget class="QLabel" name="label_14">
+                  <property name="text">
+                   <string>VAL Max</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QSpinBox" name="spinRightHueMin">
+                  <property name="maximum">
+                   <number>256</number>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="1">
+                 <widget class="QSpinBox" name="spinRightSatMin">
+                  <property name="maximum">
+                   <number>256</number>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="5">
+                 <widget class="QSpinBox" name="spinRightAreaMax">
+                  <property name="maximum">
+                   <number>10000</number>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="3">
+                 <widget class="QSpinBox" name="spinRightHueMax">
+                  <property name="maximum">
+                   <number>256</number>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="0">
+                 <widget class="QLabel" name="label_9">
+                  <property name="text">
+                   <string>HUE Min</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="1">
+                 <widget class="QSpinBox" name="spinRightValMin">
+                  <property name="maximum">
+                   <number>256</number>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="4">
+                 <widget class="QLabel" name="label_16">
+                  <property name="text">
+                   <string>Area Max</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QLabel" name="label_10">
+                  <property name="text">
+                   <string>SAT Min</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="3">
+                 <widget class="QSpinBox" name="spinRightSatMax">
+                  <property name="maximum">
+                   <number>256</number>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="2">
+                 <widget class="QLabel" name="label_12">
+                  <property name="text">
+                   <string>HUE Max</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="4">
+                 <widget class="QPushButton" name="rightSave">
+                  <property name="text">
+                   <string>Save</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="5">
+                 <widget class="QPushButton" name="rightLoad">
+                  <property name="text">
+                   <string>Load</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
               </item>
              </layout>
             </item>
@@ -287,32 +318,303 @@
           </widget>
          </widget>
         </item>
-        <item row="0" column="1">
-         <widget class="QPushButton" name="rightCalibrate">
-          <property name="text">
-           <string>Calibrate</string>
+        <item row="4" column="0">
+         <widget class="QTabWidget" name="leftTab">
+          <property name="currentIndex">
+           <number>2</number>
           </property>
-         </widget>
-        </item>
-        <item row="0" column="0">
-         <widget class="QPushButton" name="leftCalibrate">
-          <property name="text">
-           <string>Calibrate</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QPushButton" name="leftReset">
-          <property name="text">
-           <string>Reset</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QPushButton" name="rightReset">
-          <property name="text">
-           <string>Reset</string>
-          </property>
+          <widget class="QWidget" name="leftTab_RGB">
+           <attribute name="title">
+            <string>RGB</string>
+           </attribute>
+           <layout class="QGridLayout" name="gridLayout_3">
+            <item row="0" column="0">
+             <widget class="QLabel" name="leftRGB">
+              <property name="text">
+               <string>TextLabel</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <layout class="QHBoxLayout" name="horizontalLayout_2">
+              <item>
+               <widget class="QCheckBox" name="leftArenaCheck">
+                <property name="text">
+                 <string>Arena</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="leftBallsCheck">
+                <property name="text">
+                 <string>Tennis Balls</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="leftObstaclesCheck">
+                <property name="text">
+                 <string>Obstacles</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="leftRobotCheck">
+                <property name="text">
+                 <string>Robot</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="leftCalibrate">
+                <property name="text">
+                 <string>Calibrate</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="leftReset">
+                <property name="text">
+                 <string>Reset</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="leftTab_HSV">
+           <attribute name="title">
+            <string>HSV</string>
+           </attribute>
+           <layout class="QGridLayout" name="gridLayout_6">
+            <item row="0" column="0">
+             <widget class="QLabel" name="leftHSV">
+              <property name="text">
+               <string>TextLabel</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="leftTab_Threshold">
+           <attribute name="title">
+            <string>Threshold</string>
+           </attribute>
+           <layout class="QGridLayout" name="gridLayout_7">
+            <item row="0" column="0">
+             <widget class="QLabel" name="leftThreshold">
+              <property name="text">
+               <string>TextLabel</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <layout class="QHBoxLayout" name="leftRadios">
+              <item>
+               <layout class="QGridLayout" name="gridLayout_11" rowstretch="0,0,0,0" rowminimumheight="0,0,0,0">
+                <property name="sizeConstraint">
+                 <enum>QLayout::SetMinimumSize</enum>
+                </property>
+                <property name="horizontalSpacing">
+                 <number>6</number>
+                </property>
+                <item row="3" column="0">
+                 <widget class="QRadioButton" name="leftObstacles2Radio">
+                  <property name="text">
+                   <string>Obstales (Blue)</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="0">
+                 <widget class="QRadioButton" name="leftArenaRadio">
+                  <property name="text">
+                   <string>Arena</string>
+                  </property>
+                  <property name="checkable">
+                   <bool>true</bool>
+                  </property>
+                  <property name="checked">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="0">
+                 <widget class="QRadioButton" name="leftObstacles1Radio">
+                  <property name="text">
+                   <string>Obstacles (Yellow)</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QRadioButton" name="leftBallsRadio">
+                  <property name="text">
+                   <string>Tennis Balls</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="1">
+                 <widget class="QRadioButton" name="leftRobot1Radio">
+                  <property name="text">
+                   <string>Robot (Green)</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="1">
+                 <widget class="QRadioButton" name="leftRobot2Radio">
+                  <property name="text">
+                   <string>Robot (Red)</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QGridLayout" name="gridLayout_10">
+                <item row="0" column="4">
+                 <widget class="QLabel" name="label_7">
+                  <property name="text">
+                   <string>Area Min</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="0">
+                 <widget class="QLabel" name="label_3">
+                  <property name="text">
+                   <string>VAL Min</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="0">
+                 <widget class="QLabel" name="label">
+                  <property name="text">
+                   <string>HUE Min</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="2">
+                 <widget class="QLabel" name="label_5">
+                  <property name="text">
+                   <string>SAT Max</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QSpinBox" name="spinLeftHueMin">
+                  <property name="maximum">
+                   <number>256</number>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QLabel" name="label_2">
+                  <property name="text">
+                   <string>SAT Min</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="2">
+                 <widget class="QLabel" name="label_6">
+                  <property name="text">
+                   <string>VAL Max</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="2">
+                 <widget class="QLabel" name="label_4">
+                  <property name="text">
+                   <string>HUE Max</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="1">
+                 <widget class="QSpinBox" name="spinLeftSatMin">
+                  <property name="maximum">
+                   <number>256</number>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="3">
+                 <widget class="QSpinBox" name="spinLeftSatMax">
+                  <property name="maximum">
+                   <number>256</number>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="3">
+                 <widget class="QSpinBox" name="spinLeftValMax">
+                  <property name="maximum">
+                   <number>256</number>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="3">
+                 <widget class="QSpinBox" name="spinLeftHueMax">
+                  <property name="maximum">
+                   <number>256</number>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="1">
+                 <widget class="QSpinBox" name="spinLeftValMin">
+                  <property name="maximum">
+                   <number>256</number>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="5">
+                 <widget class="QSpinBox" name="spinLeftAreaMin">
+                  <property name="maximum">
+                   <number>10000</number>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="4">
+                 <widget class="QLabel" name="label_8">
+                  <property name="text">
+                   <string>Area Max</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="5">
+                 <widget class="QSpinBox" name="spinLeftAreaMax">
+                  <property name="maximum">
+                   <number>10000</number>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="4">
+                 <widget class="QPushButton" name="leftSave">
+                  <property name="text">
+                   <string>Save</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="5">
+                 <widget class="QPushButton" name="leftLoad">
+                  <property name="text">
+                   <string>Load</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
          </widget>
         </item>
        </layout>
@@ -329,18 +631,67 @@
           </property>
          </widget>
         </item>
-        <item row="0" column="0">
-         <widget class="QLabel" name="leftFinal">
+        <item row="1" column="2">
+         <widget class="QPushButton" name="pushButton">
           <property name="text">
-           <string>TextLabel</string>
+           <string>Run</string>
           </property>
          </widget>
         </item>
-        <item row="0" column="1">
-         <widget class="QLabel" name="rightFinal">
-          <property name="text">
-           <string>TextLabel</string>
+        <item row="0" column="0">
+         <widget class="QTabWidget" name="mainCamTab">
+          <property name="currentIndex">
+           <number>0</number>
           </property>
+          <widget class="QWidget" name="tab_2">
+           <attribute name="title">
+            <string>Bird's Eye View</string>
+           </attribute>
+           <layout class="QGridLayout" name="gridLayout_14">
+            <item row="0" column="0">
+             <widget class="QLabel" name="leftFinal">
+              <property name="text">
+               <string>TextLabel</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QLabel" name="rightFinal">
+              <property name="text">
+               <string>TextLabel</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="tab_3">
+           <attribute name="title">
+            <string>Left RAW</string>
+           </attribute>
+           <layout class="QGridLayout" name="gridLayout_15">
+            <item row="0" column="0">
+             <widget class="QLabel" name="leftRaw">
+              <property name="text">
+               <string>TextLabel</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="tab_4">
+           <attribute name="title">
+            <string>Right RAW</string>
+           </attribute>
+           <layout class="QGridLayout" name="gridLayout_16">
+            <item row="0" column="0">
+             <widget class="QLabel" name="rightRaw">
+              <property name="text">
+               <string>TextLabel</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
          </widget>
         </item>
        </layout>

@@ -1,20 +1,17 @@
 #include "QuickSort.h"
 
-void swap(int &a, int &b)
-{
-	int temp;
-	temp = a;
-	a = b;
-	b = temp;
-}
-
 /* This function does the quicksort
    Arguments :
 			 array - the array to be sorted
 			 startIndex - index of the first element of the section
 			 endIndex - index of the last element of the section
    */
-void QuickSort(int* array, int startIndex, int endIndex)
+
+QuickSort::QuickSort()
+{
+}
+
+void QuickSort::sort(int* array, int startIndex, int endIndex)
 {
 	int pivot = array[startIndex];					//pivot element is the leftmost element
 	int splitPoint;
@@ -27,9 +24,17 @@ void QuickSort(int* array, int startIndex, int endIndex)
 													  //SplitArray() returns the position where
 													  //pivot belongs to
 		array[splitPoint] = pivot;
-		QuickSort(array, startIndex, splitPoint-1);   //Quick sort first half
-		QuickSort(array, splitPoint+1, endIndex);	 //Quick sort second half
+		sort(array, startIndex, splitPoint-1);   //Quick sort first half
+		sort(array, splitPoint+1, endIndex);	 //Quick sort second half
 	}
+}
+
+void QuickSort::swap(int &a, int &b)
+{
+	int temp;
+	temp = a;
+	a = b;
+	b = temp;
 }
 
 /* This function splits the array around the pivot
@@ -41,7 +46,7 @@ void QuickSort(int* array, int startIndex, int endIndex)
    Returns :
 		   the position of the pivot
    */
-int SplitArray(int* array, int pivot, int startIndex, int endIndex)
+int QuickSort::SplitArray(int* array, int pivot, int startIndex, int endIndex)
 {
 	int leftBoundary = startIndex;
 	int rightBoundary = endIndex;

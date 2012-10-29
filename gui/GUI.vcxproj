@@ -97,6 +97,7 @@
     <ClCompile Include="gui.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MovementAlgorithm.cpp" />
+    <ClCompile Include="QuickSort.cpp" />
     <ClCompile Include="Webcam.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -129,6 +130,7 @@
     <ClInclude Include="GeneratedFiles\ui_gui.h" />
     <ClInclude Include="GLOBALS.h" />
     <ClInclude Include="MovementAlgorithm.h" />
+    <ClInclude Include="QuickSort.h" />
     <ClInclude Include="Webcam.h" />
   </ItemGroup>
   <ItemGroup>

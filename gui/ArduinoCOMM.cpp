@@ -1,8 +1,10 @@
 #include "ArduinoCOMM.h"
 
-ArduinoCOMM::ArduinoCOMM(QString path)
+ArduinoCOMM::ArduinoCOMM(QString path, int port)
 {
-	_arduino.start(path);
+	QStringList arguments;
+	arguments << QString::number(port);
+	_arduino.start(path, arguments);
 }
 
 ArduinoCOMM::~ArduinoCOMM()
@@ -16,7 +18,7 @@ QString ArduinoCOMM::read()
 	return QString::fromLocal8Bit(data);
 }
 
-void ArduinoCOMM::write(char * output)
+void ArduinoCOMM::write(string output)
 {
-	_arduino.write(output);
+	_arduino.write((output+"\n").c_str());
 }

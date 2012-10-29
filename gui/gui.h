@@ -1,6 +1,8 @@
 #ifndef GUI_H
 #define GUI_H
 
+#include <stdlib.h>
+
 #include <opencv\cvaux.h>
 #include <opencv\highgui.h>
 #include <opencv\cxcore.h>
@@ -28,6 +30,9 @@ private slots:
 	void on_leftReset_triggered();
 	void on_rightReset_triggered();
 
+	void writeLeftThreshold();
+	void writeRightThreshold();
+
 private:
 	Ui::GUIClass ui;
 
@@ -39,7 +44,6 @@ private:
 	QTimer * _timer;
 
 	ArduinoCOMM * _arduino;
-	QProcess _test;
 	
 	bool test;
 
@@ -49,10 +53,19 @@ private:
 	vector<Point2f> _balls;
 	vector<Point2f> _obstacles;
 	vector<Point2f> _robot;
+	double _robotAngle;
 
 	void init();
 	void displayImage(IplImage * webcamFeed, QLabel * location, int type = 0);
 	void displayFinal(IplImage * webcamFeed, QLabel * location);
+	void displayMain();
+	void detectObstacles(); // Detect if there are any obstacles in front of the robot
+
+	vector<Point2f> combinePts(vector<Point2f> pts1, vector<Point2f> pts2);
+	void readLeftThreshold();
+	void readRightThreshold();
+	
+	double dist(double x1, double x2, double y1, double y2);
 	void log(QString text);
 };
 
