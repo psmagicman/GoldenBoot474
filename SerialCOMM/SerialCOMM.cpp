@@ -8,10 +8,18 @@ using namespace std;
 
 void main(int argc, char * argv[])
 {
+
 	CSerial serial;
 	string firstInput;
 	string secondInput;
-	while (serial.Open(1, 57600)) {
+	string port = "0";
+	if (argc != 2) {
+		while (!atoi(port.c_str())) {
+			cout << "Enter Port Number: " << endl;
+			cin >> port;
+		}
+	}
+	while (serial.Open(atoi(port.c_str()), 57600)) {
 		cin >> firstInput;
 		if (firstInput != "OK") {
 			if (firstInput == "STOP") {
@@ -20,6 +28,9 @@ void main(int argc, char * argv[])
 			} else if (firstInput == "KICK") {
 				char * KICK = {"K"};
 				int kickByte = serial.SendData(KICK, strlen(KICK));
+			} else if (firstInput == "END") {
+				char * END = {"Z"};
+				int endByte = serial.SendData(END, strlen(END));
 			} else {
 				cin >> secondInput;
 				int rightMotor = atoi(firstInput.c_str());
@@ -60,8 +71,9 @@ void main(int argc, char * argv[])
 				int rightByte = serial.SendData(rightDigit, strlen(rightDigit));
 			}
 		}
-		char * input = new char[8];
-		int nBytesRead = serial.ReadData(input,8);
+		char * input = new char[1];
+		int nBytesRead = serial.ReadData(input,1);
 		cout << input;
+		Sleep(100);
 	}
 }
