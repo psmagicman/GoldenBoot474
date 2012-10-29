@@ -22,9 +22,9 @@
 #include "MovementAlgorithm.h"
 
 #define PI 3.14159265
-#define ONE_TICK 0.7008830378306
-#define BOT_WIDTH 0.19685
-#define AVOID_DISTANCE 0.0984252
+#define ONE_TICK 0.0113
+#define BOT_WIDTH 0.1968504
+#define AVOID_DISTANCE 0.262467
 
 /* Constructor */
 
@@ -35,6 +35,8 @@ MovementAlgorithm::MovementAlgorithm() {
 MovementAlgorithm::MovementAlgorithm(Robot robot, vector<Ball> balls) {
 	algoRobot = robot;
 	int numBalls = balls.size();
+	int numObs = 0;
+	obsFlag = 0;
 	algoBalls.resize(numBalls);
 	for(int i = 0; i < balls.size(); i++) {
 		algoBalls[i].x = balls[i].x;
@@ -67,10 +69,12 @@ MovementAlgorithm::MovementAlgorithm(Robot robot, vector<Ball> balls, vector<Obs
 	calcMultiObsDist();
 	obsCirc = calcObsRange();
 	compareMultiBallDist();
-	checkAngle(algoRobot.angle);
 	determineObsPath();
+	checkAngle(algoRobot.angle);
 	if(obsFlag == 1)
 		cout << "Obstacle is in the path" << endl;
+	else
+		cout << "Obstacle is not in the path" << endl;
 }
 
 MovementAlgorithm::~MovementAlgorithm() {}
@@ -89,9 +93,19 @@ int MovementAlgorithm::returnLeftSize() { return leftMotor.size(); }
 int MovementAlgorithm::returnRightSize() { return rightMotor.size(); }
 
 void MovementAlgorithm::checkAngle(double botAngle) {
+	double tempAngle;
+	tempAngle = botAngle * (180/PI);
+	calcMultiBallAngle();
 	if(botAngle > (angle-3) && botAngle < (angle+3))
 		determineForward();
+	else if(obsFlag) {
+		determineObsTurn();
+		determineObsForward();
+		determineObs2BallTurn();
+		determineObs2BallForward();
+	}
 	else {
+		cout << "Robot needs to turn: " << angle << " degrees..." << endl;
 		determineTurning();
 		determineForward();
 	}
@@ -107,7 +121,7 @@ void MovementAlgorithm::determineForward() {
 // and which will receive negative ticks
 void MovementAlgorithm::determineTurning() {
 	ticks = calcTurnTicks();
-	if(angle < 0 ) {
+	if(angle < 0) {
 		// left gets positive ticks
 		leftMotor.push_back(ticks);
 		rightMotor.push_back(-ticks);
@@ -116,6 +130,34 @@ void MovementAlgorithm::determineTurning() {
 		leftMotor.push_back(-ticks);
 		rightMotor.push_back(ticks);
 	}
+}
+
+void MovementAlgorithm::determineObsTurn() {
+	ticks = calcObsTurnTicks();
+	if(angle < 0) {
+		leftMotor.push_back(ticks);
+		rightMotor.push_back(-ticks);
+	}
+	else {
+		leftMotor.push_back(-ticks);
+		rightMotor.push_back(ticks);
+	}
+}
+
+void MovementAlgorithm::determineObsForward() {
+	ticks = calcObsForwardTicks();
+	leftMotor.push_back(ticks);
+	rightMotor.push_back(ticks);
+}
+
+void MovementAlgorithm::determineObs2BallForward() {
+	ticks = calcObs2BallForwardTicks();
+	leftMotor.push_back(ticks);
+	rightMotor.push_back(ticks);
+}
+
+void MovementAlgorithm::determineObs2BallTurn() {
+
 }
 
 int MovementAlgorithm::calcForwardTicks() {
@@ -127,6 +169,50 @@ int MovementAlgorithm::calcForwardTicks() {
 
 int MovementAlgorithm::calcTurnTicks() {
 	double tempTick;
+	calcMultiBallAngle();
+	tempTick = 2*PI*BOT_WIDTH;
+	tempTick = tempTick * angle / 360;
+	tempTick = tempTick / ONE_TICK;
+	tempTick = tempTick + 1.0;
+	cout << "Turn Ticks = " << tempTick << endl;
+	return (int)abs(tempTick);
+}
+
+int MovementAlgorithm::calcObsTurnTicks() {
+	double tempTick;
+	calcMultiObsAngle();
+	tempTick = 2*PI*BOT_WIDTH;
+	tempTick = tempTick * angle / 360;
+	tempTick = tempTick / ONE_TICK;
+	tempTick = tempTick + 1.0;
+	cout << "Turn ticks to avoid obstacle = " << tempTick << endl;
+	return (int)abs(tempTick);
+}
+
+int MovementAlgorithm::calcObsForwardTicks() {
+	double tempTick;
+	tempTick = (obsDist[actualObs] / ONE_TICK) + 1.0;
+	cout << "Forward ticks to avoid obstacle = " << tempTick << endl;
+	return (int)tempTick;
+}
+
+int MovementAlgorithm::calcObs2BallForwardTicks() {
+	double tempTick;
+	double x, y, hypo;
+	x = (double)algoBalls[actualBall].x - ((double)algoObs[actualBall].x + algoObs[0].rad + AVOID_DISTANCE);
+	y = (double)algoBalls[actualBall].y - ((double)algoObs[actualBall].y + algoObs[0].rad + AVOID_DISTANCE);
+	hypo = (double)sqrt((double)pow(x,2)+(double)pow(y,2));
+	tempTick = (hypo / ONE_TICK) + 1.0;
+	cout << "Forward Ticks = " << tempTick << endl;
+	return (int)tempTick;
+}
+
+int MovementAlgorithm::calcObs2BallTurnTicks() {
+	double tempTick;
+	double x, y;
+	x = (double)algoBalls[actualBall].x - ((double)algoObs[actualBall].x + algoObs[0].rad + AVOID_DISTANCE);
+	y = (double)algoBalls[actualBall].y - ((double)algoObs[actualBall].y + algoObs[0].rad + AVOID_DISTANCE);
+	angle = atan2(y, x) * 180 / PI;
 	tempTick = 2*PI*BOT_WIDTH;
 	tempTick = tempTick * angle / 360;
 	tempTick = tempTick / ONE_TICK;
@@ -176,15 +262,22 @@ void MovementAlgorithm::compareMultiBallDist() {
 	finalBallDist = temp;
 	cout << "Ball closest to the robot is ball" << ballNum << endl;
 	cout << "Ball" << ballNum << " has a distance of " << temp << "feet." << endl;
-	calcMultiBallAngle(ballNum);
-	cout << "Robot needs to turn: " << angle << " degrees..." << endl;
+	actualBall = ballNum -1;
 }
 
-void MovementAlgorithm::calcMultiBallAngle(int ballNum) {
-	actualBall = ballNum - 1;
+void MovementAlgorithm::calcMultiBallAngle() {
 	double x, y;
 	x = algoBalls[actualBall].x - algoRobot.x;
 	y = algoBalls[actualBall].y - algoRobot.y;
+	angle = atan2(y, x) * 180 / PI;
+}
+
+void MovementAlgorithm::calcMultiObsAngle() {
+	double x, y;
+	double tempRange;
+	tempRange = algoObs[0].rad + AVOID_DISTANCE;
+	x = algoObs[actualObs].x + tempRange - algoRobot.x;
+	y = algoObs[actualObs].y + tempRange - algoRobot.y;
 	angle = atan2(y, x) * 180 / PI;
 }
 
@@ -203,11 +296,12 @@ void MovementAlgorithm::determineObsPath() {
 	int countY = algoRobot.y;
 	for(int x = algoRobot.x; x <= abs(algoBalls[actualBall].x); x++) {
 		for(int i = 0; i < algoObs.size(); i++) {
-			if((double)x >= (double)(algoObs[i].x - algoObs[i].rad - AVOID_DISTANCE) && 
-				(double)x <= (double)(algoObs[i].x + algoObs[i].rad + AVOID_DISTANCE) &&
-				(double)countY >= (double)(algoObs[i].y - algoObs[i].rad - AVOID_DISTANCE) &&
-				(double)countY <= (double)(algoObs[i].y + algoObs[i].rad + AVOID_DISTANCE)) {
+			if((double)x >= (double)(algoObs[i].x - algoObs[i].rad/* - AVOID_DISTANCE*/) && 
+				(double)x <= (double)(algoObs[i].x + algoObs[i].rad/* + AVOID_DISTANCE*/) &&
+				(double)countY >= (double)(algoObs[i].y - algoObs[i].rad/* - AVOID_DISTANCE*/) &&
+				(double)countY <= (double)(algoObs[i].y + algoObs[i].rad/* + AVOID_DISTANCE*/)) {
 							obsFlag = 1;
+							actualObs = i;
 							break;
 			}
 			else

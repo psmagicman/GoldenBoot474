@@ -16,8 +16,12 @@ struct Ball {
 struct Obstacle {
 	int x;
 	int y;
-	int rad;
+	double rad;
 };
 
+struct Coord2D {
+	int x;
+	int y;
+};
 
 #endif GLOBAL_H_

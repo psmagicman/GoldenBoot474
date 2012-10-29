@@ -14,6 +14,8 @@
 #include <opencv\highgui.h>
 #include <opencv\cxcore.h>
 
+#define OBSTACLE_RADIUS 0.164042
+#define BALL_RADIUS 0.108268
 /* 
 	sending data to xbee masking
 	int i;
@@ -62,7 +64,7 @@ int main() {
 			cout << "Y: ";
 			cin >> balls[i].y;
 			cout << endl;
-			balls[i].rad = 5;
+			balls[i].rad = BALL_RADIUS;
 		}
 		int numObs;
 		cout << "Enter the number of obstacles: ";
@@ -75,7 +77,7 @@ int main() {
 			cout << "Y: ";
 			cin >> obstacles[i].y;
 			cout << endl;
-			obstacles[i].rad = 10;
+			obstacles[i].rad = OBSTACLE_RADIUS;
 		}
 		if(numObs > 0)
 			MovementAlgorithm algos = MovementAlgorithm(robot, balls, obstacles);

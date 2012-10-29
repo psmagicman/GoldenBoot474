@@ -31,6 +31,9 @@ public:
 	vector<int> returnLeftMotor();
 	int returnLeftSize();
 	int returnRightSize();
+	int returnBallY();
+	int returnBallX();
+	//vector<Coord2D> returnPathPoints();
 	/*vector<double> returnBallDist();
 	vector<double> returnObsDist();*/
 	
@@ -45,6 +48,7 @@ private:
 	bool turnFlag;
 	bool obsFlag;
 	int actualBall;
+	int actualObs;
 
 	vector<int> rightMotor;
 	vector<int> leftMotor;
@@ -63,13 +67,22 @@ private:
 	void checkAngle(double);
 	void calcMultiBall();
 	void compareMultiBallDist();
-	void calcMultiBallAngle(int);
+	void calcMultiBallAngle();
 	void calcMultiObsDist();
 	void determineForward();
 	void determineTurning();
 	void determineObsPath();
+	void determineObsTurn();
+	void determineObsForward();
+	void determineObs2BallTurn();
+	void determineObs2BallForward();
 	int calcForwardTicks();
 	int calcTurnTicks();
+	int calcObsTurnTicks();
+	int calcObsForwardTicks();
+	int calcObs2BallForwardTicks();
+	int calcObs2BallTurnTicks();
+	void calcMultiObsAngle();
 	double calcObsRange();
 };
 
