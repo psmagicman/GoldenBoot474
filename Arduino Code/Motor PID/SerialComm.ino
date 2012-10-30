@@ -6,23 +6,24 @@ void serialEvent(){
 void ReadInputs(){
         if(Serial.available() > 0){
            char emergency[1];
-           emergency[0] = Serial.read();
+           emergency[0] = Serial.peek();
        
            if( emergency[0] == 'E'){
                  Reset();
+                 Serial.write('1');
                  while(Serial.available()){
                    Serial.read();
                  }
            }
-        }
-}
+        
+
         
         
-/*           else{
+           else{
          
                  if((Serial.available() == 5) && (input2data == 1 )){
                         char bytes1[5];
-                        bytes1[0] = emergency[0];  
+                        bytes1[0] = Serial.read();  
                         bytes1[1] = Serial.read();
                         bytes1[2] = Serial.read();
                         bytes1[3] = Serial.read();
@@ -42,15 +43,16 @@ void ReadInputs(){
          }
         if((Serial.available() > 0) && (input1done == 1)){
                        char emergency[0];
-                       emergency[0] = Serial.read();
+                       emergency[0] = Serial.peek();
                        if( atoi(emergency) == 9){
                           Reset();
-                          Serial.flush();
+                          while(Serial.available()){
+                   Serial.read();}
                        }
         else{
                             if(Serial.available() == 5){
             char bytes2[5];
-            bytes2[0] = emergency[0];  
+            bytes2[0] = Serial.read();  
             bytes2[1] = Serial.read();
             bytes2[2] = Serial.read();
             bytes2[3] = Serial.read();
@@ -68,7 +70,8 @@ void ReadInputs(){
             Serial.println();
           }
         }
-}*/
+}
+}
 
 
 
