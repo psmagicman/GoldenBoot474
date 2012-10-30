@@ -14,6 +14,7 @@
 #include "ArduinoCOMM.h"
 #include "MovementAlgorithm.h"
 #include "Webcam.h"
+#include "ThresholdFile.h"
 
 class GUI : public QMainWindow
 {
@@ -30,8 +31,10 @@ private slots:
 	void on_leftReset_triggered();
 	void on_rightReset_triggered();
 
-	void on_leftsave_triggered();
-	void on_rightsave_triggered();
+	void on_leftsave_triggered() {_thresholdLeft->save();};
+	void on_rightsave_triggered() {_thresholdRight->save();};
+	void on_leftload_triggered() {_thresholdLeft->load();};
+	void on_rightload_triggered() {_thresholdRight->load();};
 
 	void writeLeftThreshold();
 	void writeRightThreshold();
@@ -45,6 +48,9 @@ private:
 
 	Webcam * _cam1;
 	Webcam * _cam2;
+
+	ThresholdFile * _thresholdLeft;
+	ThresholdFile * _thresholdRight;
 
 	QLabel * _progressLabel;
 	QProgressBar * _progressBar;

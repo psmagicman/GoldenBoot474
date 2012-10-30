@@ -62,8 +62,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="algorithmMain.cpp" />
     <ClCompile Include="GLOBALS.cpp" />
-    <ClCompile Include="main.cpp" />
     <ClCompile Include="MovementAlgorithm.cpp" />
   </ItemGroup>
   <ItemGroup>

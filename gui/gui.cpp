@@ -37,6 +37,8 @@ void GUI::init()
 	
 	connect(ui.leftSave, SIGNAL(clicked()), this, SLOT(on_leftsave_triggered()));
 	connect(ui.rightSave, SIGNAL(clicked()), this, SLOT(on_rightsave_triggered()));
+	connect(ui.leftLoad, SIGNAL(clicked()), this, SLOT(on_leftload_triggered()));
+	connect(ui.rightLoad, SIGNAL(clicked()), this, SLOT(on_rightload_triggered()));
 
 	connect(ui.spinLeftHueMin, SIGNAL(valueChanged(int)), this, SLOT(writeLeftThreshold()));
 	connect(ui.spinLeftHueMax, SIGNAL(valueChanged(int)), this, SLOT(writeLeftThreshold()));
@@ -67,6 +69,8 @@ void GUI::init()
 	// Initialize Webcams
 	_cam1 = new Webcam(0, true);
 	_cam2 = new Webcam(1, false);
+	_thresholdLeft = new ThresholdFile(_cam1, "LabLeft.xml");
+	_thresholdRight = new ThresholdFile(_cam2, "LabRight.xml");
 	
 	// Initialize Communication with Arduino
 	_arduino = new ArduinoCOMM("C:/Users/Wilbur/Desktop/GoldenBoot474/Debug/SerialCOMM.exe");
@@ -615,16 +619,6 @@ void GUI::writeRightThreshold()
 		_cam2->_robot2Amin = ui.spinRightAreaMin->value();
 		_cam2->_robot2Amax = ui.spinRightAreaMax->value();
 	}
-}
-
-void GUI::on_leftsave_triggered()
-{
-
-}
-
-void GUI::on_rightsave_triggered()
-{
-
 }
 
 double GUI::dist(double x1, double x2, double y1, double y2)
