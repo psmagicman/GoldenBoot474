@@ -263,38 +263,13 @@ void MovementAlgorithm::compareMultiBallDist() {
 	cout << "Ball closest to the robot is ball" << ballNum << endl;
 	cout << "Ball" << ballNum << " has a distance of " << temp << "feet." << endl;
 	actualBall = ballNum -1;
-	_X = algoBalls[actualBall].x;
-	_Y = algoBalls[actualBall].y;
 }
 
 void MovementAlgorithm::calcMultiBallAngle() {
 	double x, y;
 	x = algoBalls[actualBall].x - algoRobot.x;
 	y = algoBalls[actualBall].y - algoRobot.y;
-	if ( abs(x) < 0.01 ) {
-		if ( y > 0) {
-			angle = 90;
-		} 
-		else {
-			angle = -90;
-		}
-	}
-	else {
-		angle = atan2(abs(y), abs(x)) * 180 / PI;
-		if (y > 0 && x < 0) 
-			angle = 180 - angle;
-		else if (y < 0 && x < 0) 
-			angle = 180 + angle;
-		else if (y < 0 && x > 0) 
-			angle = 360 - angle;
-	}
-	angle = angle - algoRobot.angle/PI*180;
-	if (abs(angle) > 180) {
-		if (angle > 0)
-			angle = 360 - angle;
-		if (angle < 0)
-			angle = 360 + angle;
-	}
+	angle = atan2(y, x) * 180 / PI;
 }
 
 void MovementAlgorithm::calcMultiObsAngle() {

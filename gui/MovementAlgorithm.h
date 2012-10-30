@@ -17,7 +17,7 @@ public:
 	//MovementAlgorithm(Robot, Ball, Obstacle);
 	MovementAlgorithm();
 	MovementAlgorithm(Robot, vector<Ball>);
-	MovementAlgorithm(Robot, vector<Ball>, vector<Obstacle>);
+	MovementAlgorithm(Robot robot, vector<Ball> balls, vector<Obstacle> obstacles);
 	~MovementAlgorithm();
 
 	double returnBallDist();
@@ -31,61 +31,64 @@ public:
 	vector<int> returnLeftMotor();
 	int returnLeftSize();
 	int returnRightSize();
-	double returnBallY(){return _Y;};
-	double returnBallX(){return _X;};
-	//vector<Coord2D> returnPathPoints();
 	/*vector<double> returnBallDist();
 	vector<double> returnObsDist();*/
+
+	double getX() {return _X;};
+	double getY() {return _Y;};
 	
 private:
-	double _X;
-	double _Y;
 	Robot algoRobot;
+	Ball algoBall;
+	vector<Obstacle> algoObs;
+	vector<double> obsDist;
 	double finalBallDist;
-	//double obsDist;
 	double obsRange;
 	double angle;
 	double ball2obs;
 	bool moveFlag;
 	bool turnFlag;
 	bool obsFlag;
+	double _X;
+	double _Y;
 	int actualBall;
 	int actualObs;
+	double obsCirc;
 
 	vector<int> rightMotor;
 	vector<int> leftMotor;
 	int ticks;
 	vector<Ball> algoBalls;
-	vector<Obstacle> algoObs;
+	//vector<Obstacle> algoObstacle;
 	vector<double> ballsDist;
-	vector<double> obsDist;
-	//vector<double> ballsSlope;
-	//vector<double> obsSlope;
-	double obsCirc;
+	//vector<double> obsDist;
 	//vector<double> obsRange;
 
-
-	
-	void checkAngle(double);
-	void calcMultiBall();
-	void compareMultiBallDist();
-	void calcMultiBallAngle();
-	void calcMultiObsDist();
-	void determineForward();
-	void determineTurning();
-	void determineObsPath();
 	void determineObsTurn();
 	void determineObsForward();
-	void determineObs2BallTurn();
 	void determineObs2BallForward();
-	int calcForwardTicks();
-	int calcTurnTicks();
+	void determineObs2BallTurn();
+
 	int calcObsTurnTicks();
 	int calcObsForwardTicks();
 	int calcObs2BallForwardTicks();
 	int calcObs2BallTurnTicks();
-	void calcMultiObsAngle();
+
+	void determineObsPath();
 	double calcObsRange();
+	void calcMultiBallAngle();
+	void calcMultiObsDist();
+	void calcMultiObsAngle();
+	//void calcObsRange();
+	void checkAngle(double);
+	//void calcball2obs();
+	void calcMultiBall();
+	void compareMultiBallDist();
+	void calcMultiBallAngle(int);
+	void determineForward();
+	void determineTurning();
+	int calcForwardTicks();
+	int calcTurnTicks();
 };
 
 #endif MOVEMENTALGORITHM_H_

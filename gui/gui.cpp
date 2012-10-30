@@ -174,7 +174,7 @@ void GUI::display()
 					MovementAlgorithm algorithm = MovementAlgorithm(robot, balls);
 					vector<int> leftTicks = algorithm.returnLeftMotor();
 					vector<int> rightTicks = algorithm.returnRightMotor();
-					_path.push_back(Point2f(algorithm.returnBallX()*FINAL_WIDTH/8.0, algorithm.returnBallY()*FINAL_HEIGHT/8.0));
+					_path.push_back(Point2f(algorithm.getX()*FINAL_WIDTH/8.0, algorithm.getY()*FINAL_HEIGHT/8.0));
 					for (int i = 0; i < leftTicks.size(); i++) {
 						char leftTicksStr[5];
 						itoa(leftTicks[i],leftTicksStr,10);
