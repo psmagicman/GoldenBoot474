@@ -1,10 +1,8 @@
 #include "ArduinoCOMM.h"
 
-ArduinoCOMM::ArduinoCOMM(QString path, int port)
+ArduinoCOMM::ArduinoCOMM(QString path)
 {
-	QStringList arguments;
-	arguments << QString::number(port);
-	_arduino.start(path, arguments);
+	_arduino.start(path);
 }
 
 ArduinoCOMM::~ArduinoCOMM()

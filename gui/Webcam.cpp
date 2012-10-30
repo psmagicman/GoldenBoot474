@@ -281,7 +281,7 @@ void Webcam::calculateNormal(bool arena, bool balls, bool obstacles, bool robot,
 			for (int j = 0; j < obstaclesBotPts.size(); j++) {
 				if (
 					abs(obstaclesTopPts[i].y - obstaclesBotPts[j].y) < 100	&&
-					abs(obstaclesTopPts[i].x - obstaclesBotPts[j].x) < 20 
+					abs(obstaclesTopPts[i].x - obstaclesBotPts[j].x) < 50 
 					) 
 				{
 					if (dist(obstaclesTopPts[i].x , obstaclesBotPts[j].x, obstaclesTopPts[i].y, obstaclesBotPts[j].y) < 100) {
@@ -384,7 +384,7 @@ void Webcam::calculateFinal()
 					double distTemp = dist(_robotFrontPts[i].x, _robotBackPts[j].x, _robotFrontPts[i].y, _robotBackPts[j].y);
 					if (distTemp < _robotDist) {
 						_robotPts.push_back(_robotFrontPts[i]);
-						_robotPts.push_back(_robotBackPts[i]);
+						_robotPts.push_back(_robotBackPts[j]);
 						if (abs(_robotPts[0].x - _robotPts[1].x) < 0.5) {
 							if (_robotPts[0].y < _robotPts[1].y) // Facing Upwards
 								_robotAngle = CV_PI/2;

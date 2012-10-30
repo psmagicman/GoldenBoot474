@@ -9,7 +9,7 @@ using namespace std;
 class ArduinoCOMM
 {
 public:
-	ArduinoCOMM(QString path, int port);
+	ArduinoCOMM(QString path);
 	~ArduinoCOMM();
 
 	QString read();

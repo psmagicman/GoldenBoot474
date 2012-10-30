@@ -17,6 +17,11 @@ extern const double _ballRadius;
 extern const double _robotRadius;
 extern const double _obstacleRadius;
 
+struct Coord2D {
+	double x;
+	double y;
+};
+
 struct Robot {
 	double x;
 	double y;

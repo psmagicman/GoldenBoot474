@@ -33,6 +33,10 @@ private slots:
 	void writeLeftThreshold();
 	void writeRightThreshold();
 
+	void task1();
+	void task2();
+	void task3();
+
 private:
 	Ui::GUIClass ui;
 
@@ -45,7 +49,9 @@ private:
 
 	ArduinoCOMM * _arduino;
 	
-	bool test;
+	bool _task1;
+	bool _task2;
+	bool _task3;
 
 	IplImage * _image;
 	IplImage * _topImage;
@@ -53,6 +59,7 @@ private:
 	vector<Point2f> _balls;
 	vector<Point2f> _obstacles;
 	vector<Point2f> _robot;
+	vector<Point2f> _path;
 	double _robotAngle;
 
 	void init();

@@ -53,6 +53,10 @@ void GUI::init()
 	connect(ui.spinRightAreaMin, SIGNAL(valueChanged(int)), this, SLOT(writeRightThreshold()));
 	connect(ui.spinRightAreaMax, SIGNAL(valueChanged(int)), this, SLOT(writeRightThreshold()));
 
+	connect(ui.buttonTask1, SIGNAL(clicked()), this, SLOT(task1()));
+	connect(ui.buttonTask2, SIGNAL(clicked()), this, SLOT(task2()));
+	connect(ui.buttonTask3, SIGNAL(clicked()), this, SLOT(task3()));
+
 	// Initialize Timer
 	_timer = new QTimer(this);
 	connect(_timer, SIGNAL(timeout()), this, SLOT(display()));
@@ -62,9 +66,11 @@ void GUI::init()
 	_cam2 = new Webcam(1, false);
 	
 	// Initialize Communication with Arduino
-	_arduino = new ArduinoCOMM("C:/Users/Wilbur/Desktop/GoldenBoot474/Debug/SerialCOMM.exe", 1);
+	_arduino = new ArduinoCOMM("C:/Users/Wilbur/Desktop/GoldenBoot474/Debug/SerialCOMM.exe");
 
-	bool test = true;
+	_task1 = false;
+	_task2 = false;
+	_task3 = false;
 
 	// Initialize Images
 	_image = cvCreateImage(cvSize(WIDTH, HEIGHT), IPL_DEPTH_8U, 3);
@@ -135,20 +141,21 @@ void GUI::display()
 			// Process Both Obstacles
 			_obstacles = combinePts(_cam1->getObstacles(), _cam2->getObstacles());
 			_robot = _cam1->getRobot(); // Chose _cam1 because _cam1 is on Home end
-			_robotAngle = _cam1->getRobotAngle();
-
+			_robotAngle = CV_PI*2 - _cam1->getRobotAngle();
 			//detectObstacles();
 
 			// Algorithm
-			if (_arduino->read() == "PATH") {
+			if (_task1) {
+				_task1 = false;
 				if (_balls.size() > 0 && _robot.size() > 0) { 
 					Robot robot;
 					vector<Ball> balls;
 					vector<Obstacle> obstacles;
 				
 					robot.x = (double)_robot[0].x / (double)FINAL_WIDTH * 8.0;
-					robot.y = (double)_robot[0].y / (double)FINAL_WIDTH * 8.0;
+					robot.y = (double)_robot[0].y / (double)FINAL_HEIGHT * 8.0;
 					robot.angle = _robotAngle;
+					//robot.angle = 0;
 
 					balls.resize(_balls.size());
 					for (int i = 0; i < _balls.size(); i++) {
@@ -163,21 +170,21 @@ void GUI::display()
 					}
 
 					//MovementAlgorithm algorithm = MovementAlgorithm(robot, balls, obstacles);
+					_path.clear();
 					MovementAlgorithm algorithm = MovementAlgorithm(robot, balls);
 					vector<int> leftTicks = algorithm.returnLeftMotor();
 					vector<int> rightTicks = algorithm.returnRightMotor();
+					_path.push_back(Point2f(algorithm.returnBallX()*FINAL_WIDTH/8.0, algorithm.returnBallY()*FINAL_HEIGHT/8.0));
 					for (int i = 0; i < leftTicks.size(); i++) {
 						char leftTicksStr[5];
 						itoa(leftTicks[i],leftTicksStr,10);
+						_arduino->write((string)leftTicksStr);
+
 						char rightTicksStr[5];
 						itoa(rightTicks[i],rightTicksStr,10);
-						_arduino->write((string)leftTicksStr);
 						_arduino->write((string)rightTicksStr);
-						Sleep(100);
 					}
-				}
-				else if (_robot.size() > 0) {
-					_arduino->write("END");
+					//_arduino->write("EOL");
 				}
 			}
 			displayMain();
@@ -185,7 +192,7 @@ void GUI::display()
 			_cam2->release();
 		}
 	}
-	_arduino->write("OK");
+	//_arduino->write("OK");
 }
 
 vector<Point2f> GUI::combinePts(vector<Point2f> pts1, vector<Point2f> pts2)
@@ -277,7 +284,7 @@ void GUI::displayMain()
 		p.setPen(QPen(QColor(Qt::blue),5));
 		p.drawArc(_robot[0].x-_robotRadius, _robot[0].y-_robotRadius, _robotRadius*2, _robotRadius*2, 0, 16*360);
 		p.setPen(QPen(QColor(Qt::darkBlue),5));
-		p.drawLine(_robot[0].x, _robot[0].y, _robot[0].x + cos(_robotAngle)*20, _robot[0].y - sin(_robotAngle)*20);
+		p.drawLine(_robot[0].x, _robot[0].y, _robot[0].x + cos(_robotAngle)*20, _robot[0].y + sin(_robotAngle)*20);
 	}
 
 	// Draw Obstacles
@@ -287,8 +294,11 @@ void GUI::displayMain()
 	}
 
 	// Draw Pathing
-	if (_robot.size() > 0 && _balls.size() > 0) {
-
+	if (_robot.size() > 0 && _path.size() > 0) {
+		p.setPen(QPen(QColor(Qt::yellow), 5));
+		for (int i = 0; i < _path.size(); i++) {
+			p.drawLine(_robot[0].x, _robot[0].y, _path[i].x, _path[i].y);
+		}
 	}
 	p.end();
 
@@ -602,6 +612,21 @@ void GUI::writeRightThreshold()
 		_cam2->_robot2Amin = ui.spinRightAreaMin->value();
 		_cam2->_robot2Amax = ui.spinRightAreaMax->value();
 	}
+}
+
+void GUI::task1()
+{
+	_task1 = true;
+}
+
+void GUI::task2()
+{
+	_task2 = true;
+}
+
+void GUI::task3()
+{
+	_task3 = true;
 }
 
 double GUI::dist(double x1, double x2, double y1, double y2)
