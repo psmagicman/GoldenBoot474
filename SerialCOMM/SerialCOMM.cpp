@@ -12,19 +12,15 @@ void main(int argc, char * argv[])
 	CSerial serial;
 	string firstInput;
 	string secondInput;
-	string port = "0";
-	if (argc != 2) {
-		while (!atoi(port.c_str())) {
-			cout << "Enter Port Number: " << endl;
-			cin >> port;
-		}
-	}
-	while (serial.Open(atoi(port.c_str()), 57600)) {
+	while (serial.Open(1, 57600)) {
 		cin >> firstInput;
 		if (firstInput != "OK") {
 			if (firstInput == "STOP") {
 				char * STOP = {"E"};
 				int stopByte = serial.SendData(STOP, strlen(STOP));
+			} else if (firstInput == "EOL") {
+				char * EOL = {"N"};
+				int eolByte = serial.SendData(EOL, strlen(EOL));
 			} else if (firstInput == "KICK") {
 				char * KICK = {"K"};
 				int kickByte = serial.SendData(KICK, strlen(KICK));
