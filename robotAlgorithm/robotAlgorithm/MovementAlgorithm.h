@@ -6,7 +6,7 @@
 #include <math.h>
 #include <vector>
 
-#include "global.h"
+#include "GLOBALS.h"
 
 using namespace std;
 
@@ -15,9 +15,7 @@ public:
 	/* Constructor */
 	//MovementAlgorithm(Robot, vector<Ball>, vector<Obstacle>);
 	//MovementAlgorithm(Robot, Ball, Obstacle);
-	MovementAlgorithm();
 	MovementAlgorithm(Robot, vector<Ball>);
-	MovementAlgorithm(Robot, vector<Ball>, vector<Obstacle>);
 	~MovementAlgorithm();
 
 	double returnBallDist();
@@ -31,59 +29,46 @@ public:
 	vector<int> returnLeftMotor();
 	int returnLeftSize();
 	int returnRightSize();
-	int returnBallY();
-	int returnBallX();
-	//vector<Coord2D> returnPathPoints();
 	/*vector<double> returnBallDist();
 	vector<double> returnObsDist();*/
+
+	double getX() {return _X;};
+	double getY() {return _Y;};
 	
 private:
 	Robot algoRobot;
+	Ball algoBall;
+	Obstacle algoObs;
 	double finalBallDist;
-	//double obsDist;
+	double obsDist;
 	double obsRange;
 	double angle;
 	double ball2obs;
 	bool moveFlag;
 	bool turnFlag;
-	bool obsFlag;
-	int actualBall;
-	int actualObs;
+	double _X;
+	double _Y;
 
 	vector<int> rightMotor;
 	vector<int> leftMotor;
 	int ticks;
 	vector<Ball> algoBalls;
-	vector<Obstacle> algoObs;
+	//vector<Obstacle> algoObstacle;
 	vector<double> ballsDist;
-	vector<double> obsDist;
-	//vector<double> ballsSlope;
-	//vector<double> obsSlope;
-	double obsCirc;
+	//vector<double> obsDist;
 	//vector<double> obsRange;
 
 
-	
+	//void calcObsRange();
 	void checkAngle(double);
+	//void calcball2obs();
 	void calcMultiBall();
 	void compareMultiBallDist();
-	void calcMultiBallAngle();
-	void calcMultiObsDist();
+	void calcMultiBallAngle(int);
 	void determineForward();
 	void determineTurning();
-	void determineObsPath();
-	void determineObsTurn();
-	void determineObsForward();
-	void determineObs2BallTurn();
-	void determineObs2BallForward();
 	int calcForwardTicks();
 	int calcTurnTicks();
-	int calcObsTurnTicks();
-	int calcObsForwardTicks();
-	int calcObs2BallForwardTicks();
-	int calcObs2BallTurnTicks();
-	void calcMultiObsAngle();
-	double calcObsRange();
 };
 
 #endif MOVEMENTALGORITHM_H_
