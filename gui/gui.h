@@ -30,12 +30,15 @@ private slots:
 	void on_leftReset_triggered();
 	void on_rightReset_triggered();
 
+	void on_leftsave_triggered();
+	void on_rightsave_triggered();
+
 	void writeLeftThreshold();
 	void writeRightThreshold();
 
-	void task1();
-	void task2();
-	void task3();
+	void task1() {_task1 = true;};
+	void task2() {_task2 = true;};
+	void task3() {_task3 = true;};
 
 private:
 	Ui::GUIClass ui;

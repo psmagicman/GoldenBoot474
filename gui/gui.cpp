@@ -34,6 +34,9 @@ void GUI::init()
 	connect(ui.rightCalibrate, SIGNAL(clicked()), this, SLOT(on_rightCalibrate_triggered()));
 	connect(ui.leftReset, SIGNAL(clicked()), this, SLOT(on_leftReset_triggered()));
 	connect(ui.rightReset, SIGNAL(clicked()), this, SLOT(on_rightReset_triggered()));
+	
+	connect(ui.leftSave, SIGNAL(clicked()), this, SLOT(on_leftsave_triggered()));
+	connect(ui.rightSave, SIGNAL(clicked()), this, SLOT(on_rightsave_triggered()));
 
 	connect(ui.spinLeftHueMin, SIGNAL(valueChanged(int)), this, SLOT(writeLeftThreshold()));
 	connect(ui.spinLeftHueMax, SIGNAL(valueChanged(int)), this, SLOT(writeLeftThreshold()));
@@ -614,19 +617,14 @@ void GUI::writeRightThreshold()
 	}
 }
 
-void GUI::task1()
+void GUI::on_leftsave_triggered()
 {
-	_task1 = true;
+
 }
 
-void GUI::task2()
+void GUI::on_rightsave_triggered()
 {
-	_task2 = true;
-}
 
-void GUI::task3()
-{
-	_task3 = true;
 }
 
 double GUI::dist(double x1, double x2, double y1, double y2)

@@ -94,10 +94,13 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="GLOBALS.cpp" />
+    <ClCompile Include="GoldenBoot474.cpp" />
     <ClCompile Include="gui.cpp" />
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="ThresholdFile.cpp" />
+    <ClCompile Include="XMLReader.cpp" />
     <ClCompile Include="MovementAlgorithm.cpp" />
     <ClCompile Include="QuickSort.cpp" />
+    <ClCompile Include="tinyxml2.cpp" />
     <ClCompile Include="Webcam.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -129,8 +132,11 @@
     <ClInclude Include="ArduinoCOMM.h" />
     <ClInclude Include="GeneratedFiles\ui_gui.h" />
     <ClInclude Include="GLOBALS.h" />
+    <ClInclude Include="ThresholdFile.h" />
+    <ClInclude Include="XMLReader.h" />
     <ClInclude Include="MovementAlgorithm.h" />
     <ClInclude Include="QuickSort.h" />
+    <ClInclude Include="tinyxml2.h" />
     <ClInclude Include="Webcam.h" />
   </ItemGroup>
   <ItemGroup>
