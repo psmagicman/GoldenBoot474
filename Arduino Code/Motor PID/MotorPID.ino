@@ -46,8 +46,8 @@ int encoder2_in = A4;
 int dir_1 = A3;
 int dir_2 = A5;
 
-int pwm_1 = 255;
-int pwm_2 = 255;
+volatile int pwm_1 = 255;
+volatile int pwm_2 = 255;
 //volatile int pos_1 =0;
 //volatile int pos_2 =0;
 int pos_1 = 0;
@@ -60,17 +60,17 @@ int state =0;
 
 int input1done = 0;
 int input2data = 1;
-int poslistFlag = 0;
+int poslistFlag = 1;
 
 volatile int enc1_Count=0; 
 volatile int enc2_Count=0;
 volatile int tempdebug1 =0;
 volatile int tempdebug2 =0;
 
-int KP = 1;
-int KI = 0;
-int KD = 1;
-int error;
+//int KP = 1;
+//int KI = 0;
+//int KD = 1;
+volatile int error;
 
 void setup() {
 
@@ -146,10 +146,10 @@ void Stop()
 {
 	digitalWrite(enablepin_1, HIGH);
 	digitalWrite(enablepin_2, HIGH);
-	digitalWrite(motor1_pin_1, LOW);
-	digitalWrite(motor1_pin_2, LOW);
-	digitalWrite(motor2_pin_1, LOW); 
-	digitalWrite(motor2_pin_2, LOW);
+	digitalWrite(motor1_pin_1, HIGH);
+	digitalWrite(motor1_pin_2, HIGH);
+	digitalWrite(motor2_pin_1, HIGH); 
+	digitalWrite(motor2_pin_2, HIGH);
 }
 
 //_____________________________________________________________________________
@@ -160,16 +160,20 @@ void loop ()
 {
 	//Serial.print("Welcome to motor control");
 	Serial.print('\n');
-	//   Serial.print(tempdebug1);
-	Serial.print("Give me input");
-	//   Serial.print(tempdebug2);
-	Serial.print('\n'); 
-
+	
+	
 	//  while( state == 0){
 	//    ReadInputs();
 	//  }
 	while( state == 0 ){
+                //Serial.print("Give me input");
+                
+	        //Serial.print('\n'); 
 
+                enc1_Count =0;
+                enc2_Count =0;
+                Reset();
+                
 		if(Serial.peek() == 'N'){
 			state = 1;
 			while(Serial.available()){
@@ -187,13 +191,13 @@ void loop ()
 
 
 		if((Serial.available() == 5) && (input2data == 1 )){
-			char bytes1[5];
+			char bytes1[6];
 			bytes1[0] = Serial.read();  
 			bytes1[1] = Serial.read();
 			bytes1[2] = Serial.read();
 			bytes1[3] = Serial.read();
 			bytes1[4] = Serial.read();
-			// bytes1[5] = '\0';
+			bytes1[5] = '\0';
 			pos_1 = atoi(bytes1);
 			path.clear();
 			path.push_back(pos_1);
@@ -214,13 +218,13 @@ void loop ()
 			//    enc2_Count = 0;
 		}
 		if((Serial.available() == 5) && (input1done == 1)){
-			char bytes2[5];
+			char bytes2[6];
 			bytes2[0] = Serial.read();  
 			bytes2[1] = Serial.read();
 			bytes2[2] = Serial.read();
 			bytes2[3] = Serial.read();
 			bytes2[4] = Serial.read();
-			// bytes2[5] = '\0';
+			bytes2[5] = '\0';
 			pos_2 = atoi(bytes2);
 			path.push_back(pos_2);
 			_path.push_back(path);
@@ -238,21 +242,43 @@ void loop ()
 		}   
 	}
 	if(state == 1){    
+                
 		if (poslistFlag == 1) {
-			poslist++;
-			poslistFlag = 0;  
-			enc1_Count = 0;
-			enc2_Count = 0;
-		}
-		if( poslist == (_path.size()-1)){
-			state = 0;
-			Reset();
-		} else
-		{
-			pos_1 = _path[poslist][0];
+                        Serial.println("HELLO FLAG");
+                        Serial.print(enc1_Count);
+                        Serial.print(" ");
+                        Serial.print(enc2_Count);
+                        Serial.print("\n");
+                        Serial.print(pos_1);
+                        Serial.print(" ");
+                        Serial.print(pos_2);
+                        Serial.print("\n");
+                        pos_1 = _path[poslist][0];
 			pos_2 = _path[poslist][1];
 			abspos_1 = abs(pos_1);
 			abspos_2 = abs(pos_2);
+		        
+                        poslist++;
+			poslistFlag = 0;  
+			enc1_Count = 0;
+			enc2_Count = 0;
+                        if(abspos_1 != abspos_2){
+                          poslist = _path.size()+1;
+                        }
+		} 
+		if( poslist == (_path.size()+1)){
+			state = 0;
+                        enc1_Count=0;
+                        enc2_Count=0;
+                        Reset();
+                        poslist =0;
+                        path.clear();
+                        _path.clear();
+                        poslistFlag =1;
+                        Serial.write('1');
+		} else
+		{
+			
 			Serial.print("Begin:  ");
 			Serial.print('\n');
 			Serial.print("Error : ");
@@ -267,7 +293,7 @@ void loop ()
 			Serial.print(pos_2);
 			Serial.print('\n');
 			
-			Check ();
+			//Check ();
 			
 			//  Serial.print(error);
 			Serial.print("After the check pwm_1  pwm_2 : ");
@@ -294,30 +320,41 @@ void enc1()
 {
 	enc1_Count++;
 	Position();
+        Check();
 }
 
 void enc2()
 {
 	enc2_Count++;
 	Position();
+        Check();
 }
 
 void Check()
 { 
+//  int error;
 // int lastError = 0;
  //int sumError = 0;
 // float adjustment = 0;
 	if( enc1_Count == enc2_Count){
+            if (pos_1 != pos_2)
+              {
+                pwm_1 =100;
+                pwm_2 =100;
+              }
+             else 
+              {
 		pwm_1 = 255;
-		pwm_2 = 246; //Adjust to taste
+		pwm_2 = 255; //Adjust to taste
+              }
 		error = 0;
 	}
 	else if(enc1_Count > enc2_Count)
 	{ 
 		error = (enc1_Count - enc2_Count);
 		//   adjustment = (KP*error + KD*(error - lastError)+ KI*sumError);
-		pwm_2 += error*10;
-		pwm_1 = error*0; 
+		//pwm_2 += error + 12;
+		pwm_1 -= error + 12;
 		//  lastError = error;
 		//  sumError += error;
 	}
@@ -325,8 +362,8 @@ void Check()
 	{
 		error = (enc2_Count  - enc1_Count); 
 		// adjustment = KP*error + KD*(error - lastError)+ KI*sumError;
-		pwm_2 = error*0;
-		pwm_1 += error*10; 
+		pwm_2 -= error + 11;
+		//pwm_1 += error + 11; 
 		  // lastError = error;
 		  // sumError += error;
 	}
@@ -339,10 +376,10 @@ void Check()
 		pwm_1 = 255;
 	if (pwm_2 >= 255)
 		pwm_2 = 255;
-    if (pwm_1 <= 0)
-		pwm_1 = 0;
-    if (pwm_2 <= 0)
-		pwm_2 = 0;
+    if (pwm_1 <= 30)
+		pwm_1 = 30;
+    if (pwm_2 <= 30)
+		pwm_2 = 30;
 }
 
 void Movement()
@@ -373,14 +410,14 @@ void Movement()
 		else 
 		{
 			Stop();
-			state = 0;
+			//state = 0;
 			Serial.print("Stop");
 		}
 	} 
 	else
 	{
 		Stop();
-		state=0;
+		//state=0;
 	}
 }
 
@@ -407,9 +444,17 @@ void Reset(){
 	Stop(); 
 	//   enc1_Count =0;
 	//   enc2_Count =0;
-    pwm_1 = 255;
-    pwm_2 = 255;
-    pos_1 = 0;
+             if (pos_1 != pos_2)
+              {
+                pwm_1 =100;
+                pwm_2 =100;
+              }
+             else 
+              {
+		pwm_1 = 255;
+		pwm_2 = 255; 
+              }
+   pos_1 = 0;
     pos_2 = 0;
-    state = 0;
+    //state = 0;
 }
