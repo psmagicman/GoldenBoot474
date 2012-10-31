@@ -166,10 +166,6 @@ void loop ()
 	//    ReadInputs();
 	//  }
 	while( state == 0 ){
-                //Serial.print("Give me input");
-                
-	        //Serial.print('\n'); 
-
                 enc1_Count =0;
                 enc2_Count =0;
                 Reset();
@@ -244,21 +240,18 @@ void loop ()
 	if(state == 1){    
                 
 		if (poslistFlag == 1) {
-                        Serial.println("HELLO FLAG");
-                        Serial.print(enc1_Count);
-                        Serial.print(" ");
-                        Serial.print(enc2_Count);
-                        Serial.print("\n");
-                        Serial.print(pos_1);
-                        Serial.print(" ");
-                        Serial.print(pos_2);
-                        Serial.print("\n");
+                        Stop();
+                        delay(300);
+  
                         pos_1 = _path[poslist][0];
 			pos_2 = _path[poslist][1];
 			abspos_1 = abs(pos_1);
 			abspos_2 = abs(pos_2);
 		        
                         poslist++;
+                        
+                        
+
 			poslistFlag = 0;  
 			enc1_Count = 0;
 			enc2_Count = 0;
@@ -319,15 +312,16 @@ void loop ()
 void enc1()
 {
 	enc1_Count++;
-	Position();
-        Check();
+        Check();	
+        Position();
+        
 }
 
 void enc2()
 {
 	enc2_Count++;
-	Position();
-        Check();
+	Check();
+        Position();
 }
 
 void Check()
@@ -354,7 +348,7 @@ void Check()
 		error = (enc1_Count - enc2_Count);
 		//   adjustment = (KP*error + KD*(error - lastError)+ KI*sumError);
 		//pwm_2 += error + 12;
-		pwm_1 -= error + 12;
+		pwm_1 -= error + 60;
 		//  lastError = error;
 		//  sumError += error;
 	}
@@ -362,7 +356,7 @@ void Check()
 	{
 		error = (enc2_Count  - enc1_Count); 
 		// adjustment = KP*error + KD*(error - lastError)+ KI*sumError;
-		pwm_2 -= error + 11;
+		pwm_2 -= error + 60;
 		//pwm_1 += error + 11; 
 		  // lastError = error;
 		  // sumError += error;
@@ -378,7 +372,7 @@ void Check()
 		pwm_2 = 255;
     if (pwm_1 <= 30)
 		pwm_1 = 30;
-    if (pwm_2 <= 30)
+    if (pwm_2 <= 0)
 		pwm_2 = 30;
 }
 
