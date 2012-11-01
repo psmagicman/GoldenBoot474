@@ -106,7 +106,7 @@ void MovementAlgorithm::checkAngle(double botAngle) {
 		determineObs2BallForward();
 	}
 	else {
-		cout << "Robot needs to turn: " << botAngle - angle << " degrees..." << endl;
+		cout << "Robot needs to turn: " << angle - botAngle << " degrees..." << endl;
 		determineTurning();
 		determineForward();
 	}
@@ -170,7 +170,7 @@ int MovementAlgorithm::calcForwardTicks() {
 
 int MovementAlgorithm::calcTurnTicks() {
 	double tempTick;
-	angle = algoRobot.angle - angle;
+	angle = angle - algoRobot.angle;
 	tempTick = 2*PI*BOT_WIDTH;
 	tempTick = tempTick * angle / 360;
 	tempTick = tempTick / ONE_TICK;
