@@ -85,7 +85,8 @@ int main() {
 
 		int szMotorsLeft = algos.returnLeftSize();
 		int szMotorsRight = algos.returnRightSize();
-		//cout << "Closest ball coordinates: (" << algos.returnClosestBall().x << "," << algos.returnClosestBall().y << ")" << endl;
+		Coord2D closeBall = algos.returnClosestBall();
+		cout << "Closest ball coordinates: (" << closeBall.x << "," << closeBall.y << ")" << endl;
 		for(int i = 0; i < szMotorsRight; i++) {
 			cout << "Left Ticks" << i+1 << ": " << algos.returnLeftMotor()[i] << endl;
 			cout << "Right Ticks" << i+1 << ": " << algos.returnRightMotor()[i] << endl;

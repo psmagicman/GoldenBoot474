@@ -235,7 +235,7 @@ void MovementAlgorithm::calcMultiBall() {
 		y = algoBalls[i].y - tempY;
 		ballsDist[i] = sqrt(pow(x,2)+pow(y,2));
 		//ballsSlope[i] = tempY/tempX;
-		cout << "Ball" << i+1 << ": " << ballsDist[i] << "feet."<< endl;
+		cout << "Ball" << i+1 << ": " << ballsDist[i]/100 << "feet."<< endl;
 	}
 }
 
@@ -268,7 +268,7 @@ void MovementAlgorithm::compareMultiBallDist() {
 	}
 	finalBallDist = temp;
 	cout << "Ball closest to the robot is ball" << ballNum << endl;
-	cout << "Ball" << ballNum << " has a distance of " << temp << "feet." << endl;
+	cout << "Ball" << ballNum << " has a distance of " << temp/100 << "feet." << endl;
 	actualBall = ballNum -1;
 	closestBall.x = algoBalls[actualBall].x;
 	closestBall.y = algoBalls[actualBall].y;
