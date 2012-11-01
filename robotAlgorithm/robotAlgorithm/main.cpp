@@ -6,7 +6,7 @@
 #include <string>
 
 #include "MovementAlgorithm.h"
-#include "global.h"
+#include "GLOBALS.h"
 //#include "Serial.h"
 
 #include <opencv\cvaux.h>

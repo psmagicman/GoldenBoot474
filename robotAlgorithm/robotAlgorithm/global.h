@@ -2,8 +2,8 @@
 #define GLOBAL_H_
 
 struct Robot {
-	int x;
-	int y;
+	double x;
+	double y;
 	double angle;
 };
 
