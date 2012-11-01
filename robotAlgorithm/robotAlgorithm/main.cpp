@@ -45,7 +45,6 @@ int main() {
 	vector<Obstacle> obstacles;
 	MovementAlgorithm algos;
 
-	while(1) {
 		cout << "Enter the x coordinate of the robot: ";
 		cin >> robot.x;
 		cout << "Enter the y coordinate of the robot: ";
@@ -86,17 +85,11 @@ int main() {
 
 		int szMotorsLeft = algos.returnLeftSize();
 		int szMotorsRight = algos.returnRightSize();
-		if(szMotorsRight == szMotorsLeft)
-			cout << "szMotorsRight == szMotorsLeft" << endl;
-		else
-			cout << "szMotorsRight =/= szMotorsLeft" << endl;
+		cout << "Closest ball coordinates: (" << algos.returnClosestBall().x << "," << algos.returnClosestBall().y << ")" << endl;
 		for(int i = 0; i < szMotorsRight; i++) {
 			cout << "Left Ticks" << i+1 << ": " << algos.returnLeftMotor()[i] << endl;
 			cout << "Right Ticks" << i+1 << ": " << algos.returnRightMotor()[i] << endl;
 		}
-
-		if((cvWaitKey(10) & 255) == 27)
-			break;
-	}
+	system("PAUSE");
 	return 0;
 }

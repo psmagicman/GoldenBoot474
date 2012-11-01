@@ -90,6 +90,7 @@ vector<int> MovementAlgorithm::returnRightMotor() { return rightMotor; }
 vector<int> MovementAlgorithm::returnLeftMotor() { return leftMotor; }
 int MovementAlgorithm::returnLeftSize() { return leftMotor.size(); }
 int MovementAlgorithm::returnRightSize() { return rightMotor.size(); }
+Coord2D MovementAlgorithm::returnClosestBall() { return closestBall; } 
 
 void MovementAlgorithm::checkAngle(double botAngle) {
 	double tempAngle;
@@ -169,6 +170,7 @@ int MovementAlgorithm::calcForwardTicks() {
 int MovementAlgorithm::calcTurnTicks() {
 	double tempTick;
 	calcMultiBallAngle();
+
 	tempTick = 2*PI*BOT_WIDTH;
 	tempTick = tempTick * angle / 360;
 	tempTick = tempTick / ONE_TICK;
@@ -268,6 +270,8 @@ void MovementAlgorithm::compareMultiBallDist() {
 	cout << "Ball closest to the robot is ball" << ballNum << endl;
 	cout << "Ball" << ballNum << " has a distance of " << temp << "feet." << endl;
 	actualBall = ballNum -1;
+	closestBall.x = algoBalls[actualBall].x;
+	closestBall.y = algoBalls[actualBall].y;
 	_X = algoBalls[actualBall].x;
 	_Y = algoBalls[actualBall].y;
 }
