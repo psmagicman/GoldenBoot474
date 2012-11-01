@@ -66,7 +66,7 @@
     <ClCompile Include="MovementAlgorithm.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="global.h" />
+    <ClInclude Include="GLOBALS.h" />
     <ClInclude Include="MovementAlgorithm.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

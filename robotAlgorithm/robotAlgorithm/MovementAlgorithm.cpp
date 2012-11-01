@@ -18,19 +18,18 @@
 			to turn 5 degrees:	(pi/6)/0.333794219 ticks are needed for the right motor = 1.568627453 => 2 ticks
 								-(pi/6)/0.333794219 ticks are needed for the left motor = -1.568627453 => -2 ticks
 	Assume the arena size is 800x800
+	100 units is 1 ft
 */
 #include "MovementAlgorithm.h"
 
 #define PI 3.14159265
 #define ONE_TICK 0.0113
-#define BOT_WIDTH 0.1968504
+#define BOT_WIDTH 0.172244
 #define AVOID_DISTANCE 0.262467
 
 /* Constructor */
 
-MovementAlgorithm::MovementAlgorithm() {
-
-}
+MovementAlgorithm::MovementAlgorithm() {}
 
 MovementAlgorithm::MovementAlgorithm(Robot robot, vector<Ball> balls) {
 	algoRobot = robot;
@@ -39,8 +38,8 @@ MovementAlgorithm::MovementAlgorithm(Robot robot, vector<Ball> balls) {
 	obsFlag = 0;
 	algoBalls.resize(numBalls);
 	for(int i = 0; i < balls.size(); i++) {
-		algoBalls[i].x = balls[i].x;
-		algoBalls[i].y = balls[i].y;
+		algoBalls[i].x = balls[i].x * 100;		// coordinates are given in ft multiply by 100 to get the conversion to 800x800
+		algoBalls[i].y = balls[i].y * 100;
 		algoBalls[i].rad = balls[i].rad;
 	}
 
@@ -54,15 +53,15 @@ MovementAlgorithm::MovementAlgorithm(Robot robot, vector<Ball> balls, vector<Obs
 	int numBalls = balls.size();
 	algoBalls.resize(numBalls);
 	for(int i = 0; i < balls.size(); i++) {
-		algoBalls[i].x = balls[i].x;
-		algoBalls[i].y = balls[i].y;
+		algoBalls[i].x = balls[i].x * 100;
+		algoBalls[i].y = balls[i].y * 100;
 		algoBalls[i].rad = balls[i].rad;
 	}
 	int numObs = obstacles.size();
 	algoObs.resize(numObs);
 	for(int i = 0; i < obstacles.size(); i++) {
-		algoObs[i].x = obstacles[i].x;
-		algoObs[i].y = obstacles[i].y;
+		algoObs[i].x = obstacles[i].x * 100;
+		algoObs[i].y = obstacles[i].y * 100;
 		algoObs[i].rad = obstacles[i].rad;
 	}
 	calcMultiBall();
@@ -96,7 +95,7 @@ void MovementAlgorithm::checkAngle(double botAngle) {
 	double tempAngle;
 	tempAngle = botAngle * (180/PI);
 	calcMultiBallAngle();
-	if(botAngle > (angle-3) && botAngle < (angle+3))
+	if(botAngle > (angle-5) && botAngle < (angle+5))
 		determineForward();
 	else if(obsFlag) {
 		determineObsTurn();
@@ -162,7 +161,7 @@ void MovementAlgorithm::determineObs2BallTurn() {
 
 int MovementAlgorithm::calcForwardTicks() {
 	double tempTick;
-	tempTick = (finalBallDist / ONE_TICK) + 1.0;
+	tempTick = ((finalBallDist/100) / ONE_TICK) + 1.0;
 	cout << "Forward Ticks = " << tempTick << endl;
 	return (int) tempTick;
 }
@@ -224,12 +223,15 @@ int MovementAlgorithm::calcObs2BallTurnTicks() {
 // This method will calculate the distances of the balls from the robot
 // and save it into the ballsDist vector
 void MovementAlgorithm::calcMultiBall() {
+	double x, y;
 	double tempX, tempY;
+	tempX = algoRobot.x * 100;
+	tempY = algoRobot.y * 100;
 	ballsDist.resize(algoBalls.size());
 	for(int i = 0; i < ballsDist.size(); i++) {
-		tempX = (double)algoBalls[i].x - (double)algoRobot.x;
-		tempY = (double)algoBalls[i].y - (double)algoRobot.y;
-		ballsDist[i] = (double)sqrt(pow(tempX,2)+pow(tempY,2));
+		x = algoBalls[i].x - algoRobot.x;
+		y = algoBalls[i].y - algoRobot.y;
+		ballsDist[i] = sqrt(pow(x,2)+pow(y,2));
 		//ballsSlope[i] = tempY/tempX;
 		cout << "Ball" << i+1 << ": " << ballsDist[i] << "feet."<< endl;
 	}
@@ -263,13 +265,36 @@ void MovementAlgorithm::compareMultiBallDist() {
 	cout << "Ball closest to the robot is ball" << ballNum << endl;
 	cout << "Ball" << ballNum << " has a distance of " << temp << "feet." << endl;
 	actualBall = ballNum -1;
+	_X = algoBalls[actualBall].x;
+	_Y = algoBalls[actualBall].y;
 }
 
 void MovementAlgorithm::calcMultiBallAngle() {
 	double x, y;
 	x = algoBalls[actualBall].x - algoRobot.x;
 	y = algoBalls[actualBall].y - algoRobot.y;
-	angle = atan2(y, x) * 180 / PI;
+	if ( abs(x) < 0.01 ) {
+		if (y > 0)
+			angle = 90;
+		else
+			angle = 270;
+	}
+	else if(abs(y) < 0.01) {
+		if(x > 0)
+			angle = 0;
+		else
+			angle = 180;
+	}
+	else {
+		// default angle is for quadrant 1
+		angle = atan2(abs(y),abs(x)) * (180/PI);	// will always give positive angles
+		if((algoBalls[actualBall].x < algoRobot.x) && (algoBalls[actualBall].y > algoRobot.y))
+			angle = 180 - angle;	// angle for quadrant 2
+		else if((algoBalls[actualBall].x < algoRobot.x) && (algoBalls[actualBall].y < algoRobot.y))
+			angle = 270 - angle;	// angle for quadrant 3
+		else if((algoBalls[actualBall].x > algoRobot.x) && (algoBalls[actualBall].y > algoRobot.y))
+			angle = 360 - angle;	// angle for quadrant 4
+	}
 }
 
 void MovementAlgorithm::calcMultiObsAngle() {

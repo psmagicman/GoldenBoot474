@@ -15,7 +15,9 @@ public:
 	/* Constructor */
 	//MovementAlgorithm(Robot, vector<Ball>, vector<Obstacle>);
 	//MovementAlgorithm(Robot, Ball, Obstacle);
+	MovementAlgorithm();
 	MovementAlgorithm(Robot, vector<Ball>);
+	MovementAlgorithm(Robot robot, vector<Ball> balls, vector<Obstacle> obstacles);
 	~MovementAlgorithm();
 
 	double returnBallDist();
@@ -38,16 +40,20 @@ public:
 private:
 	Robot algoRobot;
 	Ball algoBall;
-	Obstacle algoObs;
+	vector<Obstacle> algoObs;
+	vector<double> obsDist;
 	double finalBallDist;
-	double obsDist;
 	double obsRange;
 	double angle;
 	double ball2obs;
 	bool moveFlag;
 	bool turnFlag;
+	bool obsFlag;
 	double _X;
 	double _Y;
+	int actualBall;
+	int actualObs;
+	double obsCirc;
 
 	vector<int> rightMotor;
 	vector<int> leftMotor;
@@ -58,7 +64,21 @@ private:
 	//vector<double> obsDist;
 	//vector<double> obsRange;
 
+	void determineObsTurn();
+	void determineObsForward();
+	void determineObs2BallForward();
+	void determineObs2BallTurn();
 
+	int calcObsTurnTicks();
+	int calcObsForwardTicks();
+	int calcObs2BallForwardTicks();
+	int calcObs2BallTurnTicks();
+
+	void determineObsPath();
+	double calcObsRange();
+	void calcMultiBallAngle();
+	void calcMultiObsDist();
+	void calcMultiObsAngle();
 	//void calcObsRange();
 	void checkAngle(double);
 	//void calcball2obs();
