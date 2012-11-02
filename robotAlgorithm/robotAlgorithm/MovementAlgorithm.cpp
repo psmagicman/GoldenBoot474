@@ -118,6 +118,8 @@ void MovementAlgorithm::determineForward() {
 	leftMotor.push_back(ticks);
 	rightMotor.push_back(ticks);
 	Coord2D insertPath;
+	// x is left
+	// y is right
 	insertPath.x = ticks;
 	insertPath.y = ticks;
 	path.push_back(insertPath);
@@ -129,16 +131,24 @@ void MovementAlgorithm::determineTurning() {
 	ticks = calcTurnTicks();
 	if(angle > 180 && angle < 360) {
 		// left gets positive ticks
-		leftMotor.push_back(ticks);
-		rightMotor.push_back(-ticks);
+		leftMotor.push_back(ticks);		// complement this if it is turning in the wrong direction
+		rightMotor.push_back(-ticks);	// complement this if it is turning in the wrong direction
 		Coord2D insertPath;
+		// x is left
+		// y is right
 		insertPath.x = ticks;
 		insertPath.y = -ticks;
 		path.push_back(insertPath);
 	}
 	else {
-		leftMotor.push_back(-ticks);
-		rightMotor.push_back(ticks);
+		leftMotor.push_back(-ticks);	// complement this if it is turning in the wrong direction
+		rightMotor.push_back(ticks);	// complement this if it is turning in the wrong direction
+		Coord2D insertPath;
+		// x is left
+		// y is right
+		insertPath.x = -ticks;
+		insertPath.y = ticks;
+		path.push_back(insertPath);
 	}
 }
 

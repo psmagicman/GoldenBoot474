@@ -94,6 +94,11 @@ int main() {
 		}
 		vector<Coord2D> path;
 		path = algos.returnPath();
+		cout << "Size of path variable is: " << path.size() << endl;
+		for(int i = 0; i < path.size(); i++) {
+			cout << "Path[x] " << i+1 << " = " << path[i].x << endl;
+			cout << "Path[y] " << i+1 << " = " << path[i].y << endl;
+		}
 	system("PAUSE");
 	return 0;
 }
