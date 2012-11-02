@@ -13,20 +13,20 @@ void LeftTurn(int pwm_1, int pwm_2)
 {   
 	analogWrite(enablepin_1, pwm_1);
 	analogWrite(enablepin_2, pwm_2);
-	digitalWrite(motor1_pin_1, HIGH);
-	digitalWrite(motor1_pin_2, LOW);
-	digitalWrite(motor2_pin_1, LOW);
-	digitalWrite(motor2_pin_2, HIGH); 
+	digitalWrite(motor1_pin_1, LOW);
+	digitalWrite(motor1_pin_2, HIGH);
+	digitalWrite(motor2_pin_1, HIGH);
+	digitalWrite(motor2_pin_2, LOW); 
 }
 
 void RightTurn(int pwm_1, int pwm_2) 
 {  
 	analogWrite(enablepin_1, pwm_1);
 	analogWrite(enablepin_2, pwm_2);
-	digitalWrite(motor1_pin_1, LOW);
-	digitalWrite(motor1_pin_2, HIGH);
-	digitalWrite(motor2_pin_1, HIGH);
-	digitalWrite(motor2_pin_2, LOW);  
+	digitalWrite(motor1_pin_1, HIGH);
+	digitalWrite(motor1_pin_2, LOW);
+	digitalWrite(motor2_pin_1, LOW);
+	digitalWrite(motor2_pin_2, HIGH);  
 }
 
 void Reverse(int pwm_1, int pwm_2)
@@ -130,13 +130,13 @@ void Movement()
 		}
 		else if ( pos_1 >= 0 && pos_2 < 0 )
 		{
-			RightTurn(pwm_1, pwm_2);
-			Serial.print("Right Turn");
+			LeftTurn(pwm_1, pwm_2);
+			Serial.print("Left Turn");
 		}
 		else if ( pos_1 < 0 && pos_2 >= 0 )
 		{
-			LeftTurn(pwm_1, pwm_2); 
-			Serial.print("Left Turn");
+			RightTurn(pwm_1, pwm_2); 
+			Serial.print("Right Turn");
 		}
 		else if ( pos_1 < 0 && pos_2 < 0 )
 		{
@@ -159,24 +159,11 @@ void Movement()
 
 void Position()
 {  
-	if ((enc1_Count >= abspos_1) && (enc2_Count >= abspos_2))
-	{
-		//tempdebug1 = enc1_Count;
-		//tempdebug2 = enc2_Count; 
-		//Reset();
-          /*      if( pos_1 > pos_2){
-                  RightTurn(255,255);
-                }
-                else if(pos_1 < pos_2){
-                  LeftTurn(255,255);
-                }
-                else if(abspos_1 == abspos_2){
-                  Reverse(255, 255); 
-                }
-                else{ Stop();} */
+         if((enc1_Count >= abspos_1) && (enc2_Count >= abspos_2))
+         {
                 Stop();
-		//    enc1_Count =0;
-		//    enc2_Count =0;
+		    enc1_Count =0;
+		    enc2_Count =0;
 		//    pwm_1 = 255;
 		//    pwm_2 = 255;
 		//    pos_1 = 0;
@@ -185,6 +172,22 @@ void Position()
 		poslistFlag = 1;
                 
 	}
+	if ((abspos_1 != 0) && (abspos_2 !=0) && (enc1_Count >= abspos_1*0.8) && (enc2_Count >= abspos_2*0.8) )
+	{
+		
+                if( pos_1 > pos_2){
+                  RightTurn(pwm_1,pwm_2);
+                }
+                else if(pos_1 < pos_2){
+                  LeftTurn(pwm_1,pwm_2);
+                }
+                else if(abspos_1 == abspos_2){
+                  Reverse(pwm_1, pwm_2); 
+                }
+                else{ Stop();} 
+         
+         }
+        
 }
 
 
@@ -223,6 +226,9 @@ void MotorControl(){
 			abspos_2 = abs(pos_2);
 		        
                         poslist++;
+                        Serial.println("ENCODER");
+                        Serial.println(enc1_Count);
+                        Serial.println(enc2_Count);
                         
                         
                         pwm_1 =255;

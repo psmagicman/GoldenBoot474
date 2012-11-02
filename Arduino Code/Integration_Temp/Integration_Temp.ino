@@ -108,7 +108,7 @@ void setup() {
 	digitalWrite(encoder2_in, HIGH);
 	digitalWrite(dir_2, HIGH);
 	PCintPort::attachInterrupt(encoder2_in, enc2, RISING);
-
+        Reset();
 	delay(500);
 }
 
