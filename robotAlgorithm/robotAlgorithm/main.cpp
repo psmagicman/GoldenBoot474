@@ -92,6 +92,8 @@ int main() {
 			cout << "Left Ticks" << i+1 << ": " << algos.returnLeftMotor()[i] << endl;
 			cout << "Right Ticks" << i+1 << ": " << algos.returnRightMotor()[i] << endl;
 		}
+		vector<Coord2D> path;
+		path = algos.returnPath();
 	system("PAUSE");
 	return 0;
 }

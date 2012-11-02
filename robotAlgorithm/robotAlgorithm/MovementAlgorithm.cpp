@@ -90,7 +90,8 @@ vector<int> MovementAlgorithm::returnRightMotor() { return rightMotor; }
 vector<int> MovementAlgorithm::returnLeftMotor() { return leftMotor; }
 int MovementAlgorithm::returnLeftSize() { return leftMotor.size(); }
 int MovementAlgorithm::returnRightSize() { return rightMotor.size(); }
-Coord2D MovementAlgorithm::returnClosestBall() { return closestBall; } 
+Coord2D MovementAlgorithm::returnClosestBall() { return closestBall; }
+vector<Coord2D> MovementAlgorithm::returnPath() { return path;}
 
 void MovementAlgorithm::checkAngle(double botAngle) {
 	double tempAngle;
@@ -116,6 +117,10 @@ void MovementAlgorithm::determineForward() {
 	ticks = calcForwardTicks();
 	leftMotor.push_back(ticks);
 	rightMotor.push_back(ticks);
+	Coord2D insertPath;
+	insertPath.x = ticks;
+	insertPath.y = ticks;
+	path.push_back(insertPath);
 }
 
 // This method will determine which motor will receive positive ticks 
@@ -126,6 +131,10 @@ void MovementAlgorithm::determineTurning() {
 		// left gets positive ticks
 		leftMotor.push_back(ticks);
 		rightMotor.push_back(-ticks);
+		Coord2D insertPath;
+		insertPath.x = ticks;
+		insertPath.y = -ticks;
+		path.push_back(insertPath);
 	}
 	else {
 		leftMotor.push_back(-ticks);
@@ -175,15 +184,15 @@ int MovementAlgorithm::calcTurnTicks() {
 	tempY = algoRobot.y * 100;
 	angle = angle - algoRobot.angle;
 	diffAngle = angle;
-	cout << "Turning angle = " << angle << endl;
+	//cout << "Turning angle = " << angle << endl;
 	if(angle < 0) {
 		angle += 360;
-		cout << "New Angle = " << angle << endl;
+		//cout << "New Angle = " << angle << endl;
 		if(angle > 180)
 			angle = 360 - angle;
 	}
 
-	cout << "Final Angle = " << angle << endl;
+	//cout << "Final Angle = " << angle << endl;
 	tempTick = 2*PI*BOT_WIDTH;
 	tempTick = tempTick * angle / 360;
 	tempTick = tempTick / ONE_TICK;

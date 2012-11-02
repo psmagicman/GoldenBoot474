@@ -32,6 +32,7 @@ public:
 	int returnLeftSize();
 	int returnRightSize();
 	Coord2D returnClosestBall();
+	vector<Coord2D> returnPath();
 	/*vector<double> returnBallDist();
 	vector<double> returnObsDist();*/
 
@@ -60,6 +61,7 @@ private:
 	vector<int> rightMotor;
 	vector<int> leftMotor;
 	Coord2D closestBall;
+	vector<Coord2D> path;
 	int ticks;
 	vector<Ball> algoBalls;
 	//vector<Obstacle> algoObstacle;
