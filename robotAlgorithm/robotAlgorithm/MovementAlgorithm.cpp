@@ -193,8 +193,10 @@ int MovementAlgorithm::calcTurnTicks() {
 	tempX = algoRobot.x * 100;
 	tempY = algoRobot.y * 100;
 	angle = angle - algoRobot.angle;
-	diffAngle = angle;
 	//cout << "Turning angle = " << angle << endl;
+	if(angle > 180)
+		angle = angle - 180;
+	diffAngle = angle;
 	if(angle < 0) {
 		angle += 360;
 		//cout << "New Angle = " << angle << endl;
@@ -333,7 +335,7 @@ void MovementAlgorithm::calcMultiBallAngle() {
 		if((algoBalls[actualBall].x < tempX) && (algoBalls[actualBall].y > tempY))
 			angle = 180 - angle;	// angle for quadrant 2
 		else if((algoBalls[actualBall].x < tempX) && (algoBalls[actualBall].y < tempY))
-			angle = 270 - angle;	// angle for quadrant 3
+			angle = 180 + angle;	// angle for quadrant 3
 		else if((algoBalls[actualBall].x > tempX) && (algoBalls[actualBall].y > tempY))
 			angle = 360 - angle;	// angle for quadrant 4
 	}
