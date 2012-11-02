@@ -79,17 +79,14 @@ int main() {
 			obstacles[i].rad = OBSTACLE_RADIUS;
 		}
 		if(numObs > 0)
-			MovementAlgorithm algos = MovementAlgorithm(robot, balls, obstacles);
+			algos = MovementAlgorithm(robot, balls, obstacles);
 		else
-			MovementAlgorithm algos = MovementAlgorithm(robot, balls);
+			algos = MovementAlgorithm(robot, balls);
 
 		int szMotorsLeft = algos.returnLeftSize();
 		int szMotorsRight = algos.returnRightSize();
 		Coord2D closeBall;
 		closeBall = algos.returnClosestBall();
-		int tx = algos.getX();
-		int ty = algos.getY();
-		for(int j = 0; j < 10; j++);
 		cout << "Closest ball coordinates: (" << closeBall.x << "," << closeBall.y << ")" << endl;
 		for(int i = 0; i < szMotorsRight; i++) {
 			cout << "Left Ticks" << i+1 << ": " << algos.returnLeftMotor()[i] << endl;

@@ -106,7 +106,7 @@ void MovementAlgorithm::checkAngle(double botAngle) {
 		determineObs2BallForward();
 	}
 	else {
-		cout << "Robot needs to turn: " << angle - botAngle << " degrees..." << endl;
+		cout << "Robot needs to turn to " << angle << " degrees" << endl;
 		determineTurning();
 		determineForward();
 	}
@@ -122,7 +122,7 @@ void MovementAlgorithm::determineForward() {
 // and which will receive negative ticks
 void MovementAlgorithm::determineTurning() {
 	ticks = calcTurnTicks();
-	if(angle < 0) {
+	if(angle > 180 && angle < 360) {
 		// left gets positive ticks
 		leftMotor.push_back(ticks);
 		rightMotor.push_back(-ticks);
@@ -135,7 +135,7 @@ void MovementAlgorithm::determineTurning() {
 
 void MovementAlgorithm::determineObsTurn() {
 	ticks = calcObsTurnTicks();
-	if(angle < 0) {
+	if(diffAngle < 0) {
 		leftMotor.push_back(ticks);
 		rightMotor.push_back(-ticks);
 	}
@@ -170,7 +170,20 @@ int MovementAlgorithm::calcForwardTicks() {
 
 int MovementAlgorithm::calcTurnTicks() {
 	double tempTick;
+	double tempX, tempY;
+	tempX = algoRobot.x * 100;
+	tempY = algoRobot.y * 100;
 	angle = angle - algoRobot.angle;
+	diffAngle = angle;
+	cout << "Turning angle = " << angle << endl;
+	if(angle < 0) {
+		angle += 360;
+		cout << "New Angle = " << angle << endl;
+		if(angle > 180)
+			angle = 360 - angle;
+	}
+
+	cout << "Final Angle = " << angle << endl;
 	tempTick = 2*PI*BOT_WIDTH;
 	tempTick = tempTick * angle / 360;
 	tempTick = tempTick / ONE_TICK;

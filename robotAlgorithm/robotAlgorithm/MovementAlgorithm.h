@@ -46,6 +46,7 @@ private:
 	double finalBallDist;
 	double obsRange;
 	double angle;
+	double diffAngle;
 	double ball2obs;
 	bool moveFlag;
 	bool turnFlag;
