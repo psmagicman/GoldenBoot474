@@ -31,7 +31,7 @@ struct Robot {
 struct Ball {
 	double x;
 	double y;
-	double rad;
+	int rad;
 };
 
 struct Obstacle {

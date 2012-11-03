@@ -129,7 +129,7 @@ void MovementAlgorithm::determineForward() {
 // and which will receive negative ticks
 void MovementAlgorithm::determineTurning() {
 	ticks = calcTurnTicks();
-	if(angle > 180 && angle < 360) {
+	if((diffAngle > - 180 && diffAngle < 0) || (diffAngle > 180 && diffAngle < 360)) {
 		// left gets positive ticks
 		leftMotor.push_back(ticks);		// complement this if it is turning in the wrong direction
 		rightMotor.push_back(-ticks);	// complement this if it is turning in the wrong direction
@@ -193,22 +193,19 @@ int MovementAlgorithm::calcTurnTicks() {
 	tempX = algoRobot.x * 100;
 	tempY = algoRobot.y * 100;
 	angle = angle - algoRobot.angle;
+	diffAngle = angle;
 	//cout << "Turning angle = " << angle << endl;
 	if(angle > 180)
 		angle = angle - 180;
-	diffAngle = angle;
-	if(angle < 0) {
-		angle += 360;
-		//cout << "New Angle = " << angle << endl;
-		if(angle > 180)
-			angle = 360 - angle;
-	}
-
-	//cout << "Final Angle = " << angle << endl;
+	else if(angle < -180)
+		angle = angle + 180;
 	tempTick = 2*PI*BOT_WIDTH;
 	tempTick = tempTick * angle / 360;
 	tempTick = tempTick / ONE_TICK;
-	tempTick = tempTick + 1.0;
+	if(angle > 0)
+		tempTick = tempTick - 1.0;
+	else
+		tempTick = tempTick + 1.0;
 	cout << "Turn Ticks = " << tempTick << endl;
 	return (int)abs(tempTick);
 }
