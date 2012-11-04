@@ -196,13 +196,13 @@ int MovementAlgorithm::calcTurnTicks() {
 	diffAngle = angle;
 	//cout << "Turning angle = " << angle << endl;
 	if(angle > 180)
-		angle = angle - 180;
+		angle = 360 - angle;
 	else if(angle < -180)
 		angle = angle + 180;
 	tempTick = 2*PI*BOT_WIDTH;
 	tempTick = tempTick * angle / 360;
 	tempTick = tempTick / ONE_TICK;
-	if(angle > 0)
+	if(angle < 0)
 		tempTick = tempTick - 1.0;
 	else
 		tempTick = tempTick + 1.0;
@@ -330,11 +330,11 @@ void MovementAlgorithm::calcMultiBallAngle() {
 		// default angle is for quadrant 1
 		angle = atan2(abs(y),abs(x)) * (180/PI);	// will always give positive angles
 		if((algoBalls[actualBall].x < tempX) && (algoBalls[actualBall].y > tempY))
-			angle = 180 - angle;	// angle for quadrant 2
+			angle = 90 + angle;	// angle for quadrant 2
 		else if((algoBalls[actualBall].x < tempX) && (algoBalls[actualBall].y < tempY))
 			angle = 180 + angle;	// angle for quadrant 3
-		else if((algoBalls[actualBall].x > tempX) && (algoBalls[actualBall].y > tempY))
-			angle = 360 - angle;	// angle for quadrant 4
+		else if((algoBalls[actualBall].x > tempX) && (algoBalls[actualBall].y < tempY))
+			angle = 270 + angle;	// angle for quadrant 4
 	}
 }
 
