@@ -33,6 +33,7 @@ public:
 	int returnRightSize();
 	Coord2D returnClosestBall();
 	vector<Coord2D> returnPath();
+	int returnAngle();
 	/*vector<double> returnBallDist();
 	vector<double> returnObsDist();*/
 

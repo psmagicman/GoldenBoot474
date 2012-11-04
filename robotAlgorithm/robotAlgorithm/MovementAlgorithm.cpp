@@ -92,6 +92,7 @@ int MovementAlgorithm::returnLeftSize() { return leftMotor.size(); }
 int MovementAlgorithm::returnRightSize() { return rightMotor.size(); }
 Coord2D MovementAlgorithm::returnClosestBall() { return closestBall; }
 vector<Coord2D> MovementAlgorithm::returnPath() { return path;}
+int MovementAlgorithm::returnAngle() { return (int)angle; }
 
 void MovementAlgorithm::checkAngle(double botAngle) {
 	double tempAngle;
@@ -107,7 +108,7 @@ void MovementAlgorithm::checkAngle(double botAngle) {
 		determineObs2BallForward();
 	}
 	else {
-		cout << "Robot needs to turn to " << angle << " degrees" << endl;
+		//cout << "Robot needs to turn to " << angle << " degrees" << endl;
 		determineTurning();
 		determineForward();
 	}
@@ -183,7 +184,7 @@ void MovementAlgorithm::determineObs2BallTurn() {
 int MovementAlgorithm::calcForwardTicks() {
 	double tempTick;
 	tempTick = ((finalBallDist/100) / ONE_TICK) + 1.0;
-	cout << "Forward Ticks = " << tempTick << endl;
+	//cout << "Forward Ticks = " << tempTick << endl;
 	return (int) tempTick;
 }
 
@@ -206,7 +207,7 @@ int MovementAlgorithm::calcTurnTicks() {
 		tempTick = tempTick - 1.0;
 	else
 		tempTick = tempTick + 1.0;
-	cout << "Turn Ticks = " << tempTick << endl;
+	//cout << "Turn Ticks = " << tempTick << endl;
 	return (int)abs(tempTick);
 }
 
@@ -217,14 +218,14 @@ int MovementAlgorithm::calcObsTurnTicks() {
 	tempTick = tempTick * angle / 360;
 	tempTick = tempTick / ONE_TICK;
 	tempTick = tempTick + 1.0;
-	cout << "Turn ticks to avoid obstacle = " << tempTick << endl;
+	//cout << "Turn ticks to avoid obstacle = " << tempTick << endl;
 	return (int)abs(tempTick);
 }
 
 int MovementAlgorithm::calcObsForwardTicks() {
 	double tempTick;
 	tempTick = (obsDist[actualObs] / ONE_TICK) + 1.0;
-	cout << "Forward ticks to avoid obstacle = " << tempTick << endl;
+	//cout << "Forward ticks to avoid obstacle = " << tempTick << endl;
 	return (int)tempTick;
 }
 
@@ -235,7 +236,7 @@ int MovementAlgorithm::calcObs2BallForwardTicks() {
 	y = (double)algoBalls[actualBall].y - ((double)algoObs[actualBall].y + algoObs[0].rad + AVOID_DISTANCE);
 	hypo = (double)sqrt((double)pow(x,2)+(double)pow(y,2));
 	tempTick = (hypo / ONE_TICK) + 1.0;
-	cout << "Forward Ticks = " << tempTick << endl;
+	//cout << "Forward Ticks = " << tempTick << endl;
 	return (int)tempTick;
 }
 
@@ -266,7 +267,7 @@ void MovementAlgorithm::calcMultiBall() {
 		y = algoBalls[i].y - tempY;
 		ballsDist[i] = sqrt(pow(x,2)+pow(y,2));
 		//ballsSlope[i] = tempY/tempX;
-		cout << "Ball" << i+1 << ": " << ballsDist[i]/100 << "feet."<< endl;
+		//cout << "Ball" << i+1 << ": " << ballsDist[i]/100 << "feet."<< endl;
 	}
 }
 
@@ -298,8 +299,8 @@ void MovementAlgorithm::compareMultiBallDist() {
 		}
 	}
 	finalBallDist = temp;
-	cout << "Ball closest to the robot is ball" << ballNum << endl;
-	cout << "Ball" << ballNum << " has a distance of " << temp/100 << "feet." << endl;
+	//cout << "Ball closest to the robot is ball" << ballNum << endl;
+	//cout << "Ball" << ballNum << " has a distance of " << temp/100 << "feet." << endl;
 	actualBall = ballNum -1;
 	closestBall.x = algoBalls[actualBall].x;
 	closestBall.y = algoBalls[actualBall].y;
