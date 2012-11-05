@@ -187,10 +187,10 @@ void KicktheBall()
              {
                Serial.println("Actuator is fully out");
                  
-                 pos_1 = 5; 
-                 pos_2 = 5;  
-                 abspos_1 =5;
-                 abspos_2 =5;
+                 pos_1 = 150; 
+                 pos_2 = 150;  
+                 abspos_1 =150;
+                 abspos_2 =150;
                  enc1_Count =0;
                  enc2_Count =0;
                  Serial.println("Accelerate");
@@ -223,10 +223,10 @@ void KicktheBall()
                   if (flag ==1)
              {
                Serial.println("Actuator is fully in "); 
-                 pos_1 = 5; 
-                 pos_2 = 5; 
-                 abspos_1 =5;
-                 abspos_2 =5;
+                 pos_1 = 150; 
+                 pos_2 = 150; 
+                 abspos_1 =150;
+                 abspos_2 =150;
                  enc1_Count =0;
                  enc2_Count =0;
                    Serial.println("Reverse ");
