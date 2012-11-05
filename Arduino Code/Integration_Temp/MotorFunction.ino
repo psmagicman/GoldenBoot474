@@ -43,10 +43,10 @@ void Stop()
 {
 	digitalWrite(enablepin_1, HIGH);
 	digitalWrite(enablepin_2, HIGH);
-	digitalWrite(motor1_pin_1, HIGH);
-	digitalWrite(motor1_pin_2, HIGH);
-	digitalWrite(motor2_pin_1, HIGH); 
-	digitalWrite(motor2_pin_2, HIGH);
+	digitalWrite(motor1_pin_1, LOW);
+	digitalWrite(motor1_pin_2, LOW);
+	digitalWrite(motor2_pin_1, LOW); 
+	digitalWrite(motor2_pin_2, LOW);
 }
 
 
@@ -75,13 +75,26 @@ void Check()
 	if( enc1_Count == enc2_Count){
             if (pos_1 != pos_2)
               {
-                pwm_1 =100;
-                pwm_2 =100;
+                if( (enc1_Count*100 >= abspos_1*50) && (enc2_Count*100 >= abspos_2*50)){  //Slow down before stopping
+                  pwm_1 = 60;
+                  pwm_2 = 60;
+                  
+                }
+                else{
+                  pwm_1 =100;
+                  pwm_2 =100;
+                }
               }
              else 
               {
-		pwm_1 = 255;
-		pwm_2 = 255; //Adjust to taste
+                if( (enc1_Count*100 >= abspos_1*50) && (enc2_Count*100 >= abspos_2*50)){  //Slow down before Stopping
+                  pwm_1 = 80;
+                  pwm_2 = 80;
+                }
+                else{
+                  pwm_1 = 255;
+		  pwm_2 = 255; //Adjust to taste
+                }
               }
 		error = 0;
 	}
@@ -172,7 +185,7 @@ void Position()
 		poslistFlag = 1;
                 
 	}
-	if ((abspos_1 != 0) && (abspos_2 !=0) && (enc1_Count >= abspos_1*0.8) && (enc2_Count >= abspos_2*0.8) )
+/*	if ((abspos_1 != 0) && (abspos_2 !=0) && (enc1_Count*100 >= abspos_1*85) && (enc2_Count*100 >= abspos_2*85) )
 	{
 		
                 if( pos_1 > pos_2){
@@ -186,7 +199,7 @@ void Position()
                 }
                 else{ Stop();} 
          
-         }
+         }*/
         
 }
 

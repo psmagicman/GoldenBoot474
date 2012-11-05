@@ -37,7 +37,7 @@ void Check();
 
 //SENSOR
 int sensorPin = A6;   
-int ledPin = 13;      // select the pin for the LED
+//int ledPin = 13;      // select the pin for the LED
 int sensorValue = 0;  // variable to store the value coming from the sensor
 int bufferA = 0;
 int bufferB = 0;
