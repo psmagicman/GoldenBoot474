@@ -62,6 +62,8 @@ int encoder2_in = A4;
 int dir_1 = A3;
 int dir_2 = A5;
 
+int actuator_length; 
+
 volatile int pwm_1 = 255;
 volatile int pwm_2 = 255;
 //volatile int pos_1 =0;
@@ -149,8 +151,8 @@ void CatchtheBall()
         if(SenseDistance <=30){
                 Serial.println("I see the ball");
                 Serial.println(SenseDistance);
-                //Accelerate(255,255);
-                //Check();
+                Accelerate(255,255);
+                Check();
         }
         if(SenseDistance <= 4){
                 Serial.println("Ball in the caster .");
@@ -158,7 +160,7 @@ void CatchtheBall()
                   // Ask image processing for all the values 
                   // Call kick function
                 caught=1;
-                KicktheBall();
+               // KicktheBall();
         }
   }
         enc1_Count =0;
@@ -167,37 +169,85 @@ void CatchtheBall()
 }
 
 void KicktheBall()
-{ 
+{ Reset();
+   int flag1 = 1; 
+   int i;  
+   int flag = 1; 
+      
              //Get instructions from image processing to kick the ball  
-            Acuator_length = Actuator_read();
-            while (Actuator_length <= 1024 )
+            Actuator_Read();
+            while (actuator_length < 1023 )
              {
-               Actuator_Activate(); 
-               Serial.println("Actuator is fully out"); 
+               Actuator_Activate();  
+               Actuator_Read();
+               flag= 0; 
              }
-             
-             Accelerate(255,255);
-             delay(500);
-             Serial.println("Accelerate for 500us"); 
+              delay(500);
+             if (flag ==0 )
+             {
+               Serial.println("Actuator is fully out");
                  
-               Sensor();
-           if(SenseDistance >= 8 && SenseDistance <= 12 ){
+                 pos_1 = 5; 
+                 pos_2 = 5;  
+                 abspos_1 =5;
+                 abspos_2 =5;
+                 enc1_Count =0;
+                 enc2_Count =0;
+                 Serial.println("Accelerate");
+           while (enc1_Count < pos_1 && enc2_Count < pos_2)   
+            { Accelerate(255,255); 
+             Serial.println();
+             Serial.print("Encoder1:  ");
+             Serial.print(enc1_Count);
+             Serial.print("Encoder2:  ");
+             Serial.print(enc2_Count);
+            } 
+              Stop();
+             }
+                
+         //while(flag1 == 1) 
+         // {  
+         delay(500);  
+            Sensor();
+           if(SenseDistance >= 4){
                 Serial.println("Ball just out of the caster ");
               //  Serial.println(SenseDistance);
-             Acuator_length = Actuator_read();
-            while (Actuator_length >= 25 )
+             Actuator_Read();
+            while (actuator_length > 67 )
              {
                Actuator_Deactivate(); 
-               Serial.println("Actuator is fully in "); 
+               Actuator_Read(); 
+               flag = 1; 
              }
-        }
-           
- Serial.println("Done with the ball kicking") ; 
-             Reverse(255,255);
-             delay(500);
-             // Reverse in order to avaiod touching the same ball 
-             Serial.println("Reverse for 500us"); 
-              
+                 delay(500);
+                  if (flag ==1)
+             {
+               Serial.println("Actuator is fully in "); 
+                 pos_1 = 5; 
+                 pos_2 = 5; 
+                 abspos_1 =5;
+                 abspos_2 =5;
+                 enc1_Count =0;
+                 enc2_Count =0;
+                   Serial.println("Reverse ");
+            while( enc1_Count < pos_1 && enc2_Count < pos_2) 
+            { Reverse(255, 255); 
+             Serial.println();
+             Serial.print("Encoder1:  ");
+             Serial.print(enc1_Count);
+             Serial.print("Encoder2:  ");
+             Serial.print(enc2_Count);
+             
+            }
+          
+           }
+         // else 
+           // flag1 =1; 
+          }          
+             // Reverse in order to avaiod touching the same ball  
+         //}
+
+         Serial.println("Done with the ball kicking") ;      
         enc1_Count =0;
         enc2_Count =0;
         Reset();

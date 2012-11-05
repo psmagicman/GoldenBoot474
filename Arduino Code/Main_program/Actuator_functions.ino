@@ -7,12 +7,11 @@ This sections contains the functions used to activate the Linear actuator ---- T
 #define HIGH 1
 #define PWM_MAX 255
 
-int actuator_length, actuator_length_1; 
-
 //Function Declaration
 void Actuator_Activate();
 void Actuator_Deactivate();
 void Actuator_Read();
+
 //Function Definition
 void Actuator_Deactivate() //Pushes the rod out  
 {
@@ -26,7 +25,7 @@ void Actuator_Activate() //Pulls the rod in
   digitalWrite(actuator_pin2, HIGH);
   
 }
-/*
+
 void Actuator_Read() //Reads the rod value when it's out or in
 {
   actuator_length = analogRead(actuator_input);
@@ -34,7 +33,7 @@ void Actuator_Read() //Reads the rod value when it's out or in
   Serial.print("Actuator value analog : ");
   Serial.print(actuator_length);
 }
-
+/*
 //LOOP --DELETE after testing
 void loop ()
 { char c;

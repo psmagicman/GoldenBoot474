@@ -172,7 +172,7 @@ void Position()
 		poslistFlag = 1;
                 
 	}
-	if ((abspos_1 != 0) && (abspos_2 !=0) && (enc1_Count >= abspos_1*0.8) && (enc2_Count >= abspos_2*0.8) )
+	if ((abspos_1 != 0) && (abspos_2 !=0) && (enc1_Count*100 >= abspos_1*85) && (enc2_Count*100 >= abspos_2*85) )
 	{
 		
                 if( pos_1 > pos_2){
