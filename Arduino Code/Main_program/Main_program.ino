@@ -196,6 +196,7 @@ void KicktheBall()
                  Serial.println("Accelerate");
            while (enc1_Count < pos_1 && enc2_Count < pos_2)   
             { Accelerate(255,255); 
+              //Position();
              Serial.println();
              Serial.print("Encoder1:  ");
              Serial.print(enc1_Count);
@@ -232,6 +233,7 @@ void KicktheBall()
                    Serial.println("Reverse ");
             while( enc1_Count < pos_1 && enc2_Count < pos_2) 
             { Reverse(255, 255); 
+              //Position();
              Serial.println();
              Serial.print("Encoder1:  ");
              Serial.print(enc1_Count);
