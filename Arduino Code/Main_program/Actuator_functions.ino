@@ -6,6 +6,8 @@ This sections contains the functions used to activate the Linear actuator ---- T
 #define LOW 0
 #define HIGH 1
 #define PWM_MAX 255
+#define RETRACT 72
+#define EXTEND 1023
 
 //Function Declaration
 void Actuator_Activate();
@@ -33,6 +35,29 @@ void Actuator_Read() //Reads the rod value when it's out or in
   Serial.print("Actuator value analog : ");
   Serial.print(actuator_length);
 }
+
+void ActuatorControl(int length)
+{
+            Actuator_Read();
+            if(actuator_length < length){
+                 while(actuator_length < length)
+                 {
+                  CheckforE();
+                  Actuator_Activate();
+                  Actuator_Read();
+                 }
+            }
+            else
+            {
+                while (actuator_length > length )
+                {
+                 CheckforE();
+                 Actuator_Deactivate(); 
+                 Actuator_Read(); 
+                }
+            }
+}
+            
 /*
 //LOOP --DELETE after testing
 void loop ()

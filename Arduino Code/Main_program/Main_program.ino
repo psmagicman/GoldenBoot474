@@ -18,6 +18,8 @@
 #define rate 100
 #define MOVE 1
 #define STANDBY 0
+#define RETRACT 72
+#define EXTEND 1023
 
 using namespace std;
 
@@ -146,13 +148,14 @@ void CatchtheBall()
 { 
   int caught =0;
   while(caught == 0){
+                CheckforE();
                 Sensor();
                 Serial.println(SenseDistance);
         if(SenseDistance <=30){
                 Serial.println("I see the ball");
                 Serial.println(SenseDistance);
-                Accelerate(255,255);
-                Check();
+                Accelerate(pwm_1,pwm_2);
+                //Check();
         }
         if(SenseDistance <= 4){
                 Serial.println("Ball in the caster .");
@@ -169,88 +172,91 @@ void CatchtheBall()
 }
 
 void KicktheBall()
-{ Reset();
+{ 
+   Reset();
    int flag1 = 1; 
    int i;  
    int flag = 1; 
       
-             //Get instructions from image processing to kick the ball  
-            Actuator_Read();
-            while (actuator_length < 1023 )
-             {
-               Actuator_Activate();  
-               Actuator_Read();
-               flag= 0; 
-             }
-              delay(500);
-             if (flag ==0 )
-             {
-               Serial.println("Actuator is fully out");
-                 
-                 pos_1 = 150; 
-                 pos_2 = 150;  
-                 abspos_1 =150;
-                 abspos_2 =150;
-                 enc1_Count =0;
-                 enc2_Count =0;
-                 Serial.println("Accelerate");
-           while (enc1_Count < pos_1 && enc2_Count < pos_2)   
-            { Accelerate(255,255); 
-              //Position();
+   //Get instructions from image processing to kick the ball  
+   Actuator_Read();
+   while (actuator_length < EXTEND )
+        {
+         CheckforE();
+         Actuator_Activate();  
+         Actuator_Read();
+         flag= 0; 
+        }
+   delay(300);
+   if (flag ==0 )
+     {
+      Serial.println("Actuator is fully out");                
+      pos_1 = 150; 
+      pos_2 = 150;  
+      abspos_1 =150;
+      abspos_2 =150;
+      enc1_Count =0;
+      enc2_Count =0;
+      Serial.println("Accelerate");
+      while (enc1_Count < pos_1 && enc2_Count < pos_2)   
+           { 
+             CheckforE();
+             Accelerate(pwm_1,pwm_2); 
+             //Position();
              Serial.println();
              Serial.print("Encoder1:  ");
              Serial.print(enc1_Count);
              Serial.print("Encoder2:  ");
              Serial.print(enc2_Count);
-            } 
-              Stop();
-             }
-                
-         //while(flag1 == 1) 
+           } 
+      Stop();
+     }           
+     //while(flag1 == 1) 
          // {  
-         delay(500);  
-            Sensor();
-           if(SenseDistance >= 4){
-                Serial.println("Ball just out of the caster ");
-              //  Serial.println(SenseDistance);
-             Actuator_Read();
-            while (actuator_length > 67 )
-             {
+     delay(300);  
+     Sensor();
+     if(SenseDistance >= 4)
+       {
+        Serial.println("Ball just out of the caster ");
+        //  Serial.println(SenseDistance);            
+        Actuator_Read();
+        while (actuator_length > RETRACT )
+             { 
+               CheckforE();
                Actuator_Deactivate(); 
                Actuator_Read(); 
                flag = 1; 
              }
-                 delay(500);
-                  if (flag ==1)
-             {
-               Serial.println("Actuator is fully in "); 
-                 pos_1 = 150; 
-                 pos_2 = 150; 
-                 abspos_1 =150;
-                 abspos_2 =150;
-                 enc1_Count =0;
-                 enc2_Count =0;
-                   Serial.println("Reverse ");
+         delay(300);
+         if (flag ==1)
+           {
+            Serial.println("Actuator is fully in "); 
+            pos_1 = 150; 
+            pos_2 = 150; 
+            abspos_1 =150;
+            abspos_2 =150;
+            enc1_Count =0;
+            enc2_Count =0;
+            Serial.println("Reverse ");
             while( enc1_Count < pos_1 && enc2_Count < pos_2) 
-            { Reverse(255, 255); 
-              //Position();
-             Serial.println();
-             Serial.print("Encoder1:  ");
-             Serial.print(enc1_Count);
-             Serial.print("Encoder2:  ");
-             Serial.print(enc2_Count);
-             
-            }
-          
-           }
+                 { 
+                   CheckforE();
+                   Reverse(pwm_1, pwm_2); 
+                   //Position();
+                   Serial.println();
+                   Serial.print("Encoder1:  ");
+                   Serial.print(enc1_Count);
+                   Serial.print("Encoder2:  ");
+                   Serial.print(enc2_Count);
+                 }
+          }
          // else 
            // flag1 =1; 
-          }          
-             // Reverse in order to avaiod touching the same ball  
+      }          
+      // Reverse in order to avaiod touching the same ball  
          //}
-
-         Serial.println("Done with the ball kicking") ;      
-        enc1_Count =0;
-        enc2_Count =0;
-        Reset();
+      Serial.println("Done with the ball kicking") ;      
+      enc1_Count =0;
+      enc2_Count =0;
+      Reset();
 }

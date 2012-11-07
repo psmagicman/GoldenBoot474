@@ -225,6 +225,7 @@ void Reset(){
         input1done = 0;
         input2done = 1;
         poslistFlag = 1;
+        ActuatorControl(RETRACT);
         
 }
 
@@ -235,8 +236,8 @@ void MotorControl(){
   
                         pos_1 = _path[poslist][0];
 			pos_2 = _path[poslist][1];
-			abspos_1 = abs(pos_1)-(abs(pos_1)*0.05+4);
-			abspos_2 = abs(pos_2)-(abs(pos_2)*0.05+4);
+			abspos_1 = abs(pos_1)-(abs(pos_1)*0.07+4)+1;
+			abspos_2 = abs(pos_2)-(abs(pos_2)*0.07+4)+1;
 		        
                         poslist++;
                         Serial.println("ENCODER");
