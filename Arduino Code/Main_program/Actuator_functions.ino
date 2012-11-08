@@ -31,9 +31,9 @@ void Actuator_Activate() //Pulls the rod in
 void Actuator_Read() //Reads the rod value when it's out or in
 {
   actuator_length = analogRead(actuator_input);
-  Serial.print('\n');
-  Serial.print("Actuator value analog : ");
-  Serial.print(actuator_length);
+ // Serial.print('\n');
+ // Serial.print("Actuator value analog : ");
+ // Serial.print(actuator_length);
 }
 
 void ActuatorControl(int length)

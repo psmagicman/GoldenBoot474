@@ -1,14 +1,13 @@
+/*This code determines the serial communication
+*/
 void serialEvent(){
         CheckforE();
 }
 
 void CheckforE(){
-        
         if(Serial.available() > 0){
-           char emergency[1];
-           emergency[0] = Serial.peek();
-       
-           if( emergency[0] == 'E'){
+         
+           if( Serial.peek() == 'E'){
                 
                  while(Serial.available()){
                    Serial.read();                   
@@ -25,31 +24,30 @@ void CheckforE(){
            }
         }
 }
-        
 
-        
-void ReadMotorInput(){
+void ReadInput(){
                 
                 enc1_Count =0;
                 enc2_Count =0;
                 //Reset();
+                
                 if(Serial.peek() == 'G'){
-                        Serial.println("GRABING THE BALL");
+                        Serial.println("Grabbing the ball ");
                         while(Serial.available()){
 		                Serial.read();
 			}
                         CatchtheBall();
                 }
-               
-                  if(Serial.peek() == 'K'){
-                        Serial.println("KICKING THE BALL");
+                          
+                 else if(Serial.peek() == 'K'){
+                        Serial.println("Kicking the ball ");
                         while(Serial.available()){
 		                Serial.read();
 			}
                         KicktheBall();
                 }
                 
-		if(Serial.peek() == 'N'){
+		else if(Serial.peek() == 'R'){
 			state = MOVE;
 			while(Serial.available()){
 				Serial.read();
@@ -63,6 +61,12 @@ void ReadMotorInput(){
 			Serial.println(_path.size());
 		}
 
+                else if (Serial.peek() == 'I'){
+                        Serial.println("Reading the input values ");
+                        while(Serial.available()){
+		                Serial.read();
+			}
+
 		if((Serial.available() == 5) && (input2done == 1 )){
 			char bytes1[6];
 			bytes1[0] = Serial.read();  
@@ -70,7 +74,8 @@ void ReadMotorInput(){
 			bytes1[2] = Serial.read();
 			bytes1[3] = Serial.read();
 			bytes1[4] = Serial.read();
-			bytes1[5] = '\0';
+                        bytes1[5] = '\0';
+                         CheckGarbbage(bytes1);
 			pos_1 = atoi(bytes1);
 			path.clear();
 			path.push_back(pos_1);
@@ -98,6 +103,7 @@ void ReadMotorInput(){
 			bytes2[3] = Serial.read();
 			bytes2[4] = Serial.read();
 			bytes2[5] = '\0';
+                         CheckGarbbage(bytes2);
 			pos_2 = atoi(bytes2);
 			path.push_back(pos_2);
 			_path.push_back(path);
@@ -114,3 +120,31 @@ void ReadMotorInput(){
 			Serial.println();
 		}   
 	}  
+
+         else 
+          Reset();
+}
+
+void CheckGarbbage(char value[6])
+{int i; 
+   for(i=0; i<5; ++i)
+    {
+      if (
+          (value[i] == 0) ||
+          (value[i] == 1) ||
+          (value[i] == 2) ||
+          (value[i] == 3) ||
+          (value[i] == 4) ||
+          (value[i] == 5) ||
+          (value[i] == 6) ||
+          (value[i] == 7) ||
+          (value[i] == 8) ||
+          (value[i] == 9) ||
+          (value[i] == '-') 
+          )
+           {}
+        else
+         Reset(); 
+      
+    }
+}

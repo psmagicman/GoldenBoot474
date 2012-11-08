@@ -1,17 +1,16 @@
+/*This code is the robot control code of "Team 8 - Golden boot"
+*/
+
 //HEADER FILES
 #include <stdio.h>
 #include <stdlib.h>
 #include <Servo.h>
-//#include <PID_v1.h>
-//#include <avr/interrupt.h>
-//#include <TimerOne.h>
 #include <PinChangeInt.h>
 #include <PinChangeIntConfig.h>
 #include <math.h>
 #include <iterator>
 #include <vector>
 #include <pnew.cpp>
-
 
 #define LOW 0
 #define HIGH 1
@@ -139,7 +138,7 @@ void loop ()
                 MotorControl();
         }
 	else{
-                ReadMotorInput();
+                ReadInput();
         }
 } //Close the loop
 
