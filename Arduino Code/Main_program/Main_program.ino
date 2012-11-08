@@ -109,13 +109,13 @@ void setup() {
 	pinMode(dir_1, INPUT);
 	digitalWrite(encoder1_in, HIGH);
 	digitalWrite(dir_1, HIGH);
-	PCintPort::attachInterrupt(encoder1_in, enc1, RISING);
+	PCintPort::attachInterrupt(encoder1_in, enc1, CHANGE);
 	//Initialize encoder pin #2
 	pinMode(encoder2_in, INPUT);
 	pinMode(dir_2, INPUT);
 	digitalWrite(encoder2_in, HIGH);
 	digitalWrite(dir_2, HIGH);
-	PCintPort::attachInterrupt(encoder2_in, enc2, RISING);
+	PCintPort::attachInterrupt(encoder2_in, enc2, CHANGE);
         //Actuator functions 
         pinMode(actuator_pin1, OUTPUT);
         pinMode(actuator_pin2, OUTPUT);

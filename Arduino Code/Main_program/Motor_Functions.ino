@@ -236,9 +236,17 @@ void MotorControl(){
   
                         pos_1 = _path[poslist][0];
 			pos_2 = _path[poslist][1];
-			abspos_1 = abs(pos_1)-(abs(pos_1)*0.07+4)+1;
-			abspos_2 = abs(pos_2)-(abs(pos_2)*0.07+4)+1;
-		        
+                        //abspos_1 = abs(pos_1);
+                        //abspos_2 = abs(pos_2);
+                        if(( (abs(pos_1) <= 4) && (pos_1 != 0)) || ((abs(pos_2) <= 4) && (pos_2 !=0))){
+                          abspos_1 =1;
+                          abspos_2 =1;
+                        }
+                        else{
+                          abspos_1 = abs(pos_1)-(abs(pos_1)*0.07+4)*2+1;
+                          abspos_2 = abs(pos_2)-(abs(pos_2)*0.07+4)*2+1;
+		        }
+
                         poslist++;
                         Serial.println("ENCODER");
                         Serial.println(enc1_Count);

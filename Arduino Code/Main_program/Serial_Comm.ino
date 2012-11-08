@@ -3,6 +3,7 @@ void serialEvent(){
 }
 
 void CheckforE(){
+        
         if(Serial.available() > 0){
            char emergency[1];
            emergency[0] = Serial.peek();
