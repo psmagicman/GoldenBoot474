@@ -19,6 +19,8 @@
 #define STANDBY 0
 #define RETRACT 72
 #define EXTEND 1023
+#define FALSE 0 
+#define TRUE 1
 
 using namespace std;
 
@@ -108,13 +110,13 @@ void setup() {
 	pinMode(dir_1, INPUT);
 	digitalWrite(encoder1_in, HIGH);
 	digitalWrite(dir_1, HIGH);
-	PCintPort::attachInterrupt(encoder1_in, enc1, CHANGE);
+	PCintPort::attachInterrupt(encoder1_in, enc1, RISING);
 	//Initialize encoder pin #2
 	pinMode(encoder2_in, INPUT);
 	pinMode(dir_2, INPUT);
 	digitalWrite(encoder2_in, HIGH);
 	digitalWrite(dir_2, HIGH);
-	PCintPort::attachInterrupt(encoder2_in, enc2, CHANGE);
+	PCintPort::attachInterrupt(encoder2_in, enc2, RISING);
         //Actuator functions 
         pinMode(actuator_pin1, OUTPUT);
         pinMode(actuator_pin2, OUTPUT);
@@ -132,8 +134,7 @@ void setup() {
 
 void loop () 
 {
-        Sensor();
-     
+       //Sensor();
 	if(state == MOVE){
                 MotorControl();
         }
@@ -165,8 +166,8 @@ void CatchtheBall()
                // KicktheBall();
         }
   }
-        enc1_Count =0;
-        enc2_Count =0;
+        //enc1_Count =0;
+        //enc2_Count =0;
         Reset();
 }
 
@@ -236,6 +237,8 @@ void KicktheBall()
             abspos_2 =150;
             enc1_Count =0;
             enc2_Count =0;
+            pwm_1=255;
+            pwm_2=255;
             Serial.println("Reverse ");
             while( enc1_Count < pos_1 && enc2_Count < pos_2) 
                  { 
@@ -257,5 +260,5 @@ void KicktheBall()
       Serial.println("Done with the ball kicking") ;      
       enc1_Count =0;
       enc2_Count =0;
-      Reset();
+      ResetAfterKicking();
 }

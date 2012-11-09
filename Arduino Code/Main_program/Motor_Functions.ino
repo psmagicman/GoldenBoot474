@@ -103,7 +103,7 @@ void Check()
 		error = (enc1_Count - enc2_Count);
 		//   adjustment = (KP*error + KD*(error - lastError)+ KI*sumError);
 		//pwm_2 += error + 12;
-		pwm_1 -= error + 60;
+		pwm_1 -= error*60;
 		//  lastError = error;
 		//  sumError += error;
 	}
@@ -111,7 +111,7 @@ void Check()
 	{
 		error = (enc2_Count  - enc1_Count); 
 		// adjustment = KP*error + KD*(error - lastError)+ KI*sumError;
-		pwm_2 -= error + 60;
+		pwm_2 -= error*60;
 		//pwm_1 += error + 11; 
 		  // lastError = error;
 		  // sumError += error;
@@ -203,6 +203,40 @@ void Position()
         
 }
 
+void  ResetAfterKicking()
+{
+ 	Stop(); 
+	//   enc1_Count =0;
+	//   enc2_Count =0;
+             if (pos_1 != pos_2)
+              {
+                pwm_1 =100;
+                pwm_2 =100;
+              }
+             else 
+              {
+		pwm_1 = 255;
+		pwm_2 = 255; 
+              }
+        pos_1 = 0;
+        pos_2 = 0;
+        state = STANDBY;
+        enc1_Count=0;
+        enc2_Count=0;
+        poslist =0;
+        poslistFlag = 1;
+        path.clear();
+        _path.clear();
+        input1done = 0;
+        input2done = 1;
+        poslistFlag = 1;
+        ActuatorControl(RETRACT - 10);
+        Serial.println("Robot Reset()");
+        while (Serial.available())
+        {Serial.read();
+        } 
+}
+
 
 
 void Reset(){
@@ -222,11 +256,20 @@ void Reset(){
         pos_1 = 0;
         pos_2 = 0;
         state = STANDBY;
+        enc1_Count=0;
+        enc2_Count=0;
+        poslist =0;
+        poslistFlag = 1;
+        path.clear();
+        _path.clear();
         input1done = 0;
         input2done = 1;
         poslistFlag = 1;
         ActuatorControl(RETRACT);
-        
+        Serial.println("Robot Reset()");
+        while (Serial.available())
+        {Serial.read();
+        }
 }
 
 void MotorControl(){
@@ -243,8 +286,8 @@ void MotorControl(){
                           abspos_2 =1;
                         }
                         else{
-                          abspos_1 = abs(pos_1)-(abs(pos_1)*0.07+4)*2+1;
-                          abspos_2 = abs(pos_2)-(abs(pos_2)*0.07+4)*2+1;
+                          abspos_1 = abs(pos_1)-(abs(pos_1)*0.07+4);
+                          abspos_2 = abs(pos_2)-(abs(pos_2)*0.07+4);
 		        }
 
                         poslist++;
@@ -264,12 +307,12 @@ void MotorControl(){
 		} 
 		if( poslist == (_path.size()+1)){
 			//state = STANDBY;
-                        enc1_Count=0;
-                        enc2_Count=0;
+                       // enc1_Count=0;
+                       // enc2_Count=0;
                         Reset();
-                        poslist =0;
-                        path.clear();
-                        _path.clear();
+                       // poslist =0;
+                       // path.clear();
+                       // _path.clear();
                         //poslistFlag =1;
                         Serial.write('1');
 		} else

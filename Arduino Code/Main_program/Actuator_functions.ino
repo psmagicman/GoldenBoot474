@@ -39,10 +39,13 @@ void Actuator_Read() //Reads the rod value when it's out or in
 void ActuatorControl(int length)
 {
             Actuator_Read();
-            if(actuator_length < length){
+           if(actuator_length < length)
+            {
                  while(actuator_length < length)
                  {
                   CheckforE();
+                  Serial.println("Current length :  ");
+                  Serial.print(actuator_length);
                   Actuator_Activate();
                   Actuator_Read();
                  }
@@ -51,6 +54,8 @@ void ActuatorControl(int length)
             {
                 while (actuator_length > length )
                 {
+                 Serial.println("Current length :  ");
+                  Serial.print(actuator_length); 
                  CheckforE();
                  Actuator_Deactivate(); 
                  Actuator_Read(); 

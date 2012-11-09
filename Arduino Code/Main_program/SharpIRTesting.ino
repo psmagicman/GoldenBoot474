@@ -34,15 +34,7 @@ void Sensor() {
    SenseDistance = (2914/(sensorValAvg+5))-1;
   //Serial.println(SenseDistance); 
    
-  // turn the ledPin on
-  digitalWrite(ledPin, HIGH);  
-  
-  // stop the program for <sensorValue> milliseconds:
-//  delay(sensorValue);          
-  
-  // turn the ledPin off:        
-  digitalWrite(ledPin, LOW);   
-  
+
   // stop the program for for <sensorValue> milliseconds:
   //delay(sensorValue);                  
 }
