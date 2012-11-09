@@ -44,7 +44,7 @@ void ActuatorControl(int length)
                  while(actuator_length < length)
                  {
                   CheckforE();
-                  Serial.println("Current length :  ");
+                  Serial.println("Current length : idle state  ");
                   Serial.print(actuator_length);
                   Actuator_Activate();
                   Actuator_Read();

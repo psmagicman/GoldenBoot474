@@ -203,7 +203,7 @@ void Position()
         
 }
 
-void  ResetAfterKicking()
+void  ResetNew()
 {
  	Stop(); 
 	//   enc1_Count =0;
@@ -230,7 +230,7 @@ void  ResetAfterKicking()
         input1done = 0;
         input2done = 1;
         poslistFlag = 1;
-        ActuatorControl(RETRACT - 10);
+       // ActuatorControl(RETRACT - 10);
         Serial.println("Robot Reset()");
         while (Serial.available())
         {Serial.read();
@@ -265,7 +265,7 @@ void Reset(){
         input1done = 0;
         input2done = 1;
         poslistFlag = 1;
-        ActuatorControl(RETRACT);
+        //ActuatorControl(RETRACT);
         Serial.println("Robot Reset()");
         while (Serial.available())
         {Serial.read();

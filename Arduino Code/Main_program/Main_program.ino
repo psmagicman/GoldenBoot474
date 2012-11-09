@@ -124,6 +124,7 @@ void setup() {
         digitalWrite(actuator_input, HIGH);
         
         Reset();
+        ActuatorControl(RETRACT);
 	delay(500);
 }
 
@@ -134,7 +135,7 @@ void setup() {
 
 void loop () 
 {
-       //Sensor();
+       Sensor();
 	if(state == MOVE){
                 MotorControl();
         }
@@ -160,11 +161,10 @@ void CatchtheBall()
         if(SenseDistance <= 4){
                 Serial.println("Ball in the caster .");
                 Serial.println(SenseDistance);
-                  // Ask image processing for all the values 
-                  // Call kick function
+                // Ask image processing for all the values 
+                // Call kick function
                 caught=1;
-               // KicktheBall();
-        }
+         }
   }
         //enc1_Count =0;
         //enc2_Count =0;
@@ -260,5 +260,5 @@ void KicktheBall()
       Serial.println("Done with the ball kicking") ;      
       enc1_Count =0;
       enc2_Count =0;
-      ResetAfterKicking();
+      Reset();
 }

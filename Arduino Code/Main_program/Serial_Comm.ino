@@ -8,7 +8,7 @@ void CheckforE(){
         if(Serial.available() > 0){
          
            if( Serial.peek() == 'E'){
-                
+                 Serial.println("Emergency");
                  while(Serial.available()){
                    Serial.read();                   
                  }
@@ -26,10 +26,13 @@ void CheckforE(){
 }
 
 void ReadInput(){
-                
+
+     if(Serial.available() > 0){  
                 //enc1_Count =0;
                 //enc2_Count =0;
                 //Reset();
+                CheckforE();
+                
                 if(Serial.peek() == 'G'){
                         Serial.println("Grabbing the ball ");
                         while(Serial.available()){
@@ -63,6 +66,7 @@ void ReadInput(){
                 }
          else 
           Serial.read();
+     }
 }
 
 boolean CheckGarbbage(char value[6])
