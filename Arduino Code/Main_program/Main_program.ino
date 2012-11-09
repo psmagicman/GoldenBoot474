@@ -1,6 +1,8 @@
 /*This code is the robot control code of "Team 8 - Golden boot"
 */
 
+
+
 //HEADER FILES
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,6 +14,8 @@
 #include <vector>
 #include <pnew.cpp>
 
+
+
 #define LOW 0
 #define HIGH 1
 #define rate 100
@@ -21,6 +25,7 @@
 #define EXTEND 1023
 #define FALSE 0 
 #define TRUE 1
+
 
 using namespace std;
 
@@ -52,14 +57,15 @@ int SenseDistance = 0;
 int actuator_pin1 = 12;
 int actuator_pin2 = 13;
 int actuator_input = A7;
+int actuator_enable = 11;
 
 // Pin numbers defined here
 int motor1_pin_1 = 2; // H-Bridge input pin 1 for Motor 1 (Right)
 int motor1_pin_2 = 4; // H-Bridge input pin 2 for Motor 1 
 int motor2_pin_1 = 5; // H-Bridge input pin 3 for Motor 2 (Left)
 int motor2_pin_2 = 7; // H-bridge input pin 4 for Motor 2
-int enablepin_1 = 6; // H-Bridge enable pin for Motor 2
-int enablepin_2 = 3; // H-Bridge enable pin for Motor 1
+int enablepin_1 = 6; // H-Bridge enable pin for Motor 1
+int enablepin_2 = 3; // H-Bridge enable pin for Motor 2
 int encoder1_in = A2;
 int encoder2_in = A4; 
 int dir_1 = A3;
@@ -104,7 +110,6 @@ void setup() {
 	pinMode(motor2_pin_2, OUTPUT);
 	pinMode(enablepin_1, OUTPUT);
 	pinMode(enablepin_2, OUTPUT);
-
 	//Initialize encoder pin #1 
 	pinMode(encoder1_in, INPUT); 
 	pinMode(dir_1, INPUT);
@@ -118,14 +123,17 @@ void setup() {
 	digitalWrite(dir_2, HIGH);
 	PCintPort::attachInterrupt(encoder2_in, enc2, RISING);
         //Actuator functions 
+        pinMode(actuator_enable, OUTPUT);
         pinMode(actuator_pin1, OUTPUT);
         pinMode(actuator_pin2, OUTPUT);
         pinMode(actuator_input, INPUT);
         digitalWrite(actuator_input, HIGH);
-        
+        digitalWrite(actuator_enable, LOW);
         Reset();
+        
         ActuatorControl(RETRACT);
-	delay(500);
+	
+        delay(500);
 }
 
 
@@ -179,6 +187,7 @@ void KicktheBall()
    int flag = 1; 
       
    //Get instructions from image processing to kick the ball  
+   digitalWrite(actuator_enable, HIGH); 
    Actuator_Read();
    while (actuator_length < EXTEND )
         {
@@ -192,7 +201,9 @@ void KicktheBall()
      {
       Serial.println("Actuator is fully out");                
       pos_1 = 150; 
-      pos_2 = 150;  
+      pos_2 = 150; 
+      pwm_1=255;
+      pwm_2=255; 
       abspos_1 =150;
       abspos_2 =150;
       enc1_Count =0;
@@ -260,5 +271,6 @@ void KicktheBall()
       Serial.println("Done with the ball kicking") ;      
       enc1_Count =0;
       enc2_Count =0;
+      digitalWrite(actuator_enable, LOW); 
       Reset();
 }

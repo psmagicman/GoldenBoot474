@@ -139,28 +139,28 @@ void Movement()
 		if ( pos_1 > 0 && pos_2 > 0 ) 
 		{
 			Accelerate (pwm_1, pwm_2); 
-			Serial.print("Accelerate");
+			Serial.println("Accelerate");
 		}
 		else if ( pos_1 >= 0 && pos_2 < 0 )
 		{
 			LeftTurn(pwm_1, pwm_2);
-			Serial.print("Left Turn");
+			Serial.println("Left Turn");
 		}
 		else if ( pos_1 < 0 && pos_2 >= 0 )
 		{
 			RightTurn(pwm_1, pwm_2); 
-			Serial.print("Right Turn");
+			Serial.println("Right Turn");
 		}
 		else if ( pos_1 < 0 && pos_2 < 0 )
 		{
 			Reverse(pwm_1,pwm_2);
-			Serial.print("Reverse");
+			Serial.println("Reverse");
 		}
 		else 
 		{
 			Stop();
 			//state = 0;
-			Serial.print("Stop");
+			Serial.println("Stop");
 		}
 	} 
 	else
@@ -202,7 +202,7 @@ void Position()
          }*/
         
 }
-
+/*
 void  ResetNew()
 {
  	Stop(); 
@@ -236,7 +236,7 @@ void  ResetNew()
         {Serial.read();
         } 
 }
-
+*/
 
 
 void Reset(){
@@ -286,8 +286,8 @@ void MotorControl(){
                           abspos_2 =1;
                         }
                         else{
-                          abspos_1 = abs(pos_1)-(abs(pos_1)*0.07+4);
-                          abspos_2 = abs(pos_2)-(abs(pos_2)*0.07+4);
+                          abspos_1 = abs(pos_1)-(abs(pos_1)*0.07+1);
+                          abspos_2 = abs(pos_2)-(abs(pos_2)*0.07+1);
 		        }
 
                         poslist++;
@@ -318,37 +318,37 @@ void MotorControl(){
 		} else
 		{
 			
-			Serial.print("Begin:  ");
+	/*		Serial.print("Begin:  ");
 			Serial.print('\n');
 			Serial.print("Error : ");
 			Serial.print(error);
-			Serial.print('\n');
+			Serial.print('\n');*/
 			
 			Movement();
 			
-			Serial.print("Pos1 Pos2 : ");
+	/*		Serial.print("Pos1 Pos2 : ");
 			Serial.print(pos_1);
 			Serial.print("  ");
 			Serial.print(pos_2);
-			Serial.print('\n');
+			Serial.print('\n');*/
 			
 			//Check ();
 			
 			//  Serial.print(error);
-			Serial.print("After the check pwm_1  pwm_2 : ");
+      /*			Serial.print("After the check pwm_1  pwm_2 : ");
 			Serial.print(pwm_1);
 			Serial.print("  ");
 			Serial.print(pwm_2);
-			Serial.print('\n');
+			Serial.print('\n');*/
 			
 			//Position(pos_1, pos_2);
 			
-			Serial.print("Encoder count _1  _2 : ");
+		/*	Serial.print("Encoder count _1  _2 : ");
 			Serial.print(enc1_Count);
 			Serial.print("  ");
 			Serial.print(enc2_Count);
 			Serial.print('\n');
 			Serial.print(poslist);
-			Serial.print('\n');
+			Serial.print('\n');*/
 		}
 	}

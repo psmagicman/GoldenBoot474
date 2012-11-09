@@ -37,8 +37,9 @@ void Actuator_Read() //Reads the rod value when it's out or in
 }
 
 void ActuatorControl(int length)
-{
-            Actuator_Read();
+{            
+           digitalWrite(actuator_enable, HIGH); 
+           Actuator_Read();
            if(actuator_length < length)
             {
                  while(actuator_length < length)
@@ -61,6 +62,7 @@ void ActuatorControl(int length)
                  Actuator_Read(); 
                 }
             }
+            digitalWrite(actuator_enable, LOW);
 }
             
 /*
