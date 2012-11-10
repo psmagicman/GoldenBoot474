@@ -18,7 +18,7 @@
     <item row="0" column="0">
      <widget class="QTabWidget" name="mainTab">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="mainTab_Webcams">
        <attribute name="title">
@@ -28,7 +28,7 @@
         <item row="4" column="1">
          <widget class="QTabWidget" name="rightTab">
           <property name="currentIndex">
-           <number>2</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="rightTab_RGB">
            <attribute name="title">
@@ -88,6 +88,13 @@
                <widget class="QPushButton" name="rightCalibrate">
                 <property name="text">
                  <string>Calibrate</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="rightObstacles">
+                <property name="text">
+                 <string>Find Obstacles</string>
                 </property>
                </widget>
               </item>
@@ -321,7 +328,7 @@
         <item row="4" column="0">
          <widget class="QTabWidget" name="leftTab">
           <property name="currentIndex">
-           <number>2</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="leftTab_RGB">
            <attribute name="title">
@@ -381,6 +388,13 @@
                <widget class="QPushButton" name="leftCalibrate">
                 <property name="text">
                  <string>Calibrate</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="leftObstacles">
+                <property name="text">
+                 <string>Find Obstacles</string>
                 </property>
                </widget>
               </item>
@@ -682,7 +696,14 @@
         </item>
         <item row="0" column="2">
          <layout class="QGridLayout" name="gridLayout_18">
-          <item row="1" column="0">
+          <item row="3" column="0">
+           <widget class="QPushButton" name="buttonTask2">
+            <property name="text">
+             <string>Task 2</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
            <widget class="QPushButton" name="buttonTask1">
             <property name="text">
              <string>Task 1</string>
@@ -696,26 +717,30 @@
             </property>
            </widget>
           </item>
-          <item row="2" column="0">
-           <widget class="QPushButton" name="buttonTask2">
-            <property name="text">
-             <string>Task 2</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0">
+          <item row="4" column="0">
            <widget class="QPushButton" name="buttonTask3">
             <property name="text">
              <string>Task 3</string>
             </property>
            </widget>
           </item>
-          <item row="4" column="0">
+          <item row="5" column="0">
            <widget class="QPushButton" name="buttonFinal">
             <property name="text">
              <string>Final</string>
             </property>
            </widget>
+          </item>
+          <item row="1" column="0">
+           <layout class="QHBoxLayout" name="horizontalLayout">
+            <item>
+             <widget class="QLabel" name="labelRobotAngle">
+              <property name="text">
+               <string>TextLabel</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </item>
          </layout>
         </item>

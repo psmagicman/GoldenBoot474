@@ -1,16 +1,17 @@
 #include "Webcam.h"
 
-Webcam::Webcam(int ID, bool main)
+Webcam::Webcam(int ID)
 {
 	_ID = ID;
-	_main = main; 
 	init();
 }
 
 Webcam::~Webcam()
 {
-	release();
-	cvReleaseCapture(&_capture);
+	if (capture()) {
+		release();
+		cvReleaseCapture(&_capture);
+	}
 }
 
 void Webcam::init()
@@ -77,7 +78,7 @@ void Webcam::init()
 	_robot2Vmax = 255;
 	_robot2Amin = 100;
 	_robot2Amax = 1000;
-	_robotDist = 20;
+	_robotDist = 15;
 	
 	_topLeftXarray = new int[calibrationSize];
 	_topLeftYarray = new int[calibrationSize];
@@ -89,6 +90,7 @@ void Webcam::init()
 	_botRightYarray = new int[calibrationSize];
 
 	_calibrated = false;
+	_calibratedObstacles = false;
 }
 
 bool Webcam::capture()
@@ -113,6 +115,7 @@ void Webcam::release()
 void Webcam::resetCalibrate()
 {
 	_calibrated = false;
+	_calibratedObstacles = false;
 }
 
 void Webcam::calibrate(int index)
@@ -195,6 +198,65 @@ void Webcam::finishCalibrate()
 	_calibrated = true;
 }
 
+void Webcam::calculateObstacles()
+{
+	if (_calibrated && capture()) {
+		calculateThreshold("Obstacles1");
+		vector<Point2f> obstaclesBotPts;
+		cvFindContours(_threshold, _storage, &_obstaclesBotContour, sizeof(CvContour), CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE, cvPoint(0,0));
+		for (;_obstaclesBotContour != 0; _obstaclesBotContour = _obstaclesBotContour->h_next)
+		{
+			if (cvContourArea(_obstaclesBotContour) > _obstacles1Amin && cvContourArea(_obstaclesBotContour) < _obstacles1Amax) {
+				CvMoments moment;
+				cvMoments(_obstaclesBotContour, &moment, 0);
+				double m_00 = cvGetSpatialMoment( &moment, 0, 0);
+				double m_10 = cvGetSpatialMoment( &moment, 1, 0);
+				double m_01 = cvGetSpatialMoment( &moment, 0, 1);
+				obstaclesBotPts.push_back(cvPoint(m_10/m_00, m_01/m_00));
+			}
+		}
+
+		calculateThreshold("Obstacles2");
+		vector<Point2f> obstaclesTopPts;
+		vector<double> obstaclesTopHeight;
+		cvFindContours(_threshold, _storage, &_obstaclesTopContour, sizeof(CvContour), CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE, cvPoint(0,0));
+		for (;_obstaclesTopContour != 0; _obstaclesTopContour = _obstaclesTopContour->h_next)
+		{
+			if (cvContourArea(_obstaclesTopContour) > _obstacles2Amin && cvContourArea(_obstaclesTopContour) < _obstacles2Amax) {
+				CvMoments moment;
+				cvMoments(_obstaclesTopContour, &moment, 0);
+				double m_00 = cvGetSpatialMoment( &moment, 0, 0);
+				double m_10 = cvGetSpatialMoment( &moment, 1, 0);
+				double m_01 = cvGetSpatialMoment( &moment, 0, 1);
+				obstaclesTopPts.push_back(cvPoint(m_10/m_00, m_01/m_00));
+				obstaclesTopHeight.push_back(sqrtf(cvContourArea(_obstaclesTopContour)/2));
+			}
+		}
+
+		_obstaclesPtsCam.clear();
+		for (int i = 0; i < obstaclesTopPts.size(); i++) {
+			for (int j = 0; j < obstaclesBotPts.size(); j++) {
+				if (
+					abs(obstaclesTopPts[i].y - obstaclesBotPts[j].y) < 100	&&
+					abs(obstaclesTopPts[i].x - obstaclesBotPts[j].x) < 50 
+					) 
+				{
+					if (dist(obstaclesTopPts[i].x , obstaclesBotPts[j].x, obstaclesTopPts[i].y, obstaclesBotPts[j].y) < 75) {
+						_obstaclesPtsCam.push_back(Point2f(
+							2*obstaclesBotPts[j].x - obstaclesTopPts[i].x,
+							2*obstaclesBotPts[j].y - obstaclesTopPts[i].y - obstaclesTopHeight[i]
+							));
+					}
+				}
+			}
+		}
+		_obstaclesPts = _obstaclesPtsCam;
+		perspectiveTransform((Mat)_obstaclesPtsCam, (Mat)_obstaclesPts, _homography);
+
+		_calibratedObstacles = true;
+	}
+}
+
 void Webcam::calculateNormal(bool arena, bool balls, bool obstacles, bool robot, bool draw)
 {
 	if (arena) {
@@ -226,7 +288,7 @@ void Webcam::calculateNormal(bool arena, bool balls, bool obstacles, bool robot,
 				double m_00 = cvGetSpatialMoment( &moment, 0, 0);
 				double m_10 = cvGetSpatialMoment( &moment, 1, 0);
 				double m_01 = cvGetSpatialMoment( &moment, 0, 1);
-				_ballPts.push_back(cvPoint(m_10/m_00, m_01/m_00));
+				_ballPts.push_back(cvPoint(m_10/m_00, m_01/m_00 + sqrtf(cvContourArea(contours)/(double)CV_PI)/2.0 ));
 				if (draw) {
 					cvCircle(_normal, _ballPts.back(), 1, CV_RGB(0,255,0));
 					cvDrawContours(_normal, contours, CV_RGB(0,255,0), CV_RGB(0,255,0), -1, 1, 8, cvPoint(0,0));
@@ -238,65 +300,39 @@ void Webcam::calculateNormal(bool arena, bool balls, bool obstacles, bool robot,
 
 	if (obstacles) {
 		// Detect Obstacles
-		calculateThreshold("Obstacles1");
-		vector<Point2f> obstaclesBotPts;
-		CvSeq * contoursBot;
-		cvFindContours(_threshold, _storage, &contoursBot, sizeof(CvContour), CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE, cvPoint(0,0));
-		for (;contoursBot != 0; contoursBot = contoursBot->h_next)
-		{
-			if (cvContourArea(contoursBot) > _obstacles1Amin && cvContourArea(contoursBot) < _obstacles1Amax) {
-				if (draw) cvDrawContours(_normal, contoursBot, CV_RGB(255,0,0), CV_RGB(255,0,0), -1, 1, 8, cvPoint(0,0));			
-				CvMoments moment;
-				cvMoments(contoursBot, &moment, 0);
-				double m_00 = cvGetSpatialMoment( &moment, 0, 0);
-				double m_10 = cvGetSpatialMoment( &moment, 1, 0);
-				double m_01 = cvGetSpatialMoment( &moment, 0, 1);
-				obstaclesBotPts.push_back(cvPoint(m_10/m_00, m_01/m_00));
+		if (!_calibratedObstacles) {
+			calculateThreshold("Obstacles1");
+			CvSeq * contoursBot;
+			cvFindContours(_threshold, _storage, &contoursBot, sizeof(CvContour), CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE, cvPoint(0,0));
+			for (;contoursBot != 0; contoursBot = contoursBot->h_next)
+			{
+				if (cvContourArea(contoursBot) > _obstacles1Amin && cvContourArea(contoursBot) < _obstacles1Amax) {
+					if (draw) cvDrawContours(_normal, contoursBot, CV_RGB(255,0,0), CV_RGB(255,0,0), -1, 1, 8, cvPoint(0,0));
+				}
 			}
-		}
-		delete contoursBot;
+			delete contoursBot;
 
-		calculateThreshold("Obstacles2");
-		vector<Point2f> obstaclesTopPts;
-		vector<double> obstaclesTopHeight;
-		CvSeq * contoursTop;
-		cvFindContours(_threshold, _storage, &contoursTop, sizeof(CvContour), CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE, cvPoint(0,0));
-		for (;contoursTop != 0; contoursTop = contoursTop->h_next)
-		{
-			if (cvContourArea(contoursTop) > _obstacles2Amin && cvContourArea(contoursTop) < _obstacles2Amax) {
-				if (draw) cvDrawContours(_normal, contoursTop, CV_RGB(128,0,0), CV_RGB(255,0,0), -1, 1, 8, cvPoint(0,0));			
-				CvMoments moment;
-				cvMoments(contoursTop, &moment, 0);
-				double m_00 = cvGetSpatialMoment( &moment, 0, 0);
-				double m_10 = cvGetSpatialMoment( &moment, 1, 0);
-				double m_01 = cvGetSpatialMoment( &moment, 0, 1);
-				obstaclesTopPts.push_back(cvPoint(m_10/m_00, m_01/m_00));
-				obstaclesTopHeight.push_back(sqrtf(cvContourArea(contoursTop)/2));
+			calculateThreshold("Obstacles2");
+			CvSeq * contoursTop;
+			cvFindContours(_threshold, _storage, &contoursTop, sizeof(CvContour), CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE, cvPoint(0,0));
+			for (;contoursTop != 0; contoursTop = contoursTop->h_next)
+			{
+				if (cvContourArea(contoursTop) > _obstacles2Amin && cvContourArea(contoursTop) < _obstacles2Amax) {
+					if (draw) cvDrawContours(_normal, contoursTop, CV_RGB(128,0,0), CV_RGB(255,0,0), -1, 1, 8, cvPoint(0,0));
+				}
 			}
+			delete contoursTop;
 		}
-		delete contoursTop;
-
-		_obstaclesPts.clear();
-		for (int i = 0; i < obstaclesTopPts.size(); i++) {
-			for (int j = 0; j < obstaclesBotPts.size(); j++) {
-				if (
-					abs(obstaclesTopPts[i].y - obstaclesBotPts[j].y) < 100	&&
-					abs(obstaclesTopPts[i].x - obstaclesBotPts[j].x) < 50 
-					) 
-				{
-					if (dist(obstaclesTopPts[i].x , obstaclesBotPts[j].x, obstaclesTopPts[i].y, obstaclesBotPts[j].y) < 100) {
-						_obstaclesPts.push_back(Point2f(
-							2*obstaclesBotPts[j].x - obstaclesTopPts[i].x,
-							2*obstaclesBotPts[j].y - obstaclesTopPts[i].y - obstaclesTopHeight[i]
-							));
-						if (draw) cvCircle(_normal, _obstaclesPts.back(), 1, CV_RGB(255,0,0));
-					}
+		else {
+			if (draw) {
+				for (int i = 0; i < _obstaclesPtsCam.size(); i++) {
+					cvDrawCircle(_normal, _obstaclesPtsCam[i], 1, CV_RGB(255,0,0));
 				}
 			}
 		}
 	}
 
-	if (robot && _main) { // Detect Robot only if this is the main camera
+	if (robot) { // Detect Robot only if this is the main camera
 		// Find Front of Robot
 		calculateThreshold("Robot1");
 		CvSeq * contoursFront;
@@ -311,7 +347,7 @@ void Webcam::calculateNormal(bool arena, bool balls, bool obstacles, bool robot,
 				double m_00 = cvGetSpatialMoment( &moment, 0, 0);
 				double m_10 = cvGetSpatialMoment( &moment, 1, 0);
 				double m_01 = cvGetSpatialMoment( &moment, 0, 1);
-				_robotFrontPts.push_back(cvPoint(m_10/m_00,m_01/m_00));
+				_robotFrontPts.push_back(cvPoint(m_10/m_00,(m_01/m_00+20)));
 			}
 		}
 		delete contoursFront;
@@ -330,7 +366,7 @@ void Webcam::calculateNormal(bool arena, bool balls, bool obstacles, bool robot,
 				double m_00 = cvGetSpatialMoment( &moment, 0, 0);
 				double m_10 = cvGetSpatialMoment( &moment, 1, 0);
 				double m_01 = cvGetSpatialMoment( &moment, 0, 1);
-				_robotBackPts.push_back(cvPoint(m_10/m_00,m_01/m_00));
+				_robotBackPts.push_back(cvPoint(m_10/m_00,(m_01/m_00+20)));
 			}
 		}
 		delete contoursBack;
@@ -375,8 +411,8 @@ void Webcam::calculateFinal()
 		if (_ballPts.size() > 0) perspectiveTransform((Mat)_ballPts, (Mat)_ballPts, _homography);
 
 		// Transform the Robot to Plane, and find middle point + angle
+		_robotPts.clear();
 		if (_robotFrontPts.size() > 0 && _robotBackPts.size() > 0) {
-			_robotPts.clear();
 			perspectiveTransform((Mat)_robotFrontPts, (Mat)_robotFrontPts, _homography);
 			perspectiveTransform((Mat)_robotBackPts, (Mat)_robotBackPts, _homography);
 			for (int i = 0; i < _robotFrontPts.size(); i++) {
@@ -385,11 +421,20 @@ void Webcam::calculateFinal()
 					if (distTemp < _robotDist) {
 						_robotPts.push_back(_robotFrontPts[i]);
 						_robotPts.push_back(_robotBackPts[j]);
+						for (int k = 0; k < _robotPts.size(); k++) {
+							_robotPts[k].y = _robotPts[k].y + distTemp;
+						}
 						if (abs(_robotPts[0].x - _robotPts[1].x) < 0.5) {
 							if (_robotPts[0].y < _robotPts[1].y) // Facing Upwards
 								_robotAngle = CV_PI/2;
 							else // Facing Downwards
 								_robotAngle = CV_PI*3/2;
+						}
+						else if (abs(_robotPts[0].y - _robotPts[1].y) < 0.5) {
+							if (_robotPts[0].x > _robotPts[1].x)
+								_robotAngle = 0;
+							else
+								_robotAngle = CV_PI;
 						}
 						else {
 							_robotAngle = atan(abs(_robotPts[0].y - _robotPts[1].y)/abs(_robotPts[0].x - _robotPts[1].x));
@@ -404,10 +449,6 @@ void Webcam::calculateFinal()
 					}
 				}
 			}
-		}
-
-		if (_obstaclesPts.size() > 0) {
-			perspectiveTransform((Mat)_obstaclesPts, (Mat)_obstaclesPts, _homography);
 		}
 	}
 }

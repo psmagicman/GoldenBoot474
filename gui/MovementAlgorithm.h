@@ -31,6 +31,9 @@ public:
 	vector<int> returnLeftMotor();
 	int returnLeftSize();
 	int returnRightSize();
+	Coord2D returnClosestBall();
+	vector<Coord2D> returnPath();
+	int returnAngle() {return angle;};
 	/*vector<double> returnBallDist();
 	vector<double> returnObsDist();*/
 
@@ -45,6 +48,7 @@ private:
 	double finalBallDist;
 	double obsRange;
 	double angle;
+	double diffAngle;
 	double ball2obs;
 	bool moveFlag;
 	bool turnFlag;
@@ -57,10 +61,13 @@ private:
 
 	vector<int> rightMotor;
 	vector<int> leftMotor;
+	Coord2D closestBall;
+	vector<Coord2D> path;
 	int ticks;
 	vector<Ball> algoBalls;
 	//vector<Obstacle> algoObstacle;
 	vector<double> ballsDist;
+	double robotAngle;
 	//vector<double> obsDist;
 	//vector<double> obsRange;
 

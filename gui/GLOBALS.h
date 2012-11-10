@@ -10,7 +10,6 @@
 
 #define BAUD_RATE 57600
 
-extern const int _numOfWebcams;
 extern const int calibrationSize;
 
 extern const double _ballRadius;

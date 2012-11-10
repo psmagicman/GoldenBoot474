@@ -28,6 +28,8 @@ private slots:
 	void display();
 	void on_leftCalibrate_triggered();
 	void on_rightCalibrate_triggered();
+	void on_leftObstacles_triggered();
+	void on_rightObstacles_triggered();
 	void on_leftReset_triggered();
 	void on_rightReset_triggered();
 
@@ -39,9 +41,10 @@ private slots:
 	void writeLeftThreshold();
 	void writeRightThreshold();
 
-	void task1() {_task1 = true;};
-	void task2() {_task2 = true;};
-	void task3() {_task3 = true;};
+	void task1() {_task1 = true; _ballsToScore = 1; _ballsScored = 0;};
+	void task2() {_task2 = true; _ballsToScore = 1; _ballsScored = 0;};
+	void task3() {_task3 = true; _ballsToScore = 1; _ballsScored = 0;};
+	void final() {_final = true; _ballsToScore = 3; _ballsScored = 0;};
 
 private:
 	Ui::GUIClass ui;
@@ -55,12 +58,20 @@ private:
 	QLabel * _progressLabel;
 	QProgressBar * _progressBar;
 	QTimer * _timer;
-
+	
+	MovementAlgorithm _algorithm;
 	ArduinoCOMM * _arduino;
 	
 	bool _task1;
 	bool _task2;
 	bool _task3;
+	bool _final;
+
+	int _state;
+	int _pathIndex;
+
+	int _ballsToScore;
+	int _ballsScored;
 
 	IplImage * _image;
 	IplImage * _topImage;
@@ -68,16 +79,17 @@ private:
 	vector<Point2f> _balls;
 	vector<Point2f> _obstacles;
 	vector<Point2f> _robot;
-	vector<Point2f> _path;
+	vector <Coord2D> _path;
 	double _robotAngle;
+	vector<double> _robotAngles;
 
 	void init();
 	void displayImage(IplImage * webcamFeed, QLabel * location, int type = 0);
 	void displayFinal(IplImage * webcamFeed, QLabel * location);
 	void displayMain();
-	void detectObstacles(); // Detect if there are any obstacles in front of the robot
+	void detectProblems(); // Detect if there are any obstacles in front of the robot or out of projectory
 
-	vector<Point2f> combinePts(vector<Point2f> pts1, vector<Point2f> pts2);
+	vector<Point2f> combinePts(vector<Point2f> pts1, vector<Point2f> pts2, double distLimit);
 	void readLeftThreshold();
 	void readRightThreshold();
 	

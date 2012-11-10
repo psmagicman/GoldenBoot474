@@ -19,13 +19,15 @@ using namespace cv;
 class Webcam
 {
 public:
-	Webcam(int ID, bool home);
+	Webcam(int ID);
 	~Webcam();
 	
 	bool capture();
 
 	void calibrate(int index);
 	void finishCalibrate();
+
+	void calculateObstacles();
 
 	bool isCalibrated() {return _calibrated;};
 	void resetCalibrate();
@@ -106,7 +108,6 @@ public:
 
 private:
 	int _ID;
-	bool _main; // Is this the main camera?
 	CvSize _size; // Size of Capture Image
 	CvSize _finalSize; // Size of Processed (Final) Image
 
@@ -140,8 +141,13 @@ private:
 	map<string, Point2f> _topArenaPts;
 	map<string, Point2f> _botArenaPts;
 
+	bool _calibratedObstacles;
+	CvSeq * _obstaclesTopContour;
+	CvSeq * _obstaclesBotContour;
+
 	vector<Point2f> _ballPts;
 	vector<Point2f> _obstaclesPts;
+	vector<Point2f> _obstaclesPtsCam;
 	vector<Point2f> _robotPts;
 	vector<Point2f> _robotFrontPts;
 	vector<Point2f> _robotBackPts;
