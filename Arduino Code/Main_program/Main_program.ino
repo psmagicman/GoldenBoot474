@@ -96,6 +96,10 @@ volatile int tempdebug1 =0;
 volatile int tempdebug2 =0;
 
 volatile int error;
+volatile int sumError1 =0;
+volatile int sumError2 =0;
+int KI = 10;
+int motor = 0;
 
 void setup() {
 

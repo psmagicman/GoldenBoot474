@@ -73,22 +73,24 @@ void Check()
  //int sumError = 0;
 // float adjustment = 0;
 	if( enc1_Count == enc2_Count){
+            motor =0;
             if (pos_1 != pos_2)
               {
-              /*  if( (enc1_Count*100 >= abspos_1*80) && (enc2_Count*100 >= abspos_2*80)){  //Slow down before stopping
-                  pwm_1 = 60;
-                  pwm_2 = 60;
+                
+                if( (enc1_Count*100 >= abspos_1*85) && (enc2_Count*100 >= abspos_2*85)){  //Slow down before stopping
+                  pwm_1 = 70;
+                  pwm_2 = 70;
                   
                 }
-                else{*/
+                else{
                   pwm_1 =100;
                   pwm_2 =100;
-             //   }
+                }
               }
              else 
               {
               /*  if( (enc1_Count*100 >= abspos_1*80) && (enc2_Count*100 >= abspos_2*80)){  //Slow down before Stopping
-                  pwm_1 = 80;
+                 pwm_1 = 80;
                   pwm_2 = 80;
                 }
                 else{*/
@@ -100,21 +102,25 @@ void Check()
 	}
 	else if(enc1_Count > enc2_Count)
 	{ 
+                motor =1;
+                
 		error = (enc1_Count - enc2_Count);
-		//   adjustment = (KP*error + KD*(error - lastError)+ KI*sumError);
-		//pwm_2 += error + 12;
-		pwm_1 -= error*60;
+	        //adjustment = (KP*error + KD*(error - lastError)+ KI*sumError);
+		//pwm_2 += error*30+KI*sumError1;
+		pwm_1 -= error*60+KI*sumError1;
 		//  lastError = error;
-		//  sumError += error;
+		  sumError1 += error;
 	}
 	else if(enc1_Count < enc2_Count)
-	{
+	{      
+                motor = 2;
+                
 		error = (enc2_Count  - enc1_Count); 
 		// adjustment = KP*error + KD*(error - lastError)+ KI*sumError;
-		pwm_2 -= error*60;
-		//pwm_1 += error + 11; 
+		pwm_2 -= error*60+KI*sumError2;
+		//pwm_1 += error*60+KI*sumError2; 
 		  // lastError = error;
-		  // sumError += error;
+		   sumError2 += error;
 	}
 	else 
 	{
@@ -172,6 +178,10 @@ void Movement()
 
 void Position()
 {  
+         /*if((enc1_Count >= abspos_1*0.8) && (enc2_Count >= abspos_2*0.8)){
+               pwm_1 =70;
+               pwm_2 =70;
+         }*/
          if((enc1_Count >= abspos_1) && (enc2_Count >= abspos_2))
          {
                 Stop();
@@ -202,41 +212,6 @@ void Position()
          }*/
         
 }
-/*
-void  ResetNew()
-{
- 	Stop(); 
-	//   enc1_Count =0;
-	//   enc2_Count =0;
-             if (pos_1 != pos_2)
-              {
-                pwm_1 =100;
-                pwm_2 =100;
-              }
-             else 
-              {
-		pwm_1 = 255;
-		pwm_2 = 255; 
-              }
-        pos_1 = 0;
-        pos_2 = 0;
-        state = STANDBY;
-        enc1_Count=0;
-        enc2_Count=0;
-        poslist =0;
-        poslistFlag = 1;
-        path.clear();
-        _path.clear();
-        input1done = 0;
-        input2done = 1;
-        poslistFlag = 1;
-       // ActuatorControl(RETRACT - 10);
-        Serial.println("Robot Reset()");
-        while (Serial.available())
-        {Serial.read();
-        } 
-}
-*/
 
 
 void Reset(){
@@ -273,6 +248,17 @@ void Reset(){
 }
 
 void MotorControl(){
+  
+                if(motor == 0){
+                  Serial.println("Neurtal");}
+                  else if(motor == 1){
+                    Serial.println("Faster Right");}
+                    else if(motor ==2 ){
+                      Serial.println("Faster Left");}
+                    else{}
+                    
+                        
+                
   		if (poslistFlag == 1) {
                         Stop();
                         delay(300);
@@ -286,8 +272,10 @@ void MotorControl(){
                           abspos_2 =1;
                         }
                         else{
-                          abspos_1 = abs(pos_1)-(abs(pos_1)*0.07+1);
-                          abspos_2 = abs(pos_2)-(abs(pos_2)*0.07+1);
+                          //abspos_1 = abs(pos_1)-(abs(pos_1)*0.07+1);
+                          //abspos_2 = abs(pos_2)-(abs(pos_2)*0.07+1);
+                          abspos_1 =abs(pos_1)-3;
+                          abspos_2 =abs(pos_2)-3;
 		        }
 
                         poslist++;
@@ -301,6 +289,8 @@ void MotorControl(){
 			poslistFlag = 0;  
 			enc1_Count = 0;
 			enc2_Count = 0;
+                        sumError1= 0;
+                        sumError2 =0;
                         if(abspos_1 != abspos_2){
                           poslist = _path.size()+1;
                         }
@@ -318,11 +308,11 @@ void MotorControl(){
 		} else
 		{
 			
-	/*		Serial.print("Begin:  ");
+			Serial.print("Begin:  ");
 			Serial.print('\n');
 			Serial.print("Error : ");
 			Serial.print(error);
-			Serial.print('\n');*/
+			Serial.print('\n');
 			
 			Movement();
 			
@@ -335,20 +325,20 @@ void MotorControl(){
 			//Check ();
 			
 			//  Serial.print(error);
-      /*			Serial.print("After the check pwm_1  pwm_2 : ");
+      			Serial.print("After the check pwm_1  pwm_2 : ");
 			Serial.print(pwm_1);
 			Serial.print("  ");
 			Serial.print(pwm_2);
-			Serial.print('\n');*/
+			Serial.print('\n');
 			
 			//Position(pos_1, pos_2);
 			
-		/*	Serial.print("Encoder count _1  _2 : ");
+			Serial.print("Encoder count _1  _2 : ");
 			Serial.print(enc1_Count);
 			Serial.print("  ");
 			Serial.print(enc2_Count);
 			Serial.print('\n');
 			Serial.print(poslist);
-			Serial.print('\n');*/
+			Serial.print('\n');
 		}
 	}
