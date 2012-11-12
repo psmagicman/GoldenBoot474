@@ -93,7 +93,6 @@ private:
 	void readLeftThreshold();
 	void readRightThreshold();
 	
-	double dist(double x1, double x2, double y1, double y2);
 	void log(QString text);
 };
 

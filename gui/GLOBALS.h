@@ -1,10 +1,14 @@
 #ifndef __GLOBALS__
 #define __GLOBALS__
 
+#include <math.h>
+
 #define WIDTH	640
 #define HEIGHT	480
 #define FINAL_WIDTH 400
 #define FINAL_HEIGHT 400
+
+#define PI	3.14159265359
 
 #define FT_TO_CM 30.48
 
@@ -30,13 +34,17 @@ struct Robot {
 struct Ball {
 	double x;
 	double y;
-	int rad;
 };
 
 struct Obstacle {
 	double x;
 	double y;
-	int rad;
+	double rad;
 };
+
+extern double dist(double x1, double x2, double y1, double y2);
+extern double distFromLine(Coord2D A, Coord2D B, Coord2D C);
+extern double angleBetweenPoints(Coord2D A, Coord2D B);
+extern double cosineLaw(double lenA, double lenB, double lenC);
 
 #endif

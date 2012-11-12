@@ -24,7 +24,7 @@
 
 #define PI 3.14159265
 #define ONE_TICK 0.0113
-#define BOT_WIDTH 0.172244
+#define BOT_WIDTH 0.16896
 #define AVOID_DISTANCE 0.262467
 
 /* Constructor */
@@ -41,7 +41,6 @@ MovementAlgorithm::MovementAlgorithm(Robot robot, vector<Ball> balls) {
 	for(int i = 0; i < balls.size(); i++) {
 		algoBalls[i].x = balls[i].x;
 		algoBalls[i].y = balls[i].y;
-		algoBalls[i].rad = balls[i].rad;
 	}
 
 	calcMultiBall();
@@ -57,7 +56,6 @@ MovementAlgorithm::MovementAlgorithm(Robot robot, vector<Ball> balls, vector<Obs
 	for(int i = 0; i < balls.size(); i++) {
 		algoBalls[i].x = balls[i].x;
 		algoBalls[i].y = balls[i].y;
-		algoBalls[i].rad = balls[i].rad;
 	}
 	int numObs = obstacles.size();
 	algoObs.resize(numObs);

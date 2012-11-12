@@ -88,7 +88,7 @@ void GUI::init()
 
 	_robotAngles.resize(5);
 	for (int i = 0; i < _robotAngles.size(); i++) {
-		_robotAngles[i] = 0;
+		_robotAngles[i] = -1;
 	}
 	_state = 0;
 
@@ -171,20 +171,27 @@ void GUI::display()
 			if (leftAngle == -1) leftAngle = rightAngle;
 			if (rightAngle == -1) rightAngle = leftAngle;
 
+			double tempAngle;
 			if (abs(leftAngle - rightAngle) > CV_PI) {
-				_robotAngles[0] = 0;
+				tempAngle = 0;
+				_robotAngle = 0;
 			} else {
-				_robotAngles[0] = (leftAngle + rightAngle)/2;
+				tempAngle = (leftAngle + rightAngle)/2;
+				_robotAngle = (leftAngle + rightAngle)/2;
 			}
-			for (int i = _robotAngles.size()-1; i > 0; i--) {
-				_robotAngles[i] = _robotAngles[i-1];
+
+			if (abs(tempAngle - _robotAngles[0]) < CV_PI || _robotAngles[_robotAngles.size()-1] == -1) {
+				_robotAngles[0] = tempAngle;
+				for (int i = _robotAngles.size()-1; i > 0; i--) {
+					_robotAngles[i] = _robotAngles[i-1];
+				}
 			}
 			
-			_robotAngle = 0;
+			//_robotAngle = 0;
 			for (int i = 0; i < _robotAngles.size(); i++) {
-				_robotAngle += _robotAngles[i];
+				//_robotAngle += _robotAngles[i];
 			}
-			_robotAngle /= _robotAngles.size();
+			//_robotAngle /= _robotAngles.size();
 			
 			ui.labelRobotAngle->setText("Left Angle: " + QString::number((int)(leftAngle*180/CV_PI)) + "   Right Angle: " + QString::number((int)(rightAngle*180/CV_PI)) + "   Combined Angle: " + QString::number((int)(_robotAngles[0]*180/CV_PI)) + "   Corrected Angle: " + QString::number((int)(_robotAngle*180/CV_PI)));
 			// Algorithm
@@ -412,15 +419,14 @@ void GUI::detectProblems()
 		// cosTheta = A DOT B / (LEN(A) * LEN(B))
 		if (_path.size() > 1) {
 			Coord2D A;
-			A.x = _robot[0].x - _path[_pathIndex].x;
-			A.y = _robot[0].y - _path[_pathIndex].y;
+			A.x = _robot[1].x;
+			A.y = _robot[1].y;
 			Coord2D B;
-			B.x = _path[_pathIndex+1].x - _path[_pathIndex].x;
-			B.y = _path[_pathIndex+1].y - _path[_pathIndex].y;
-			double lenA = dist(A.x, 0, A.y, 0);
-			double lenB = dist(B.x, 0, B.y, 0);
-			double theta = acos( (A.x*B.x + A.y*B.y) / (lenA * lenB) );
-			double distFromRoute = lenA * sin(theta);
+			B.x = _path[_pathIndex+1].x;
+			B.y = _path[_pathIndex+1].y;
+			Coord2D C;
+			C.x = _path[_pathIndex].x;
+			C.x = _path[_pathIndex].y;
 			//log(QString::number(distFromRoute));
 			/*
 			if (distFromRoute > 10) {
@@ -826,14 +832,6 @@ void GUI::writeRightThreshold()
 		_cam2->_robot2Amin = ui.spinRightAreaMin->value();
 		_cam2->_robot2Amax = ui.spinRightAreaMax->value();
 	}
-}
-
-double GUI::dist(double x1, double x2, double y1, double y2)
-{
-	return sqrtf(
-		pow(x1 - x2,2) +
-		pow(y1 - y2,2)
-		);
 }
 
 void GUI::log(QString text)

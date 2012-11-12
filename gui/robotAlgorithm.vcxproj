@@ -62,13 +62,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="algorithmMain.cpp" />
+    <ClCompile Include="algoMain.cpp" />
+    <ClCompile Include="Algorithm.cpp" />
     <ClCompile Include="GLOBALS.cpp" />
-    <ClCompile Include="MovementAlgorithm.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Algorithm.h" />
     <ClInclude Include="GLOBALS.h" />
-    <ClInclude Include="MovementAlgorithm.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

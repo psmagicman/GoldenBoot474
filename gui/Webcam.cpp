@@ -504,11 +504,3 @@ IplImage * Webcam::getFinal()
 	}
 	return _final;
 }
-
-double Webcam::dist(double x1, double x2, double y1, double y2)
-{
-	return sqrtf(
-		pow(x1 - x2,2) +
-		pow(y1 - y2,2)
-		);
-}
