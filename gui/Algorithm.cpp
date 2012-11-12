@@ -76,8 +76,7 @@ void Algorithm::analyzeField(Robot robot, vector<Ball> balls)
 				// If an obstacle is detected to be in-between the path, add a new point to the path
 				if (obstaclePts.x > 0 && obstaclePts.y > 0) {
 					Coord2D newPath = getNewPointAroundObstacle(obstaclePts,beginPts,endPts);
-					path.pop_back();
-					path.push_back(newPath);
+					path[path.size()-1] = newPath;
 					path.push_back(endPts);
 				}
 			}
