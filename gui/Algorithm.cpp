@@ -136,12 +136,83 @@ void Algorithm::analyzeObstacles()
 Coord2D Algorithm::getNewPointAroundObstacle(Obstacle obstacle, Coord2D beginPts, Coord2D endPts)
 {
 	Coord2D newPoint;
+	// beginPts is the starting position
+	// endPts is the ball position
 	// TODO: use getTangentPointObstacle.
 	// Logic:
 	//		1. Find the Tangent points between BeginPts to Obstacle - Choose the point that is closest to EndPts
 	//		2. Find the Tangent points between EndPts to Obstacle - Choose the point that is closest to BeginPts
 	//		3. Construct a line-equation for 1. and 2., and find their intercept. Their intercept is the new point
+	vector<Coord2D> tempBeginPoint;
+	vector<Coord2D> tempEndPoint;
+	tempBeginPoint = getTangentPointOfObstacle(obstacle, beginPts);
+	tempEndPoint = getTangentPointOfObstacle(obstacle, endPts);
+
+	// Step 1
+	Coord2D tempNewPoint1 = tempBeginPoint[0];	// Load this temp point with a default value
+	for(int i = 1; i < tempBeginPoint.size(); i++) {
+		if(checkGTPoints(tempBeginPoint[i], tempNewPoint1, endPts) || checkLTPoints(tempBeginPoint[i], tempNewPoint1, endPts))
+			tempNewPoint1 = tempBeginPoint[i];
+	}
+
+	// Step 2
+	Coord2D tempNewPoint2 = tempEndPoint[0]; // Load this temp point with a default value
+	for(int i = 1; i < tempEndPoint.size(); i++) {
+		if(checkGTPoints(tempEndPoint[i], tempNewPoint2, beginPts) || checkLTPoints(tempEndPoint[i], tempNewPoint2, beginPts))
+			tempNewPoint2 = tempEndPoint[i];
+	}
+	
+	// slope from the endPts to step 1
+	double rise1, run1, slope1;
+	rise1 = tempNewPoint1.y - endPts.y;
+	run1 = tempNewPoint1.x - endPts.x;
+	slope1 = rise1/run1;
+	// slope from the beginPts to step 2
+	double rise2, run2, slope2;
+	rise2 = tempNewPoint2.y - beginPts.y;
+	run2 = tempNewPoint2.x - beginPts.x;
+	slope2 = rise2/run2;
+	// equation of a line y = mx + b 
+	double b1, b2;
+	b1 = tempNewPoint1.y - (slope1*tempNewPoint1.x);
+	b2 = tempNewPoint2.y - (slope2*tempNewPoint2.x);
+	double newX, newY;
+	// m1*x + b1 = m2*x + b2
+	// b2 - b1 = x(m1 - m2)
+	// x = (b2 - b1)/(m1 - m2)
+	newX = (b2 - b1)/(slope1 - slope2);
+	newY = slope1*newX + b1;
+	newPoint.x = newX;
+	newPoint.y = newY;
 	return newPoint;
+}
+
+// checkGTPoints -	Checks the points that are passed as parameters if they are closer to the posPoints parameter
+//					currentPoint is the point that is being compared with
+//					prevPoint is the previous point that was compared
+//					posPoints is can be either the beginning point or the end point
+//					returns true if current x and y value is greater than previous x and y values and less than the posPoints x and y values
+bool Algorithm::checkGTPoints(Coord2D currentPoint, Coord2D prevPoint, Coord2D posPoints)
+{
+	if(currentPoint.x > prevPoint.x && currentPoint.x < posPoints.x) {
+		if(currentPoint.y > prevPoint.y && currentPoint.y < posPoints.y)
+			return true;
+	}
+	return false;
+}
+
+// checkLTPoints -	Checks the points that are passed as parameters if they are closer to the posPoints parameter
+//					currentPoint is the point that is being compared with
+//					prevPoint is the previous point that was compared
+//					posPoints is can be either the beginning point or the end point
+//					returns true if current x and y value is less than previous x and y values and greater than the posPoints x and y values
+bool Algorithm::checkLTPoints(Coord2D currentPoint, Coord2D prevPoint, Coord2D posPoints)
+{
+	if(currentPoint.x < prevPoint.x && currentPoint.x > posPoints.x) {
+		if(currentPoint.y < prevPoint.y && currentPoint.y > posPoints.y) 
+			return true;
+	}
+	return false;
 }
 
 // getTangetPointOfObstacle - Returns the two points on the circle that is tangent to the point

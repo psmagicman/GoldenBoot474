@@ -38,6 +38,8 @@ private:
 	vector<vector<Coord2D> > _paths;
 
 	void analyzeObstacles();
+	bool checkGTPoints(Coord2D, Coord2D, Coord2D);
+	bool checkLTPoints(Coord2D, Coord2D, Coord2D); 
 };
 
 #endif
