@@ -270,3 +270,82 @@ vector<Coord2D> Algorithm::getTangentPointOfObstacle(Obstacle obstacle, Coord2D 
 
 	return newPoints;
 }
+
+int Algorithm::calcForwardTicks(double dist)
+{
+	double tempTick;
+	tempTick = ((dist/100)/ONE_TICK);
+	tempTick * 2.0;
+	return (int)tempTick;
+}
+
+int Algorithm::calcTurnTicks(double angle)
+{
+	double tempTick;
+	tempTick = 2*PI*BOT_WIDTH;
+	tempTick = tempTick*angle/360;
+	tempTick = tempTick/ONE_TICK;
+	tempTick = tempTick * 2.0;
+	return (int)abs(tempTick);
+}
+
+
+/*
+ * Calculates the turning angle required for each point on the path
+ */
+void Algorithm::calcAngles()
+{
+	//_angles;
+	//_paths;
+	vector<Coord2D> subTicks;
+	//vector<double> subAngles;
+	Coord2D tempTicks;
+	double prevAngle;
+	for(int i = 0; i < _paths.size(); i++) {
+		for(int j = 1; j < _paths[i].size()-1; j++) {
+			double tempForwardTicks;
+			double tempTurnTicks;
+			tempForwardTicks = calcForwardTicks(dist(_paths[i][j].x, _paths[i][j-1].x, _paths[i][j].y, _paths[i][j-1].y));
+			tempTicks.x = tempForwardTicks;
+			tempTicks.y = tempForwardTicks;
+			if(j == 1) {
+				double checkAngle;
+				checkAngle = (angleWithOrigin(_paths[i][1]) - _robot.angle)*(180/PI);
+				if(checkAngle < 0.01 && checkAngle > -0.01) {
+					subTicks.push_back(tempTicks);
+				}
+				else {
+					tempTurnTicks = calcTurnTicks(checkAngle);
+					if(checkAngle > 0) {
+						tempTicks.x = tempTurnTicks;
+						tempTicks.y = -tempTurnTicks;
+						subTicks.push_back(tempTicks);
+					}
+					else {
+						tempTicks.x = -tempTurnTicks;
+						tempTicks.y = tempTurnTicks;
+						subTicks.push_back(tempTicks);
+					}
+					tempTicks.x = tempForwardTicks;
+					tempTicks.y = tempForwardTicks;
+					subTicks.push_back(tempTicks);
+				}
+			}
+			else {
+				if(j == 2)
+					prevAngle = (angleWithOrigin(_paths[i][1]) - _robot.angle)*(180/PI);
+				else
+					prevAngle = ;
+				double a, b, c;
+				a = dist(_paths[i][j].x,_paths[i][j-1].x,_paths[i][j].y,_paths[i][j-1].y);
+				b = dist(_paths[i][j].x,_paths[i][j+1].x,_paths[i][j].y,_paths[i][j+1].y);
+				c = dist(_paths[i][j-1].x,_paths[i][j+1].x,_paths[i][j-1].y,_paths[i][j+1].y);
+				double tempAngle;
+				tempAngle = cosineLaw(a, b, c);
+			}
+		}
+		//subAngles.clear();
+
+		subTicks.clear();
+	}
+}

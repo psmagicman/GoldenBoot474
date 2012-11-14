@@ -14,7 +14,7 @@
 
 #define BAUD_RATE 57600
 
-#define BOT_WIDTH 0.172255
+#define BOT_WIDTH 0.172244
 #define ONE_TICK 0.0113
 
 extern const int calibrationSize;
