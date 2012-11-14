@@ -271,36 +271,47 @@ vector<Coord2D> Algorithm::getTangentPointOfObstacle(Obstacle obstacle, Coord2D 
 	return newPoints;
 }
 
-int Algorithm::calcForwardTicks(double dist)
+Coord2D Algorithm::calcForwardTicks(double dist)
 {
+	Coord2D tempTicks;
 	double tempTick;
 	tempTick = ((dist/100)/ONE_TICK);
 	tempTick * 2.0;
-	return (int)tempTick;
+	tempTicks.x = tempTick;
+	tempTicks.y = tempTick;
 }
 
-int Algorithm::calcTurnTicks(double angle)
+Coord2D Algorithm::calcTurnTicks(double angle)
 {
+	Coord2D tempTicks;
 	double tempTick;
 	tempTick = 2*PI*BOT_WIDTH;
 	tempTick = tempTick*angle/360;
 	tempTick = tempTick/ONE_TICK;
 	tempTick = tempTick * 2.0;
-	return (int)abs(tempTick);
+	tempTick = abs(tempTick);
+	if(angle > 0) {
+		tempTicks.x = tempTick;
+		tempTicks.y = -tempTick;
+	}
+	else {
+		tempTicks.x = -tempTick;
+		tempTicks.y = tempTick;
+	}
+	return tempTicks;
 }
 
 
 /*
  * Calculates the turning angle required for each point on the path
  */
-void Algorithm::calcAngles()
+/*void Algorithm::calculateTicks()
 {
 	//_angles;
 	//_paths;
 	vector<Coord2D> subTicks;
 	//vector<double> subAngles;
 	Coord2D tempTicks;
-	double prevAngle;
 	for(int i = 0; i < _paths.size(); i++) {
 		for(int j = 1; j < _paths[i].size()-1; j++) {
 			double tempForwardTicks;
@@ -332,20 +343,56 @@ void Algorithm::calcAngles()
 				}
 			}
 			else {
-				if(j == 2)
-					prevAngle = (angleWithOrigin(_paths[i][1]) - _robot.angle)*(180/PI);
-				else
-					prevAngle = ;
 				double a, b, c;
 				a = dist(_paths[i][j].x,_paths[i][j-1].x,_paths[i][j].y,_paths[i][j-1].y);
 				b = dist(_paths[i][j].x,_paths[i][j+1].x,_paths[i][j].y,_paths[i][j+1].y);
 				c = dist(_paths[i][j-1].x,_paths[i][j+1].x,_paths[i][j-1].y,_paths[i][j+1].y);
 				double tempAngle;
 				tempAngle = cosineLaw(a, b, c);
+				tempAngle = 180 - tempAngle;
+				tempTurnTicks = calcTurnTicks(tempAngle);
+				if(_paths[i][j].x);
 			}
 		}
 		//subAngles.clear();
 
 		subTicks.clear();
 	}
+}*/
+
+/*
+ * compares the total amount of ticks for each path
+ */
+vector<Coord2D> Algorithm::compareTicks()
+{
+	vector<vector<Coord2D> > totalTicks;
+	for(int i = 0; i <_paths.size(); i++) {
+		totalTicks.push_back(calculateTicks(_paths[i]));
+	}
+	for(int i = 0; i < totalTicks.size(); i++) {
+		// calculate the total ticks of each path, then return the vector ticks that has the smallest ticks
+	}
+}
+
+/*
+ * calculates the ticks of the path passed into the function
+ */
+vector<Coord2D> Algorithm::calculateTicks(vector<Coord2D> path)
+{
+	vector<Coord2D> ticks;
+	Coord2D tempTicks;
+	for(int i = 1; i < path.size()-1; i++) {
+		double angle, a, b, c;
+		a = dist(path[i].x,path[i-1].x,path[i].y,path[i-1].y);
+		b = dist(path[i].x,path[i+1].x,path[i].y,path[i+1].y);
+		c = dist(path[i-1].x,path[i+1].x,path[i-1].y,path[i+1].y);
+		if(i < path.size()-1) {
+			angle = cosineLaw(a, b, c);
+			tempTicks = calcTurnTicks(angle);
+			ticks.push_back(tempTicks);
+		}
+		tempTicks = calcForwardTicks(a);
+		ticks.push_back(tempTicks);
+	}
+	return ticks;
 }

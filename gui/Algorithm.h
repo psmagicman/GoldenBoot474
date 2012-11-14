@@ -19,8 +19,6 @@ public:
 
 	void analyzeField(Robot robot, vector<Ball> balls);
 
-	int calcForwardTicks(double);
-	int calcTurnTicks(double);
 	/*
 	Coord2D				getClosestBall();
 	vector<Coord2D>		getPathToClosestBall();
@@ -46,7 +44,10 @@ private:
 	void analyzeObstacles();
 	bool checkGTPoints(Coord2D, Coord2D, Coord2D);
 	bool checkLTPoints(Coord2D, Coord2D, Coord2D); 
-	void calcAngles();
+	vector<Coord2D> calculateTicks(vector<Coord2D>);
+	vector<Coord2D> compareTicks();
+	Coord2D calcForwardTicks(double);
+	Coord2D calcTurnTicks(double);
 };
 
 #endif
