@@ -4,10 +4,11 @@ void serialEvent(){
         CheckforE();
 }
 
-void CheckforE(){
+boolean CheckforE(){
         if(Serial.available() > 0){
          
            if( Serial.peek() == 'E'){
+                 emergency = 1;
                  Serial.println("Emergency");
                  while(Serial.available()){
                    Serial.read();                   
@@ -21,8 +22,11 @@ void CheckforE(){
                  //path.clear();
                  //_path.clear();
                  Serial.write('1');
+                 return TRUE;
            }
+          else return FALSE;
         }
+        else return FALSE;
 }
 
 void ReadInput(){

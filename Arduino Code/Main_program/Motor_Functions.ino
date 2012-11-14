@@ -77,14 +77,14 @@ void Check()
             if (pos_1 != pos_2)
               {
                 
-                if( (enc1_Count*100 >= abspos_1*85) && (enc2_Count*100 >= abspos_2*85)){  //Slow down before stopping
-                  pwm_1 = 70;
-                  pwm_2 = 70;
+                if( (enc1_Count >= abspos_1*0.85) && (enc2_Count >= abspos_2*0.85)){  //Slow down before stopping
+                  pwm_1 = 100;
+                  pwm_2 = 100;
                   
                 }
                 else{
-                  pwm_1 =100;
-                  pwm_2 =100;
+                  pwm_1 =150;
+                  pwm_2 =150;
                 }
               }
              else 
@@ -107,7 +107,7 @@ void Check()
 		error = (enc1_Count - enc2_Count);
 	        //adjustment = (KP*error + KD*(error - lastError)+ KI*sumError);
 		//pwm_2 += error*30+KI*sumError1;
-		pwm_1 -= error*60+KI*sumError1;
+		pwm_1 -= error*KP+KI*sumError1;  
 		//  lastError = error;
 		  sumError1 += error;
 	}
@@ -117,7 +117,7 @@ void Check()
                 
 		error = (enc2_Count  - enc1_Count); 
 		// adjustment = KP*error + KD*(error - lastError)+ KI*sumError;
-		pwm_2 -= error*60+KI*sumError2;
+		pwm_2 -= error*KP+KI*sumError2;
 		//pwm_1 += error*60+KI*sumError2; 
 		  // lastError = error;
 		   sumError2 += error;
@@ -214,38 +214,6 @@ void Position()
 }
 
 
-void Reset(){
-	Stop(); 
-	//   enc1_Count =0;
-	//   enc2_Count =0;
-             if (pos_1 != pos_2)
-              {
-                pwm_1 =100;
-                pwm_2 =100;
-              }
-             else 
-              {
-		pwm_1 = 255;
-		pwm_2 = 255; 
-              }
-        pos_1 = 0;
-        pos_2 = 0;
-        state = STANDBY;
-        enc1_Count=0;
-        enc2_Count=0;
-        poslist =0;
-        poslistFlag = 1;
-        path.clear();
-        _path.clear();
-        input1done = 0;
-        input2done = 1;
-        poslistFlag = 1;
-        //ActuatorControl(RETRACT);
-        Serial.println("Robot Reset()");
-        while (Serial.available())
-        {Serial.read();
-        }
-}
 
 void MotorControl(){
   
@@ -267,15 +235,15 @@ void MotorControl(){
 			pos_2 = _path[poslist][1];
                         //abspos_1 = abs(pos_1);
                         //abspos_2 = abs(pos_2);
-                        if(( (abs(pos_1) <= 4) && (pos_1 != 0)) || ((abs(pos_2) <= 4) && (pos_2 !=0))){
+                        if(( (abs(pos_1) <= 11) && (pos_1 != 0)) || ((abs(pos_2) <= 11) && (pos_2 !=0))){
                           abspos_1 =1;
                           abspos_2 =1;
                         }
                         else{
                           //abspos_1 = abs(pos_1)-(abs(pos_1)*0.07+1);
                           //abspos_2 = abs(pos_2)-(abs(pos_2)*0.07+1);
-                          abspos_1 =abs(pos_1)-3;
-                          abspos_2 =abs(pos_2)-3;
+                          abspos_1 =abs(pos_1)-11;
+                          abspos_2 =abs(pos_2)-11;
 		        }
 
                         poslist++;

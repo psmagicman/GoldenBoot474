@@ -89,6 +89,7 @@ int state = STANDBY;
 int input1done = 0;
 int input2done = 1;
 int poslistFlag = 1;
+int emergency = 0;
 
 volatile int enc1_Count=0; 
 volatile int enc2_Count=0;
@@ -98,7 +99,8 @@ volatile int tempdebug2 =0;
 volatile int error;
 volatile int sumError1 =0;
 volatile int sumError2 =0;
-int KI = 10;
+int KI = 5;
+int KP = 90;
 int motor = 0;
 
 void setup() {
@@ -119,13 +121,13 @@ void setup() {
 	pinMode(dir_1, INPUT);
 	digitalWrite(encoder1_in, HIGH);
 	digitalWrite(dir_1, HIGH);
-	PCintPort::attachInterrupt(encoder1_in, enc1, RISING);
+	PCintPort::attachInterrupt(encoder1_in, enc1, CHANGE);
 	//Initialize encoder pin #2
 	pinMode(encoder2_in, INPUT);
 	pinMode(dir_2, INPUT);
 	digitalWrite(encoder2_in, HIGH);
 	digitalWrite(dir_2, HIGH);
-	PCintPort::attachInterrupt(encoder2_in, enc2, RISING);
+	PCintPort::attachInterrupt(encoder2_in, enc2, CHANGE);
         //Actuator functions 
         pinMode(actuator_enable, OUTPUT);
         pinMode(actuator_pin1, OUTPUT);
@@ -161,7 +163,10 @@ void CatchtheBall()
 { 
   int caught =0;
   while(caught == 0){
-                CheckforE();
+                if( CheckforE() == TRUE){ 
+                  Reset();
+                  break;
+                }
                 Sensor();
                 Serial.println(SenseDistance);
         if(SenseDistance <=30){
@@ -195,83 +200,93 @@ void KicktheBall()
    Actuator_Read();
    while (actuator_length < EXTEND )
         {
-         CheckforE();
+         if( CheckforE() == TRUE){
+            flag = 1;
+            break;
+            
+         }
          Actuator_Activate();  
          Actuator_Read();
          flag= 0; 
         }
-   delay(300);
-   if (flag ==0 )
+   //delay(300);
+  /* if (flag ==0 )
      {
       Serial.println("Actuator is fully out");                
-      pos_1 = 150; 
-      pos_2 = 150; 
+      pos_1 = 80; 
+      pos_2 = 80; 
       pwm_1=255;
       pwm_2=255; 
-      abspos_1 =150;
-      abspos_2 =150;
+      abspos_1 = 80;
+      abspos_2 = 80;
       enc1_Count =0;
       enc2_Count =0;
       Serial.println("Accelerate");
       while (enc1_Count < pos_1 && enc2_Count < pos_2)   
            { 
-             CheckforE();
-             Accelerate(pwm_1,pwm_2); 
+             if( CheckforE() == TRUE){ 
+                flag = 1;
+                break;
+             }
+             Reverse(pwm_1,pwm_2); 
              //Position();
              Serial.println();
              Serial.print("Encoder1:  ");
              Serial.print(enc1_Count);
              Serial.print("Encoder2:  ");
              Serial.print(enc2_Count);
-           } 
-      Stop();
-     }           
+           } */ 
+      //Stop();
+     //}           
      //while(flag1 == 1) 
          // {  
-     delay(300);  
+     //delay(300);  
      Sensor();
-     if(SenseDistance >= 4)
+     if(SenseDistance >= 4 && flag == 0)
        {
-        Serial.println("Ball just out of the caster ");
-        //  Serial.println(SenseDistance);            
-        Actuator_Read();
-        while (actuator_length > RETRACT )
+         Serial.println("Actuator is fully in "); 
+         pos_1 = 150; 
+         pos_2 = 150; 
+         abspos_1 =150;
+         abspos_2 =150;
+         enc1_Count =0;
+         enc2_Count =0;
+         pwm_1=255;
+         pwm_2=255;
+         Serial.println("Reverse ");
+         while( enc1_Count < pos_1 && enc2_Count < pos_2) 
+         { 
+           if( CheckforE() == TRUE){ 
+             flag = 1;
+             break;
+           }
+           Accelerate(pwm_1, pwm_2); 
+           //Position();
+           Serial.println();
+           Serial.print("Encoder1:  ");
+           Serial.print(enc1_Count);
+           Serial.print("Encoder2:  ");
+           Serial.print(enc2_Count);
+          }
+          delay(300);
+          if (flag ==0)
+            {
+             Serial.println("Ball just out of the caster ");
+             //  Serial.println(SenseDistance);            
+             Actuator_Read();
+             while (actuator_length > RETRACT )
              { 
-               CheckforE();
+               if( CheckforE() == TRUE){ 
+                   flag =1; 
+                   break;
+               }
                Actuator_Deactivate(); 
                Actuator_Read(); 
-               flag = 1; 
+               flag = 0; 
              }
-         delay(300);
-         if (flag ==1)
-           {
-            Serial.println("Actuator is fully in "); 
-            pos_1 = 150; 
-            pos_2 = 150; 
-            abspos_1 =150;
-            abspos_2 =150;
-            enc1_Count =0;
-            enc2_Count =0;
-            pwm_1=255;
-            pwm_2=255;
-            Serial.println("Reverse ");
-            while( enc1_Count < pos_1 && enc2_Count < pos_2) 
-                 { 
-                   CheckforE();
-                   Reverse(pwm_1, pwm_2); 
-                   //Position();
-                   Serial.println();
-                   Serial.print("Encoder1:  ");
-                   Serial.print(enc1_Count);
-                   Serial.print("Encoder2:  ");
-                   Serial.print(enc2_Count);
-                 }
-          }
-         // else 
-           // flag1 =1; 
-      }          
-      // Reverse in order to avaiod touching the same ball  
-         //}
+             delay(300); 
+            } 
+      }
       Serial.println("Done with the ball kicking") ;      
       enc1_Count =0;
       enc2_Count =0;
