@@ -38,7 +38,6 @@ private:
 	vector<Ball>		_balls;
 	vector<Obstacle>	_obstacles;
 	vector<vector<Coord2D> > _paths;
-	vector<vector<double> > _angles;
 	vector<vector<Coord2D> > _ticks;
 
 	void analyzeObstacles();

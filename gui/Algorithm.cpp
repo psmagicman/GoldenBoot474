@@ -290,7 +290,7 @@ Coord2D Algorithm::calcTurnTicks(double angle)
 	tempTick = tempTick/ONE_TICK;
 	tempTick = tempTick * 2.0;
 	tempTick = abs(tempTick);
-	if(angle > 0) {
+	if(angle > 0) {			// need to change this conditional statement, this will always be true no matter the case
 		tempTicks.x = tempTick;
 		tempTicks.y = -tempTick;
 	}
@@ -301,65 +301,6 @@ Coord2D Algorithm::calcTurnTicks(double angle)
 	return tempTicks;
 }
 
-
-/*
- * Calculates the turning angle required for each point on the path
- */
-/*void Algorithm::calculateTicks()
-{
-	//_angles;
-	//_paths;
-	vector<Coord2D> subTicks;
-	//vector<double> subAngles;
-	Coord2D tempTicks;
-	for(int i = 0; i < _paths.size(); i++) {
-		for(int j = 1; j < _paths[i].size()-1; j++) {
-			double tempForwardTicks;
-			double tempTurnTicks;
-			tempForwardTicks = calcForwardTicks(dist(_paths[i][j].x, _paths[i][j-1].x, _paths[i][j].y, _paths[i][j-1].y));
-			tempTicks.x = tempForwardTicks;
-			tempTicks.y = tempForwardTicks;
-			if(j == 1) {
-				double checkAngle;
-				checkAngle = (angleWithOrigin(_paths[i][1]) - _robot.angle)*(180/PI);
-				if(checkAngle < 0.01 && checkAngle > -0.01) {
-					subTicks.push_back(tempTicks);
-				}
-				else {
-					tempTurnTicks = calcTurnTicks(checkAngle);
-					if(checkAngle > 0) {
-						tempTicks.x = tempTurnTicks;
-						tempTicks.y = -tempTurnTicks;
-						subTicks.push_back(tempTicks);
-					}
-					else {
-						tempTicks.x = -tempTurnTicks;
-						tempTicks.y = tempTurnTicks;
-						subTicks.push_back(tempTicks);
-					}
-					tempTicks.x = tempForwardTicks;
-					tempTicks.y = tempForwardTicks;
-					subTicks.push_back(tempTicks);
-				}
-			}
-			else {
-				double a, b, c;
-				a = dist(_paths[i][j].x,_paths[i][j-1].x,_paths[i][j].y,_paths[i][j-1].y);
-				b = dist(_paths[i][j].x,_paths[i][j+1].x,_paths[i][j].y,_paths[i][j+1].y);
-				c = dist(_paths[i][j-1].x,_paths[i][j+1].x,_paths[i][j-1].y,_paths[i][j+1].y);
-				double tempAngle;
-				tempAngle = cosineLaw(a, b, c);
-				tempAngle = 180 - tempAngle;
-				tempTurnTicks = calcTurnTicks(tempAngle);
-				if(_paths[i][j].x);
-			}
-		}
-		//subAngles.clear();
-
-		subTicks.clear();
-	}
-}*/
-
 /*
  * compares the total amount of ticks for each path
  */
@@ -369,9 +310,22 @@ vector<Coord2D> Algorithm::compareTicks()
 	for(int i = 0; i <_paths.size(); i++) {
 		totalTicks.push_back(calculateTicks(_paths[i]));
 	}
+	double sum_of_elems = 99999999999999;		// loading this sum with a very large value
+	double tempSum = 0;
+	int ticksIndex;
 	for(int i = 0; i < totalTicks.size(); i++) {
 		// calculate the total ticks of each path, then return the vector ticks that has the smallest ticks
+		for(int j = 0; j < totalTicks[i].size(); j++) {
+			tempSum += abs(totalTicks[i][j].x);
+		}
+		if(sum_of_elems > tempSum) {
+			// does a comparison of the previous smallest sum with the current sum
+			sum_of_elems = tempSum;
+			ticksIndex = i;
+			// remembers the index of the vector here the path with the lowest amount of ticks are located
+		}
 	}
+	return totalTicks[ticksIndex];
 }
 
 /*
