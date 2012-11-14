@@ -133,86 +133,53 @@ void Algorithm::analyzeObstacles()
 	_obstacles = tempObstacles;
 }
 
-Coord2D Algorithm::getNewPointAroundObstacle(Obstacle obstacle, Coord2D beginPts, Coord2D endPts)
+void Algorithm::analyzeObstacles()
 {
-	Coord2D newPoint;
-	// beginPts is the starting position
-	// endPts is the ball position
-	// TODO: use getTangentPointObstacle.
-	// Logic:
-	//		1. Find the Tangent points between BeginPts to Obstacle - Choose the point that is closest to EndPts
-	//		2. Find the Tangent points between EndPts to Obstacle - Choose the point that is closest to BeginPts
-	//		3. Construct a line-equation for 1. and 2., and find their intercept. Their intercept is the new point
-	vector<Coord2D> tempBeginPoint;
-	vector<Coord2D> tempEndPoint;
-	tempBeginPoint = getTangentPointOfObstacle(obstacle, beginPts);
-	tempEndPoint = getTangentPointOfObstacle(obstacle, endPts);
+	vector<Obstacle> tempObstacles;
+	tempObstacles.clear();
+	for (int i = 0; i < _obstacles.size() && _obstacles[i].rad != 0; i++) 
+	{
+		vector<Obstacle> combinedObstacles;
+		combinedObstacles.push_back(_obstacles[i]);
+		// Combine Obstacles that does not have enough gap in-between for the robot to fit through
+		for (int j = 0; j < _obstacles.size(); j++) 
+		{
+			if (i != j) {
+				double obstacleDistance = dist(_obstacles[i].x, _obstacles[j].x, _obstacles[i].y, _obstacles[j].y);
+				// If the distance between 2 obstacles are smaller than the size of robot, add the obstacle to to-be combined list
+				if (obstacleDistance < (_obstacles[i].rad + _obstacles[j].rad))
+				{
+					combinedObstacles.push_back(_obstacles[j]);
+					_obstacles[j].rad = 0;
+				}
+			}
+		}
 
-	// Step 1
-	Coord2D tempNewPoint1 = tempBeginPoint[0];	// Load this temp point with a default value
-	for(int i = 1; i < tempBeginPoint.size(); i++) {
-		if(checkGTPoints(tempBeginPoint[i], tempNewPoint1, endPts) || checkLTPoints(tempBeginPoint[i], tempNewPoint1, endPts))
-			tempNewPoint1 = tempBeginPoint[i];
-	}
+		Obstacle combinedObstacle;
+		combinedObstacle.x = 0;
+		combinedObstacle.y = 0;
+		// Find Center Point of Close-Obstacles
+		for (int j = 0; j < combinedObstacles.size(); j++) 
+		{
+			combinedObstacle.x += combinedObstacles[j].x;
+			combinedObstacle.y += combinedObstacles[j].y;
+		}
+		combinedObstacle.x /= combinedObstacles.size();
+		combinedObstacle.y /= combinedObstacles.size();
 
-	// Step 2
-	Coord2D tempNewPoint2 = tempEndPoint[0]; // Load this temp point with a default value
-	for(int i = 1; i < tempEndPoint.size(); i++) {
-		if(checkGTPoints(tempEndPoint[i], tempNewPoint2, beginPts) || checkLTPoints(tempEndPoint[i], tempNewPoint2, beginPts))
-			tempNewPoint2 = tempEndPoint[i];
+		// Find Radius of new Obstacle
+		// New Radius = largest distance between new center with all associated obstacle centers plus obstacle radius
+		combinedObstacle.rad = 0;
+		for (int j = 0; j < combinedObstacles.size(); j++) 
+		{
+			if (combinedObstacle.rad < dist(combinedObstacles[j].x, combinedObstacle.x, combinedObstacles[j].y, combinedObstacle.y)) {
+				combinedObstacle.rad = dist(combinedObstacles[j].x, combinedObstacle.x, combinedObstacles[j].y, combinedObstacle.y); 
+			}
+		}
+		combinedObstacle.rad += combinedObstacles[0].rad;
+		tempObstacles.push_back(combinedObstacle);
 	}
-	
-	// slope from the endPts to step 1
-	double rise1, run1, slope1;
-	rise1 = tempNewPoint1.y - endPts.y;
-	run1 = tempNewPoint1.x - endPts.x;
-	slope1 = rise1/run1;
-	// slope from the beginPts to step 2
-	double rise2, run2, slope2;
-	rise2 = tempNewPoint2.y - beginPts.y;
-	run2 = tempNewPoint2.x - beginPts.x;
-	slope2 = rise2/run2;
-	// equation of a line y = mx + b 
-	double b1, b2;
-	b1 = tempNewPoint1.y - (slope1*tempNewPoint1.x);
-	b2 = tempNewPoint2.y - (slope2*tempNewPoint2.x);
-	double newX, newY;
-	// m1*x + b1 = m2*x + b2
-	// b2 - b1 = x(m1 - m2)
-	// x = (b2 - b1)/(m1 - m2)
-	newX = (b2 - b1)/(slope1 - slope2);
-	newY = slope1*newX + b1;
-	newPoint.x = newX;
-	newPoint.y = newY;
-	return newPoint;
-}
-
-// checkGTPoints -	Checks the points that are passed as parameters if they are closer to the posPoints parameter
-//					currentPoint is the point that is being compared with
-//					prevPoint is the previous point that was compared
-//					posPoints is can be either the beginning point or the end point
-//					returns true if current x and y value is greater than previous x and y values and less than the posPoints x and y values
-bool Algorithm::checkGTPoints(Coord2D currentPoint, Coord2D prevPoint, Coord2D posPoints)
-{
-	if(currentPoint.x > prevPoint.x && currentPoint.x < posPoints.x) {
-		if(currentPoint.y > prevPoint.y && currentPoint.y < posPoints.y)
-			return true;
-	}
-	return false;
-}
-
-// checkLTPoints -	Checks the points that are passed as parameters if they are closer to the posPoints parameter
-//					currentPoint is the point that is being compared with
-//					prevPoint is the previous point that was compared
-//					posPoints is can be either the beginning point or the end point
-//					returns true if current x and y value is less than previous x and y values and greater than the posPoints x and y values
-bool Algorithm::checkLTPoints(Coord2D currentPoint, Coord2D prevPoint, Coord2D posPoints)
-{
-	if(currentPoint.x < prevPoint.x && currentPoint.x > posPoints.x) {
-		if(currentPoint.y < prevPoint.y && currentPoint.y > posPoints.y) 
-			return true;
-	}
-	return false;
+	_obstacles = tempObstacles;
 }
 
 // getTangetPointOfObstacle - Returns the two points on the circle that is tangent to the point
@@ -279,9 +246,10 @@ Coord2D Algorithm::calcForwardTicks(double dist)
 	tempTick * 2.0;
 	tempTicks.x = tempTick;
 	tempTicks.y = tempTick;
+	return tempTicks;
 }
 
-Coord2D Algorithm::calcTurnTicks(double angle)
+Coord2D Algorithm::calcTurnTicks(double angle, Coord2D cPt, Coord2D nPt)
 {
 	Coord2D tempTicks;
 	double tempTick;
@@ -290,11 +258,13 @@ Coord2D Algorithm::calcTurnTicks(double angle)
 	tempTick = tempTick/ONE_TICK;
 	tempTick = tempTick * 2.0;
 	tempTick = abs(tempTick);
-	if(angle > 0) {			// need to change this conditional statement, this will always be true no matter the case
+	if((cPt.x > nPt.x && cPt.y < nPt.y) || (cPt.x < nPt.x && cPt.y < nPt.y) || (cPt.x < nPt.x && cPt.y > nPt.y) || (cPt.x > nPt.x && cPt.y > nPt.y)) {			
+		// left turn
 		tempTicks.x = tempTick;
 		tempTicks.y = -tempTick;
 	}
 	else {
+		// right turn
 		tempTicks.x = -tempTick;
 		tempTicks.y = tempTick;
 	}
@@ -342,7 +312,8 @@ vector<Coord2D> Algorithm::calculateTicks(vector<Coord2D> path)
 		c = dist(path[i-1].x,path[i+1].x,path[i-1].y,path[i+1].y);
 		if(i < path.size()-1) {
 			angle = cosineLaw(a, b, c);
-			tempTicks = calcTurnTicks(angle);
+			angle = 180 - angle;
+			tempTicks = calcTurnTicks(angle, path[i], path[i+1]);
 			ticks.push_back(tempTicks);
 		}
 		tempTicks = calcForwardTicks(a);

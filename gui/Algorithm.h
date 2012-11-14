@@ -40,13 +40,11 @@ private:
 	vector<vector<Coord2D> > _paths;
 	vector<vector<Coord2D> > _ticks;
 
-	void analyzeObstacles();
-	bool checkGTPoints(Coord2D, Coord2D, Coord2D);
-	bool checkLTPoints(Coord2D, Coord2D, Coord2D); 
+	void analyzeObstacles(); 
 	vector<Coord2D> calculateTicks(vector<Coord2D>);
 	vector<Coord2D> compareTicks();
 	Coord2D calcForwardTicks(double);
-	Coord2D calcTurnTicks(double);
+	Coord2D calcTurnTicks(double, Coord2D, Coord2D);
 };
 
 #endif
