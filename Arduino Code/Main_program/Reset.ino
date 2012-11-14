@@ -3,16 +3,8 @@ void Reset(){
 	Stop(); 
 	//   enc1_Count =0;
 	//   enc2_Count =0;
-             if (pos_1 != pos_2)
-              {
-                pwm_1 =100;
-                pwm_2 =100;
-              }
-             else 
-              {
-		pwm_1 = 255;
-		pwm_2 = 255; 
-              }
+	pwm_1 = 255;
+	pwm_2 = 255; 
         pos_1 = 0;
         pos_2 = 0;
         state = STANDBY;
@@ -25,6 +17,9 @@ void Reset(){
         input1done = 0;
         input2done = 1;
         poslistFlag = 1;
+        sumError1 =0;
+        sumError2 =0;
+        
         ActuatorControl(RETRACT);
         Serial.println("Robot Reset()");
         while (Serial.available())

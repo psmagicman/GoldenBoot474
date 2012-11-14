@@ -78,13 +78,13 @@ void Check()
               {
                 
                 if( (enc1_Count >= abspos_1*0.85) && (enc2_Count >= abspos_2*0.85)){  //Slow down before stopping
-                  pwm_1 = 100;
-                  pwm_2 = 100;
+                  pwm_1 = 70;
+                  pwm_2 = 70;
                   
                 }
                 else{
-                  pwm_1 =150;
-                  pwm_2 =150;
+                  pwm_1 =100;
+                  pwm_2 =100;
                 }
               }
              else 
@@ -107,7 +107,7 @@ void Check()
 		error = (enc1_Count - enc2_Count);
 	        //adjustment = (KP*error + KD*(error - lastError)+ KI*sumError);
 		//pwm_2 += error*30+KI*sumError1;
-		pwm_1 -= error*KP+KI*sumError1;  
+		pwm_1 -= (error*KP+KI*sumError1);  
 		//  lastError = error;
 		  sumError1 += error;
 	}
@@ -117,7 +117,7 @@ void Check()
                 
 		error = (enc2_Count  - enc1_Count); 
 		// adjustment = KP*error + KD*(error - lastError)+ KI*sumError;
-		pwm_2 -= error*KP+KI*sumError2;
+		pwm_2 -= (error*KP+KI*sumError2);
 		//pwm_1 += error*60+KI*sumError2; 
 		  // lastError = error;
 		   sumError2 += error;
@@ -235,15 +235,15 @@ void MotorControl(){
 			pos_2 = _path[poslist][1];
                         //abspos_1 = abs(pos_1);
                         //abspos_2 = abs(pos_2);
-                        if(( (abs(pos_1) <= 11) && (pos_1 != 0)) || ((abs(pos_2) <= 11) && (pos_2 !=0))){
+                        if(( (abs(pos_1) <= 10) && (pos_1 != 0)) || ((abs(pos_2) <= 10) && (pos_2 !=0))){
                           abspos_1 =1;
                           abspos_2 =1;
                         }
                         else{
                           //abspos_1 = abs(pos_1)-(abs(pos_1)*0.07+1);
                           //abspos_2 = abs(pos_2)-(abs(pos_2)*0.07+1);
-                          abspos_1 =abs(pos_1)-11;
-                          abspos_2 =abs(pos_2)-11;
+                          abspos_1 =abs(pos_1)-9;
+                          abspos_2 =abs(pos_2)-9;
 		        }
 
                         poslist++;

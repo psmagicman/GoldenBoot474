@@ -25,6 +25,8 @@
 #define EXTEND 1023
 #define FALSE 0 
 #define TRUE 1
+#define RIGHT 1
+#define LEFT 0
 
 
 using namespace std;
@@ -90,6 +92,7 @@ int input1done = 0;
 int input2done = 1;
 int poslistFlag = 1;
 int emergency = 0;
+int GrabDir =0;
 
 volatile int enc1_Count=0; 
 volatile int enc2_Count=0;
@@ -100,7 +103,7 @@ volatile int error;
 volatile int sumError1 =0;
 volatile int sumError2 =0;
 int KI = 5;
-int KP = 90;
+int KP = 70;
 int motor = 0;
 
 void setup() {
@@ -159,34 +162,6 @@ void loop ()
 } //Close the loop
 
 
-void CatchtheBall()
-{ 
-  int caught =0;
-  while(caught == 0){
-                if( CheckforE() == TRUE){ 
-                  Reset();
-                  break;
-                }
-                Sensor();
-                Serial.println(SenseDistance);
-        if(SenseDistance <=30){
-                Serial.println("I see the ball");
-                Serial.println(SenseDistance);
-                Accelerate(pwm_1,pwm_2);
-                //Check();
-        }
-        if(SenseDistance <= 4){
-                Serial.println("Ball in the caster .");
-                Serial.println(SenseDistance);
-                // Ask image processing for all the values 
-                // Call kick function
-                caught=1;
-         }
-  }
-        //enc1_Count =0;
-        //enc2_Count =0;
-        Reset();
-}
 
 void KicktheBall()
 { 

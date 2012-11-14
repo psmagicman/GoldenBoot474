@@ -38,7 +38,17 @@ void ReadInput(){
                 CheckforE();
                 
                 if(Serial.peek() == 'G'){
-                        Serial.println("Grabbing the ball ");
+                        Serial.println("Grabbing the ball to my right");
+                        GrabDir =RIGHT;
+                        while(Serial.available()){
+		                Serial.read();
+			}
+                        CatchtheBall();
+                }
+                
+                                if(Serial.peek() == 'L'){
+                        Serial.println("Grabbing the ball to my left");
+                        GrabDir =LEFT;
                         while(Serial.available()){
 		                Serial.read();
 			}
