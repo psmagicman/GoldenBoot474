@@ -14,6 +14,9 @@
 
 #define BAUD_RATE 57600
 
+#define BOT_WIDTH 0.172255
+#define ONE_TICK 0.0113
+
 extern const int calibrationSize;
 
 extern const double _ballRadius;
@@ -44,7 +47,7 @@ struct Obstacle {
 
 extern double dist(double x1, double x2, double y1, double y2);
 extern double distFromLine(Coord2D A, Coord2D B, Coord2D C);
-extern double angleBetweenPoints(Coord2D A, Coord2D B);
+extern double angleWithOrigin(Coord2D A);
 extern double cosineLaw(double lenA, double lenB, double lenC);
 
 #endif
