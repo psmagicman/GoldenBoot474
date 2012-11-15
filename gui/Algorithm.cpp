@@ -1,10 +1,10 @@
 #include "Algorithm.h"
 
-Algorithm::Algorithm()
+testAlgorithm::testAlgorithm()
 {
 }
 
-Algorithm::Algorithm(vector<Obstacle> obstacles)
+testAlgorithm::testAlgorithm(vector<Obstacle> obstacles)
 {
 	_obstacles = obstacles;
 	for (int i = 0; i < _obstacles.size(); i++) {
@@ -27,7 +27,7 @@ vector<Coord2D> Algorithm::getPathToGoal()
 }
 */
 
-void Algorithm::analyzeField(Robot robot, vector<Ball> balls)
+void testAlgorithm::analyzeField(Robot robot, vector<Ball> balls)
 {
 	_robot = robot;
 	_balls = balls;
@@ -85,7 +85,7 @@ void Algorithm::analyzeField(Robot robot, vector<Ball> balls)
 	}
 }
 
-void Algorithm::analyzeObstacles()
+void testAlgorithm::analyzeObstacles()
 {
 	vector<Obstacle> tempObstacles;
 	for (int i = 0; i < _obstacles.size() && _obstacles[i].rad != 0; i++) 
@@ -105,7 +105,6 @@ void Algorithm::analyzeObstacles()
 				}
 			}
 		}
-
 		Obstacle combinedObstacle;
 		combinedObstacle.x = 0;
 		combinedObstacle.y = 0;
@@ -133,57 +132,62 @@ void Algorithm::analyzeObstacles()
 	_obstacles = tempObstacles;
 }
 
-void Algorithm::analyzeObstacles()
+Coord2D testAlgorithm::getNewPointAroundObstacle(Obstacle obstacle, Coord2D beginPts, Coord2D endPts)
 {
-	vector<Obstacle> tempObstacles;
-	tempObstacles.clear();
-	for (int i = 0; i < _obstacles.size() && _obstacles[i].rad != 0; i++) 
-	{
-		vector<Obstacle> combinedObstacles;
-		combinedObstacles.push_back(_obstacles[i]);
-		// Combine Obstacles that does not have enough gap in-between for the robot to fit through
-		for (int j = 0; j < _obstacles.size(); j++) 
-		{
-			if (i != j) {
-				double obstacleDistance = dist(_obstacles[i].x, _obstacles[j].x, _obstacles[i].y, _obstacles[j].y);
-				// If the distance between 2 obstacles are smaller than the size of robot, add the obstacle to to-be combined list
-				if (obstacleDistance < (_obstacles[i].rad + _obstacles[j].rad))
-				{
-					combinedObstacles.push_back(_obstacles[j]);
-					_obstacles[j].rad = 0;
-				}
-			}
-		}
+	Coord2D newPoint;
+	// beginPts is the starting position
+	// endPts is the ball position
+	// TODO: use getTangentPointObstacle.
+	// Logic:
+	//		1. Find the Tangent points between BeginPts to Obstacle - Choose the point that is closest to EndPts
+	//		2. Find the Tangent points between EndPts to Obstacle - Choose the point that is closest to BeginPts
+	//		3. Construct a line-equation for 1. and 2., and find their intercept. Their intercept is the new point
+	vector<Coord2D> tempBeginPoint;
+	vector<Coord2D> tempEndPoint;
+	tempBeginPoint = getTangentPointOfObstacle(obstacle, beginPts);
+	tempEndPoint = getTangentPointOfObstacle(obstacle, endPts);
 
-		Obstacle combinedObstacle;
-		combinedObstacle.x = 0;
-		combinedObstacle.y = 0;
-		// Find Center Point of Close-Obstacles
-		for (int j = 0; j < combinedObstacles.size(); j++) 
-		{
-			combinedObstacle.x += combinedObstacles[j].x;
-			combinedObstacle.y += combinedObstacles[j].y;
-		}
-		combinedObstacle.x /= combinedObstacles.size();
-		combinedObstacle.y /= combinedObstacles.size();
+	// Step 1
+	Coord2D tempNewPoint1; // Stores the Tangent Coord for begin point
+	if ( dist(endPts.x, tempBeginPoint[0].x, endPts.y, tempBeginPoint[0].y) < dist(endPts.x, tempBeginPoint[1].x, endPts.y, tempBeginPoint[1].y) )
+		tempNewPoint1 = tempBeginPoint[0];
+	else
+		tempNewPoint1 = tempBeginPoint[1];
 
-		// Find Radius of new Obstacle
-		// New Radius = largest distance between new center with all associated obstacle centers plus obstacle radius
-		combinedObstacle.rad = 0;
-		for (int j = 0; j < combinedObstacles.size(); j++) 
-		{
-			if (combinedObstacle.rad < dist(combinedObstacles[j].x, combinedObstacle.x, combinedObstacles[j].y, combinedObstacle.y)) {
-				combinedObstacle.rad = dist(combinedObstacles[j].x, combinedObstacle.x, combinedObstacles[j].y, combinedObstacle.y); 
-			}
-		}
-		combinedObstacle.rad += combinedObstacles[0].rad;
-		tempObstacles.push_back(combinedObstacle);
-	}
-	_obstacles = tempObstacles;
+	// Step 2
+	Coord2D tempNewPoint2; // Stores the tangent Coord for end point
+	if ( dist(beginPts.x, tempEndPoint[0].x, beginPts.y, tempEndPoint[0].y) < dist(beginPts.x, tempEndPoint[1].x, beginPts.y, tempEndPoint[1].y) )
+		tempNewPoint2 = tempEndPoint[0];
+	else
+		tempNewPoint2 = tempEndPoint[1];
+	
+	// slope from the endPts to step 1
+	double rise1, run1, slope1;
+	rise1 = tempNewPoint1.y - beginPts.y;
+	run1 = tempNewPoint1.x - beginPts.x;
+	slope1 = rise1/run1;
+	// slope from the beginPts to step 2
+	double rise2, run2, slope2;
+	rise2 = tempNewPoint2.y - endPts.y;
+	run2 = tempNewPoint2.x - endPts.x;
+	slope2 = rise2/run2;
+	// equation of a line y = mx + b 
+	double b1, b2;
+	b1 = tempNewPoint1.y - (slope1*tempNewPoint1.x);
+	b2 = tempNewPoint2.y - (slope2*tempNewPoint2.x);
+	double newX, newY;
+	// m1*x + b1 = m2*x + b2
+	// b2 - b1 = x(m1 - m2)
+	// x = (b2 - b1)/(m1 - m2)
+	newX = (b2 - b1)/(slope1 - slope2);
+	newY = slope1*newX + b1;
+	newPoint.x = newX;
+	newPoint.y = newY;
+	return newPoint;
 }
 
 // getTangetPointOfObstacle - Returns the two points on the circle that is tangent to the point
-vector<Coord2D> Algorithm::getTangentPointOfObstacle(Obstacle obstacle, Coord2D point)
+vector<Coord2D> testAlgorithm::getTangentPointOfObstacle(Obstacle obstacle, Coord2D point)
 {
 	double lenBetweenObstaclePath = obstacle.rad;
 	double lenBetweenPointObstacle = dist(point.x, obstacle.x, point.y, obstacle.y);
@@ -238,7 +242,7 @@ vector<Coord2D> Algorithm::getTangentPointOfObstacle(Obstacle obstacle, Coord2D 
 	return newPoints;
 }
 
-Coord2D Algorithm::calcForwardTicks(double dist)
+Coord2D testAlgorithm::calcForwardTicks(double dist)
 {
 	Coord2D tempTicks;
 	double tempTick;
@@ -249,7 +253,7 @@ Coord2D Algorithm::calcForwardTicks(double dist)
 	return tempTicks;
 }
 
-Coord2D Algorithm::calcTurnTicks(double angle, Coord2D cPt, Coord2D nPt)
+Coord2D testAlgorithm::calcTurnTicks(double angle, Coord2D cPt, Coord2D nPt)
 {
 	Coord2D tempTicks;
 	double tempTick;
@@ -274,10 +278,10 @@ Coord2D Algorithm::calcTurnTicks(double angle, Coord2D cPt, Coord2D nPt)
 /*
  * compares the total amount of ticks for each path
  */
-vector<Coord2D> Algorithm::compareTicks()
+vector<Coord2D> testAlgorithm::compareTicks()
 {
 	vector<vector<Coord2D> > totalTicks;
-	for(int i = 0; i <_paths.size(); i++) {
+	for(int i = 0; i < _paths.size(); i++) {
 		totalTicks.push_back(calculateTicks(_paths[i]));
 	}
 	double sum_of_elems = 99999999999999;		// loading this sum with a very large value
@@ -301,7 +305,7 @@ vector<Coord2D> Algorithm::compareTicks()
 /*
  * calculates the ticks of the path passed into the function
  */
-vector<Coord2D> Algorithm::calculateTicks(vector<Coord2D> path)
+vector<Coord2D> testAlgorithm::calculateTicks(vector<Coord2D> path)
 {
 	vector<Coord2D> ticks;
 	Coord2D tempTicks;

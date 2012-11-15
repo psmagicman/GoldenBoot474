@@ -11,11 +11,11 @@ using namespace std;
 const int _width = 800;
 const int _height = 800;
 
-class Algorithm
+class testAlgorithm
 {
 public:
-	Algorithm();
-	Algorithm(vector<Obstacle> obstacles);
+	testAlgorithm();
+	testAlgorithm(vector<Obstacle> obstacles);
 
 	void analyzeField(Robot robot, vector<Ball> balls);
 

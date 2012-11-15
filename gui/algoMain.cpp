@@ -9,7 +9,7 @@ int main()
 {
 	Coord2D point;
 	Obstacle obstacle;
-	Algorithm algorithm;
+	testAlgorithm algorithm;
 
 	while (true) {
 		string input = "";
