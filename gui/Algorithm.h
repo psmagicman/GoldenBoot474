@@ -29,8 +29,11 @@ public:
 	vector<Ball>		getBalls(){return _balls;};
 	vector<Obstacle>	getObstacles(){return _obstacles;};
 	
-	Coord2D				getNewPointAroundObstacle(Obstacle obstacle, Coord2D beginPts, Coord2D endPts);
-	vector<Coord2D>		getTangentPointOfObstacle(Obstacle obstacle, Coord2D point);
+
+	vector<Coord2D>		getClosestPath();
+	vector<Coord2D>		getClosestTick();
+	vector<Coord2D>		getPathToGoal();
+	vector<Coord2D>		getTickToGoal();
 
 	
 private:
@@ -40,7 +43,12 @@ private:
 	vector<vector<Coord2D> > _paths;
 	vector<vector<Coord2D> > _ticks;
 
+	int _closest; // Index of Closest Path/Ticks
+
 	void analyzeObstacles(); 
+	Coord2D				getNewPointAroundObstacle(Obstacle obstacle, Coord2D beginPts, Coord2D endPts);
+	vector<Coord2D>		getTangentPointOfObstacle(Obstacle obstacle, Coord2D point);
+
 	vector<Coord2D> calculateTicks(vector<Coord2D>);
 	vector<Coord2D> compareTicks();
 	Coord2D calcForwardTicks(double);

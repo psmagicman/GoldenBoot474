@@ -29,12 +29,6 @@ int main()
 		cout << "Obstacle Rad: ";
 		cin >> input;
 		obstacle.rad = atof(input.c_str());
-		
-		vector<Coord2D> test = algorithm.getTangentPointOfObstacle(obstacle,point);
-		for (int i = 0; i < test.size(); i++) {
-			cout << "Test X: " << test[i].x << endl;
-			cout << "Test Y: " << test[i].y << endl;
-		}
 
 		cout << endl;
 	}

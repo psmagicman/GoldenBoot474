@@ -2,6 +2,7 @@
 
 testAlgorithm::testAlgorithm()
 {
+	_closest = -1;
 }
 
 testAlgorithm::testAlgorithm(vector<Obstacle> obstacles)
@@ -11,21 +12,44 @@ testAlgorithm::testAlgorithm(vector<Obstacle> obstacles)
 		_obstacles[i].rad = _obstacleRadius*2;
 	}
 	analyzeObstacles();
+	_closest = -1;
 }
 
-/*
-Coord2D Algorithm::getClosestBall()
+vector<Coord2D> testAlgorithm::getClosestPath()
 {
+	vector<Coord2D> empty;
+	empty.clear();
+	if (_closest >= 0)
+		return _paths[_closest];
+	else
+		return empty;
 }
 
-vector<Coord2D> Algorithm::getPathToClosestBall()
+vector<Coord2D> testAlgorithm::getClosestTick()
 {
+	vector<Coord2D> empty;
+	empty.clear();
+	if (_closest >= 0)
+		return _ticks[_closest];
+	else
+		return empty;
 }
 
-vector<Coord2D> Algorithm::getPathToGoal()
+vector<Coord2D> testAlgorithm::getPathToGoal()
 {
+	vector<Coord2D> empty;
+	empty.clear();
+
+	return empty;
 }
-*/
+
+vector<Coord2D> testAlgorithm::getTickToGoal()
+{
+	vector<Coord2D> empty;
+	empty.clear();
+
+	return empty;
+}
 
 void testAlgorithm::analyzeField(Robot robot, vector<Ball> balls)
 {
@@ -284,7 +308,7 @@ vector<Coord2D> testAlgorithm::compareTicks()
 	for(int i = 0; i < _paths.size(); i++) {
 		totalTicks.push_back(calculateTicks(_paths[i]));
 	}
-	double sum_of_elems = 99999999999999;		// loading this sum with a very large value
+	double sum_of_elems = 99999;		// loading this sum with a very large value
 	double tempSum = 0;
 	int ticksIndex;
 	for(int i = 0; i < totalTicks.size(); i++) {
@@ -295,11 +319,11 @@ vector<Coord2D> testAlgorithm::compareTicks()
 		if(sum_of_elems > tempSum) {
 			// does a comparison of the previous smallest sum with the current sum
 			sum_of_elems = tempSum;
-			ticksIndex = i;
+			_closest = i;
 			// remembers the index of the vector here the path with the lowest amount of ticks are located
 		}
 	}
-	return totalTicks[ticksIndex];
+	return totalTicks[_closest];
 }
 
 /*
@@ -309,6 +333,15 @@ vector<Coord2D> testAlgorithm::calculateTicks(vector<Coord2D> path)
 {
 	vector<Coord2D> ticks;
 	Coord2D tempTicks;
+	double opp = dist(path[0].x, path[1].x, path[0].y, path[1].y);
+	double adj = dist(path[0].x, path[1].x, path[0].y, path[0].y);
+	double firstAngle = atan(abs(opp/adj))*(180/PI);
+	firstAngle = firstAngle - _robot.angle*(180/PI);
+	tempTicks = calcTurnTicks(firstAngle, path[0], path[1]);
+	ticks.push_back(tempTicks);
+	tempTicks = calcForwardTicks(dist(path[0].x, path[1].x, path[0].y, path[1].y));
+	ticks.push_back(tempTicks);
+
 	for(int i = 1; i < path.size()-1; i++) {
 		double angle, a, b, c;
 		a = dist(path[i].x,path[i-1].x,path[i].y,path[i-1].y);
