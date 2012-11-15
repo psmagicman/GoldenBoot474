@@ -60,8 +60,7 @@ private:
 	QProgressBar * _progressBar;
 	QTimer * _timer;
 	
-	MovementAlgorithm _algorithm;
-	testAlgorithm _testAlgorithm;
+	CAlgorithm _algorithm;
 	ArduinoCOMM * _arduino;
 	
 	bool _task1;
@@ -79,18 +78,33 @@ private:
 	IplImage * _image;
 	IplImage * _topImage;
 
-	vector<Point2f> _balls;
-	vector<Point2f> _obstacles;
-	vector<Point2f> _robot;
-	vector <Coord2D> _path;
-	double _robotAngle;
-	vector<double> _robotAngles;
+	vector<Point2f>		_balls;
+	Point2f				_targetBall;
+	vector<Point2f>		_obstacles;
+	vector<Point2f>		_robot;
+	vector <Coord2D>	_path;
+	double				_robotAngle;
+	vector<double>		_robotAngles;
+
+	Robot				_algoRobot;
+	vector<Ball>		_algoBalls;
+	vector<Obstacle>	_algoObstacles;
 
 	void init();
+	void processRobot();
+	void processBalls();
 	void displayImage(IplImage * webcamFeed, QLabel * location, int type = 0);
 	void displayFinal(IplImage * webcamFeed, QLabel * location);
 	void displayMain();
 	void detectProblems(); // Detect if there are any obstacles in front of the robot or out of projectory
+
+	void doTask1();
+	void doTask2();
+	void doTask3();
+	void doFinal();
+	void stopRobot();
+	void taskInit();
+	void restartTask();
 
 	vector<Point2f> combinePts(vector<Point2f> pts1, vector<Point2f> pts2, double distLimit);
 	void readLeftThreshold();

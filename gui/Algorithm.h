@@ -11,24 +11,19 @@ using namespace std;
 const int _width = 800;
 const int _height = 800;
 
-class testAlgorithm
+class CAlgorithm
 {
 public:
-	testAlgorithm();
-	testAlgorithm(vector<Obstacle> obstacles);
+	CAlgorithm();
+	CAlgorithm(vector<Obstacle> obstacles);
 
 	void analyzeField(Robot robot, vector<Ball> balls);
-
-	/*
-	Coord2D				getClosestBall();
-	vector<Coord2D>		getPathToClosestBall();
-	vector<Coord2D>		getPathToGoal();
-	*/
 
 	Robot				getRobot(){return _robot;};
 	vector<Ball>		getBalls(){return _balls;};
 	vector<Obstacle>	getObstacles(){return _obstacles;};
 	
+	Ball				getClosestBall(){return _closestBall;};
 
 	vector<Coord2D>		getClosestPath();
 	vector<Coord2D>		getClosestTick();
@@ -42,6 +37,8 @@ private:
 	vector<Obstacle>	_obstacles;
 	vector<vector<Coord2D> > _paths;
 	vector<vector<Coord2D> > _ticks;
+
+	Ball				_closestBall;
 
 	int _closest; // Index of Closest Path/Ticks
 

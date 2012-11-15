@@ -87,6 +87,9 @@ void GUI::init()
 
 	_pathIndex = 0;
 
+	_targetBall.x = -1;
+	_targetBall.y = -1;
+
 	_robotAngles.resize(5);
 	for (int i = 0; i < _robotAngles.size(); i++) {
 		_robotAngles[i] = -1;
@@ -158,211 +161,52 @@ void GUI::display()
 				displayImage(_cam2->getNormal(), ui.rightRaw);
 			}
 			// Process Both Cameras
-			_balls = combinePts(_cam1->getBalls(),_cam2->getBalls(), 20);
-			// Process Both Obstacles
 			_obstacles = combinePts(_cam1->getObstacles(), _cam2->getObstacles(), 50);
-			// Process Both Robots
-			_robot = combinePts(_cam1->getRobot(), _cam2->getRobot(), 20);
-			double leftAngle = -1;
-			double rightAngle = -1;
-			if (_cam1->getRobot().size() > 0) leftAngle = _cam1->getRobotAngle();
-			if (_cam2->getRobot().size() > 0) rightAngle = _cam2->getRobotAngle();
-			if (rightAngle >= CV_PI) rightAngle -= CV_PI;
-			else rightAngle += CV_PI;
-			if (leftAngle == -1) leftAngle = rightAngle;
-			if (rightAngle == -1) rightAngle = leftAngle;
-
-			double tempAngle;
-			if (abs(leftAngle - rightAngle) > CV_PI) {
-				tempAngle = 0;
-			} else {
-				tempAngle = (leftAngle + rightAngle)/2;
-			}
-			
-			_robotAngles[0] = tempAngle;
-			for (int i = _robotAngles.size()-1; i > 0; i--) {
-				_robotAngles[i] = _robotAngles[i-1];
-			}
-			
-			_robotAngle = 0;
-			int angleSize = 0;
-			for (int i = 0; i < _robotAngles.size(); i++) {
-				if (abs(_robotAngles[i]-_robotAngles[0]) < PI/2) {
-					_robotAngle += _robotAngles[i];
-					angleSize++;
-				}
-			}
-			_robotAngle /= angleSize;
-			
-			ui.labelRobotAngle->setText("Left Angle: " + QString::number((int)(leftAngle*180/CV_PI)) + "   Right Angle: " + QString::number((int)(rightAngle*180/CV_PI)) + "   Combined Angle: " + QString::number((int)(_robotAngles[0]*180/CV_PI)) + "   Corrected Angle: " + QString::number((int)(_robotAngle*180/CV_PI)));
+			processBalls();
+			processRobot();
 
 			// Algorithm
 			//detectProblems();
-			if (_task1 || _task2 || _task3) {
-				if (_balls.size() > 0 && _robot.size() > 0) { 
-					Robot robot;
-					vector<Ball> balls;
-					vector<Obstacle> obstacles;
-				
-					double xRatio = (double)800.0 / FINAL_WIDTH;
-					double yRatio = (double)800.0 / FINAL_HEIGHT;
+			if (_task1 || _task2 || _task3 || _final) {
+				if (_balls.size() > 0 && _robot.size() > 0) {
 
-					robot.x = (double)_robot[1].x * xRatio;
-					robot.y = (double)(FINAL_HEIGHT - _robot[1].y) * yRatio; // Flip the Y-axis
-					robot.angle = _robotAngle;
-
-					balls.resize(_balls.size());
-					for (int i = 0; i < _balls.size(); i++) {
-						balls[i].x = (double)_balls[i].x * xRatio;
-						balls[i].y = (double)(FINAL_HEIGHT - _balls[i].y) * yRatio; // Flip the Y-axis
-					}
-
-					obstacles.resize(_obstacles.size());
+					_algoObstacles.resize(_obstacles.size());
 					for (int i = 0; i < _obstacles.size(); i++) {
-						obstacles[i].x = (double)_obstacles[i].x * xRatio;
-						obstacles[i].y = (double)(FINAL_HEIGHT - _obstacles[i].y) * yRatio; // Flip the Y-axis
-					}
-					
-					_testAlgorithm = testAlgorithm(obstacles);
+						_algoObstacles[i].x = (double)_obstacles[i].x;
+						_algoObstacles[i].y = (double)FINAL_HEIGHT - _obstacles[i].y; // Flip the Y-axis
+					}					
+					_algorithm = CAlgorithm(_algoObstacles);
+
+					stopRobot();
+
 					// Task 1 : Move Towards a Single Ball and Touch it
 					if (_task1) {
-						_prevTask = 1;
-						_algorithm = MovementAlgorithm(robot, balls);
-						_path.clear();
-						_pathIndex = 0;
-						Coord2D robotLocation;
-						robotLocation.x = robot.x;
-						robotLocation.y = robot.y;
-						_path.push_back(robotLocation);
-						_path.push_back(_algorithm.returnClosestBall()); // I'll be using this to draw a line from Robot to Closest Ball
-						for (int i = 0; i < _path.size(); i++) {
-							_path[i].x = _path[i].x / 800.0 * FINAL_WIDTH;
-							_path[i].y = FINAL_HEIGHT - (_path[i].y / 800.0 * FINAL_HEIGHT);
-						}
-						vector<Coord2D> directions = _algorithm.returnPath(); // I'll be using this to make a list of Commands to Ball
-						QString message = "Task 1: ";
-						if (directions.size() > 0) {
-							message += "BEGIN ";
-							_arduino->write("STOP");
-						}
-						for (int i = 0; i < directions.size(); i++) {
-							_arduino->write("START");
-							char RTicksStr[5];
-							itoa(directions[i].y,RTicksStr,10);
-							_arduino->write((string)RTicksStr);
-
-							char LTicksStr[5];
-							itoa(directions[i].x,LTicksStr,10);
-							_arduino->write((string)LTicksStr);
-							message += "<" + QString::number(directions[i].y) + "," + QString::number(directions[i].x) + "> ";
-						}
-						message += " " + QString::number(_algorithm.returnAngle());
-						if (directions.size() > 0) {
-							_arduino->write("EOL");
-							message += " EOL";
-						}
-						ui.labelTicks->setText(message);
+						doTask1();
 						_task1 = false;
 					}
 
 					// Task 2 : Move Towards a Single Ball with 2 Obstacles and Touch it
 					if (_task2) {
-						_prevTask = 2;
-						_testAlgorithm.analyzeField(robot,balls);
-						_path.clear();
-						_path = _testAlgorithm.getClosestPath();
-						vector<Coord2D> _tick = _testAlgorithm.getClosestTick();
-						for (int i = 0; i < _path.size(); i++) {
-							_path[i].x /= 2;
-							_path[i].y /= 2;
-							_path[i].y = FINAL_HEIGHT - _path[i].y;
-						}
-						QString tickMessage = "Ticks: ";
-						for (int i = 0; i < _tick.size(); i++) {
-							tickMessage += "(" + QString::number(_tick[i].x) + "," + QString::number(_tick[i].y) + ") ";
-						}
-						ui.labelTicks->setText(tickMessage);
-						/*
-						_previousLocation.x = _robot[0].x;
-						_previousLocation.y = _robot[0].y;
-						_path = _algorithm.getClosestBall(robot, balls);
-						vector<Coord2D> directions = _algorithm.pathToClosestBall(robot, balls, obstacles);
-						QString message = "Task 2: ";
-						for (int i = 0; i < directions.size(); i++) {
-							char LTicksStr[5]
-							itoa(directions[i].x,LTicksStr,10);
-							_arduino->write((string)LTicksStr);
-
-							char RTicksStr[5]
-							itoa(directions[i].y,RTicksStr,10);
-							_arduino->write((string)RTicksStr);
-							message += "<" + QString::number(directions[i].x) + "," + QString::number(directions[i].y) + "> ";
-						}
-						log(message);
-						_arduino->write("EOF");
-						_task2 = false;
-						*/
+						doTask2();
 						_task2 = false;
 					}
 
 					// Task 3 : Move all Balls to Goal with 4 Obstacles
 					if (_task3) {
-						_prevTask = 3;
-						/*
-						if (_state == 0) {
-							_previousLocation.x = _robot[0].x;
-							_previousLocation.y = _robot[0].y;
-							_path = _algorithm.getClosestBall(robot, balls);
-							vector<Coord2D> directions = _algorithm.pathToClosestBall(robot, balls, obstacles);
-							for (int i = 0; i < directions.size(); i++) {
-								char LTicksStr[5]
-								itoa(directions[i].x,LTicksStr,10);
-								_arduino->write((string)LTicksStr);
-
-								char RTicksStr[5]
-								itoa(directions[i].y,RTicksStr,10);
-								_arduino->write((string)RTicksStr);
-							}
-							_arduino->write("EOF");
-							state = 1;						
-						 } else if (_state == 1) {
-							_previousLocation.x = _robot[0].x;
-							_previousLocation.y = _robot[0].y;
-							vector<Coord2D> directions = _algorithm.pathToGoal(robot, balls, obstacles);
-							for (int i = 0; i < directions.size(); i++) {
-								char LTicksStr[5]
-								itoa(directions[i].x,LTicksStr,10);
-								_arduino->write((string)LTicksStr);
-
-								char RTicksStr[5]
-								itoa(directions[i].y,RTicksStr,10);
-								_arduino->write((string)RTicksStr);
-							}
-							_arduino->write("EOF");
-							state = 2;
-						 } else if (_state == 2) {
-							_arduino->write("KICK");
-							_arduino->write("EOF");
-							_ballsScored++;
-							state = 0;
-							if (_ballsScored >= _ballsToScore) {
-								_task3 = false;
-							}
-						 }
-						*/
+						doTask3();
 						_task3 = false;
+					}
+
+					// Final : Score 3 Balls
+					if (_final) {
+						doFinal();
+						_final = false;
 					}
 				}
 				else {
 					log("ERROR: No Balls or Robot detected");
 				}
 			}
-			/*
-			else {
-				_path.x = -1;
-				_path.y = -1;
-			}
-			*/
 			displayMain();
 			_cam1->release();
 			_cam2->release();
@@ -371,6 +215,45 @@ void GUI::display()
 			log ("ERROR: No Cameras Detected");
 		}
 	}
+}
+
+void GUI::processRobot()
+{
+	_robot = combinePts(_cam1->getRobot(), _cam2->getRobot(), 50);
+	double leftAngle = -1;
+	double rightAngle = -1;
+	if (_cam1->getRobot().size() > 0) leftAngle = _cam1->getRobotAngle();
+	if (_cam2->getRobot().size() > 0) rightAngle = _cam2->getRobotAngle();
+	if (rightAngle >= CV_PI) rightAngle -= CV_PI;
+	else rightAngle += CV_PI;
+	if (leftAngle == -1) leftAngle = rightAngle;
+	if (rightAngle == -1) rightAngle = leftAngle;
+
+	double tempAngle;
+	if (abs(leftAngle - rightAngle) > CV_PI) tempAngle = 0;
+	else tempAngle = (leftAngle + rightAngle)/2;
+			
+	_robotAngles[0] = tempAngle;
+	for (int i = _robotAngles.size()-1; i > 0; i--) {
+		_robotAngles[i] = _robotAngles[i-1];
+	}
+			
+	_robotAngle = 0;
+	int angleSize = 0;
+	for (int i = 0; i < _robotAngles.size(); i++) {
+		if (abs(_robotAngles[i]-_robotAngles[0]) < PI/2) {
+			_robotAngle += _robotAngles[i];
+			angleSize++;
+		}
+	}
+	_robotAngle /= angleSize;
+			
+	ui.labelRobotAngle->setText("Left Angle: " + QString::number((int)(leftAngle*180/CV_PI)) + "   Right Angle: " + QString::number((int)(rightAngle*180/CV_PI)) + "   Combined Angle: " + QString::number((int)(_robotAngles[0]*180/CV_PI)) + "   Corrected Angle: " + QString::number((int)(_robotAngle*180/CV_PI)));
+}
+
+void GUI::processBalls()
+{
+	_balls = combinePts(_cam1->getBalls(),_cam2->getBalls(), 20);
 }
 
 vector<Point2f> GUI::combinePts(vector<Point2f> pts1, vector<Point2f> pts2, double distLimit)
@@ -404,6 +287,172 @@ vector<Point2f> GUI::combinePts(vector<Point2f> pts1, vector<Point2f> pts2, doub
 	return combined;
 }
 
+void GUI::doTask1()
+{
+	_prevTask = 1;
+	taskInit();
+	
+	_algorithm.analyzeField(_algoRobot,_algoBalls);
+	_path.clear();
+	_path = _algorithm.getClosestPath();
+	vector<Coord2D> tick = _algorithm.getClosestTick();
+	for (int i = 0; i < _path.size(); i++) _path[i].y = FINAL_HEIGHT - _path[i].y;
+	_targetBall.x = _algorithm.getClosestBall().x;
+	_targetBall.y = _algorithm.getClosestBall().y;
+	
+	QString tickMessage = "Ticks: ";
+	for (int i = 0; i < tick.size(); i++) {
+		tickMessage += "(" + QString::number((int)tick[i].x) + "," + QString::number((int)tick[i].y) + ")";
+
+		_arduino->write("START");
+
+		char RTicksStr[5];
+		itoa(tick[i].y,RTicksStr,10);
+		_arduino->write((string)RTicksStr);
+
+		char LTicksStr[5];
+		itoa(tick[i].x,LTicksStr,10);
+		_arduino->write((string)LTicksStr);
+	}
+	if (tick.size() > 0) {
+		_arduino->write("EOL");
+	}
+	ui.labelTicks->setText(tickMessage);
+}
+
+void GUI::doTask2()
+{
+	_prevTask = 2;
+	taskInit();
+	_algorithm.analyzeField(_algoRobot,_algoBalls);
+	_path.clear();
+	_path = _algorithm.getClosestPath();
+	vector<Coord2D> _tick = _algorithm.getClosestTick();
+	for (int i = 0; i < _path.size(); i++) _path[i].y = FINAL_HEIGHT - _path[i].y;
+	_targetBall.x = _algorithm.getClosestBall().x;
+	_targetBall.y = _algorithm.getClosestBall().y;
+	QString tickMessage = "Ticks: ";
+	for (int i = 0; i < _tick.size(); i++) {
+		tickMessage += "(" + QString::number((int)_tick[i].x) + "," + QString::number((int)_tick[i].y) + ")";
+	}
+	ui.labelTicks->setText(tickMessage);
+	/*
+	_previousLocation.x = _robot[0].x;
+	_previousLocation.y = _robot[0].y;
+	_path = _algorithm.getClosestBall(robot, balls);
+	vector<Coord2D> directions = _algorithm.pathToClosestBall(robot, balls, obstacles);
+	QString message = "Task 2: ";
+	for (int i = 0; i < directions.size(); i++) {
+		char LTicksStr[5]
+		itoa(directions[i].x,LTicksStr,10);
+		_arduino->write((string)LTicksStr);
+
+		char RTicksStr[5]
+		itoa(directions[i].y,RTicksStr,10);
+		_arduino->write((string)RTicksStr);
+		message += "<" + QString::number(directions[i].x) + "," + QString::number(directions[i].y) + "> ";
+	}
+	log(message);
+	_arduino->write("EOF");
+	_task2 = false;
+	*/
+}
+
+void GUI::doTask3()
+{
+	_prevTask = 3;
+	taskInit();
+	/*
+	if (_state == 0) {
+		_previousLocation.x = _robot[0].x;
+		_previousLocation.y = _robot[0].y;
+		_path = _algorithm.getClosestBall(robot, balls);
+		vector<Coord2D> directions = _algorithm.pathToClosestBall(robot, balls, obstacles);
+		for (int i = 0; i < directions.size(); i++) {
+			char LTicksStr[5]
+			itoa(directions[i].x,LTicksStr,10);
+			_arduino->write((string)LTicksStr);
+
+			char RTicksStr[5]
+			itoa(directions[i].y,RTicksStr,10);
+			_arduino->write((string)RTicksStr);
+		}
+		_arduino->write("EOF");
+		state = 1;						
+		} else if (_state == 1) {
+		_previousLocation.x = _robot[0].x;
+		_previousLocation.y = _robot[0].y;
+		vector<Coord2D> directions = _algorithm.pathToGoal(robot, balls, obstacles);
+		for (int i = 0; i < directions.size(); i++) {
+			char LTicksStr[5]
+			itoa(directions[i].x,LTicksStr,10);
+			_arduino->write((string)LTicksStr);
+
+			char RTicksStr[5]
+			itoa(directions[i].y,RTicksStr,10);
+			_arduino->write((string)RTicksStr);
+		}
+		_arduino->write("EOF");
+		state = 2;
+		} else if (_state == 2) {
+		_arduino->write("KICK");
+		_arduino->write("EOF");
+		_ballsScored++;
+		state = 0;
+		if (_ballsScored >= _ballsToScore) {
+			_task3 = false;
+		}
+	}
+	*/
+}
+
+void GUI::doFinal()
+{
+}
+
+void GUI::stopRobot()
+{
+	double robotChange = 0;
+	do {
+		_arduino->write("STOP");
+		_cam1->capture();
+		_cam1->calculateFinal();
+		_cam2->capture();
+		_cam2->calculateFinal();
+		vector<Point2f> prevRobotPos = combinePts(_cam1->getRobot(), _cam2->getRobot(), 50);
+		Sleep(500);
+		_cam1->capture();
+		_cam1->calculateFinal();
+		_cam2->capture();
+		_cam2->calculateFinal();
+		vector<Point2f> currRobotPos = combinePts(_cam1->getRobot(), _cam2->getRobot(), 50);
+		robotChange = dist(currRobotPos[1].x, prevRobotPos[1].x, currRobotPos[1].y, prevRobotPos[1].y);
+	} while (robotChange > 10);	
+}
+
+void GUI::taskInit()
+{
+	processRobot();
+	_algoRobot.x = _robot[1].x;
+	_algoRobot.y = FINAL_HEIGHT - _robot[1].y; // Flip the Y-axis
+	_algoRobot.angle = _robotAngle;
+
+	processBalls();
+	_algoBalls.resize(_balls.size());
+	for (int i = 0; i < _balls.size(); i++) {
+		_algoBalls[i].x = _balls[i].x;
+		_algoBalls[i].y = FINAL_HEIGHT - _balls[i].y; // Flip the Y-axis
+	}
+}
+
+void GUI::restartTask()
+{
+	stopRobot();
+	if (_prevTask == 1) _task1 = true;
+	else if (_prevTask == 2) _task2 = true;
+	else if (_prevTask == 3) _task3 = true;
+}
+
 void GUI::detectProblems()
 {
 	if (_robot.size() > 0) {
@@ -431,10 +480,8 @@ void GUI::detectProblems()
 				}
 				
 				if (abs(obstacleAngle - _robotAngle) < 0.1) {
-					if (_prevTask == 1) _task1 = true;
-					else if (_prevTask == 2) _task2 = true;
-					else if (_prevTask == 3) _task3 = true;
 					log("STOP - OBSTACLE IN FRONT");
+					restartTask();
 				}
 			}
 		}
@@ -451,14 +498,21 @@ void GUI::detectProblems()
 			C.x = _path[_pathIndex].x;
 			C.x = _path[_pathIndex].y;
 			if (distFromLine(A,B,C) < 10) {
-				/*
-				if (_prevTask == 1) _task1 = true;
-				else if (_prevTask == 2) _task2 = true;
-				else if (_prevTask == 3) _task3 = true;
-				*/
 				log ("STOP - NO LONGER ON-ROUTE");
+				restartTask();
 			}
 		}
+
+		for (int i = 0; i < _balls.size(); i++) {
+			if ( dist(_targetBall.x, _balls[i].x, _targetBall.y, _balls[i].y) < 25 ) {
+				break;
+			}
+			if (i == _balls.size() -1) {
+				log ("STOP - TARGET BALL LOCATION MOVED");
+				restartTask();
+			}
+		}
+		
 	}
 }
 
@@ -525,15 +579,20 @@ void GUI::displayMain()
 		p.setPen(QPen(QColor(Qt::red),5));
 		p.drawArc(_obstacles[i].x-_obstacleRadius, _obstacles[i].y-_obstacleRadius, _obstacleRadius*2, _obstacleRadius*2, 0, 16*360);
 	}
+	vector<Obstacle> newObstacles = _algorithm.getObstacles();
+	for (int i = 0; i < newObstacles.size(); i++) {
+		p.setPen(QPen(QColor(Qt::darkRed),2));
+		p.drawArc(newObstacles[i].x-newObstacles[i].rad, (FINAL_HEIGHT - newObstacles[i].y) -newObstacles[i].rad, newObstacles[i].rad*2, newObstacles[i].rad*2, 0, 16*360);
+	}
 
 	// Draw Pathing
 	QString pathMessage = "Path: ";
 	if (_path.size() > 0) {
-		pathMessage += "(" + QString::number((int)_path[0].x*2) + "," + QString::number((int)(FINAL_HEIGHT - _path[0].y)*2) + ")";
+		pathMessage += "(" + QString::number((int)_path[0].x) + "," + QString::number((int)(FINAL_HEIGHT - _path[0].y)) + ")";
 	}
 	for (int i = 0; i < _path.size()-1 && _path.size() > 0; i++) {
 		p.setPen(QPen(QColor(Qt::yellow), 5));
-		pathMessage += "(" + QString::number((int)_path[i+1].x*2) + "," + QString::number((int)(FINAL_HEIGHT - _path[i+1].y)*2) + ")";
+		pathMessage += "(" + QString::number((int)_path[i+1].x) + "," + QString::number((int)(FINAL_HEIGHT - _path[i+1].y)) + ")";
 		p.drawLine(_path[i].x, _path[i].y, _path[i+1].x, _path[i+1].y);
 		p.setPen(QPen(QColor(Qt::darkYellow), 5));
 		p.drawArc(_path[i].x-1, _path[i].y-1, 2, 2, 0, 16*360);

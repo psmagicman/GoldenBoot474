@@ -22,6 +22,7 @@ extern const int calibrationSize;
 extern const double _ballRadius;
 extern const double _robotRadius;
 extern const double _obstacleRadius;
+extern const double _safetyRadius;
 
 struct Coord2D {
 	double x;

@@ -99,7 +99,6 @@
     <ClCompile Include="gui.cpp" />
     <ClCompile Include="ThresholdFile.cpp" />
     <ClCompile Include="XMLReader.cpp" />
-    <ClCompile Include="MovementAlgorithm.cpp" />
     <ClCompile Include="QuickSort.cpp" />
     <ClCompile Include="tinyxml2.cpp" />
     <ClCompile Include="Webcam.cpp" />
@@ -136,7 +135,6 @@
     <ClInclude Include="GLOBALS.h" />
     <ClInclude Include="ThresholdFile.h" />
     <ClInclude Include="XMLReader.h" />
-    <ClInclude Include="MovementAlgorithm.h" />
     <ClInclude Include="QuickSort.h" />
     <ClInclude Include="tinyxml2.h" />
     <ClInclude Include="Webcam.h" />

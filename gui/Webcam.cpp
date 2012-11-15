@@ -96,7 +96,7 @@ void Webcam::init()
 bool Webcam::capture()
 {
 	_normal = cvQueryFrame(_capture);
-	//_normal = cvLoadImage("test.jpg", CV_LOAD_IMAGE_COLOR);
+	_normal = cvQueryFrame(_capture);
 	if (_normal) cvCvtColor(_normal, _hsv, CV_BGR2HSV);
 	if (_normal && _hsv) {
 		_storage = cvCreateMemStorage(0);
@@ -116,6 +116,9 @@ void Webcam::resetCalibrate()
 {
 	_calibrated = false;
 	_calibratedObstacles = false;
+	_robotPts.clear();
+	_obstaclesPts.clear();
+	_ballPts.clear();
 }
 
 void Webcam::calibrate(int index)
@@ -405,7 +408,7 @@ void Webcam::calculateFinal()
 {
 	// If Calibrated, Calculate Objects
 	if (_calibrated) {
-		calculateNormal(0,1,1,1);
+		calculateNormal(0,1,0,1);
 		
 		// Transform the Balls to plane
 		if (_ballPts.size() > 0) perspectiveTransform((Mat)_ballPts, (Mat)_ballPts, _homography);

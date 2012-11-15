@@ -1,21 +1,21 @@
 #include "Algorithm.h"
 
-testAlgorithm::testAlgorithm()
+CAlgorithm::CAlgorithm()
 {
 	_closest = -1;
 }
 
-testAlgorithm::testAlgorithm(vector<Obstacle> obstacles)
+CAlgorithm::CAlgorithm(vector<Obstacle> obstacles)
 {
 	_obstacles = obstacles;
 	for (int i = 0; i < _obstacles.size(); i++) {
-		_obstacles[i].rad = _obstacleRadius*3;
+		_obstacles[i].rad = _safetyRadius;
 	}
 	analyzeObstacles();
 	_closest = -1;
 }
 
-vector<Coord2D> testAlgorithm::getClosestPath()
+vector<Coord2D> CAlgorithm::getClosestPath()
 {
 	vector<Coord2D> empty;
 	empty.clear();
@@ -25,7 +25,7 @@ vector<Coord2D> testAlgorithm::getClosestPath()
 		return empty;
 }
 
-vector<Coord2D> testAlgorithm::getClosestTick()
+vector<Coord2D> CAlgorithm::getClosestTick()
 {
 	vector<Coord2D> empty;
 	empty.clear();
@@ -35,7 +35,7 @@ vector<Coord2D> testAlgorithm::getClosestTick()
 		return empty;
 }
 
-vector<Coord2D> testAlgorithm::getPathToGoal()
+vector<Coord2D> CAlgorithm::getPathToGoal()
 {
 	vector<Coord2D> empty;
 	empty.clear();
@@ -43,7 +43,7 @@ vector<Coord2D> testAlgorithm::getPathToGoal()
 	return empty;
 }
 
-vector<Coord2D> testAlgorithm::getTickToGoal()
+vector<Coord2D> CAlgorithm::getTickToGoal()
 {
 	vector<Coord2D> empty;
 	empty.clear();
@@ -51,7 +51,7 @@ vector<Coord2D> testAlgorithm::getTickToGoal()
 	return empty;
 }
 
-void testAlgorithm::analyzeField(Robot robot, vector<Ball> balls)
+void CAlgorithm::analyzeField(Robot robot, vector<Ball> balls)
 {
 	_closest = -1;
 	_robot = robot;
@@ -64,6 +64,20 @@ void testAlgorithm::analyzeField(Robot robot, vector<Ball> balls)
 	// Cycle through all the Balls, and construct a Path to each ball
 	for (int iBall = 0; iBall < _balls.size(); iBall++) {
 		vector<Coord2D> path;
+		path.clear();
+		/*
+		bool validBall = true;
+		for (int i = 0; i < _obstacles.size(); i++) {
+			if ( dist(_balls[iBall].x, _obstacles[i].x, _balls[iBall].y, _obstacles[i].y) <= _obstacles[i].rad) {
+				validBall = false;
+				break;
+			}
+		}
+		if (!validBall) {
+			_paths.push_back(path);
+			continue;
+		}
+		*/
 		// Set Beginning Coordinates to Robot
 		beginPts.x = _robot.x;
 		beginPts.y = _robot.y;
@@ -112,7 +126,7 @@ void testAlgorithm::analyzeField(Robot robot, vector<Ball> balls)
 	compareTicks();
 }
 
-void testAlgorithm::analyzeObstacles()
+void CAlgorithm::analyzeObstacles()
 {
 	vector<Obstacle> tempObstacles;
 	for (int i = 0; i < _obstacles.size() && _obstacles[i].rad != 0; i++) 
@@ -159,7 +173,7 @@ void testAlgorithm::analyzeObstacles()
 	_obstacles = tempObstacles;
 }
 
-Coord2D testAlgorithm::getNewPointAroundObstacle(Obstacle obstacle, Coord2D beginPts, Coord2D endPts)
+Coord2D CAlgorithm::getNewPointAroundObstacle(Obstacle obstacle, Coord2D beginPts, Coord2D endPts)
 {
 	Coord2D newPoint;
 	// beginPts is the starting position
@@ -214,7 +228,7 @@ Coord2D testAlgorithm::getNewPointAroundObstacle(Obstacle obstacle, Coord2D begi
 }
 
 // getTangetPointOfObstacle - Returns the two points on the circle that is tangent to the point
-vector<Coord2D> testAlgorithm::getTangentPointOfObstacle(Obstacle obstacle, Coord2D point)
+vector<Coord2D> CAlgorithm::getTangentPointOfObstacle(Obstacle obstacle, Coord2D point)
 {
 	double lenBetweenObstaclePath = obstacle.rad*1.1;
 	double lenBetweenPointObstacle = dist(point.x, obstacle.x, point.y, obstacle.y);
@@ -269,7 +283,7 @@ vector<Coord2D> testAlgorithm::getTangentPointOfObstacle(Obstacle obstacle, Coor
 	return newPoints;
 }
 
-Coord2D testAlgorithm::calcForwardTicks(double dist)
+Coord2D CAlgorithm::calcForwardTicks(double dist)
 {
 	Coord2D tempTicks;
 	double tempTick;
@@ -280,7 +294,7 @@ Coord2D testAlgorithm::calcForwardTicks(double dist)
 	return tempTicks;
 }
 
-Coord2D testAlgorithm::calcTurnTicks(double angle, Coord2D cPt, Coord2D nPt)
+Coord2D CAlgorithm::calcTurnTicks(double angle, Coord2D cPt, Coord2D nPt)
 {
 	Coord2D tempTicks;
 	double tempTick;
@@ -305,7 +319,7 @@ Coord2D testAlgorithm::calcTurnTicks(double angle, Coord2D cPt, Coord2D nPt)
 /*
  * compares the total amount of ticks for each path
  */
-void testAlgorithm::compareTicks()
+void CAlgorithm::compareTicks()
 {
 	_ticks.clear();
 	for(int i = 0; i < _paths.size(); i++) {
@@ -328,6 +342,7 @@ void testAlgorithm::compareTicks()
 				// does a comparison of the previous smallest sum with the current sum
 				sum = tempSum;
 				_closest = i;
+				_closestBall = _balls[_closest];
 				// remembers the index of the vector here the path with the lowest amount of ticks are located
 			}
 		}
@@ -337,7 +352,7 @@ void testAlgorithm::compareTicks()
 /*
  * calculates the ticks of the path passed into the function
  */
-vector<Coord2D> testAlgorithm::calculateTicks(vector<Coord2D> path)
+vector<Coord2D> CAlgorithm::calculateTicks(vector<Coord2D> path)
 {
 	vector<Coord2D> ticks;
 	Coord2D tempTicks;
