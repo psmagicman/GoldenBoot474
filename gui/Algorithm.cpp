@@ -53,6 +53,7 @@ vector<Coord2D> testAlgorithm::getTickToGoal()
 
 void testAlgorithm::analyzeField(Robot robot, vector<Ball> balls)
 {
+	_closest = -1;
 	_robot = robot;
 	_balls = balls;
 	_paths.clear();
@@ -60,13 +61,12 @@ void testAlgorithm::analyzeField(Robot robot, vector<Ball> balls)
 	Coord2D beginPts; // Beginning Coordinates of a path
 	Coord2D endPts; // Ending Coordinates of a path
 
-	// Set Beginning Coordinates to Robot
-	beginPts.x = _robot.x;
-	beginPts.y = _robot.y;
-
 	// Cycle through all the Balls, and construct a Path to each ball
 	for (int iBall = 0; iBall < _balls.size(); iBall++) {
 		vector<Coord2D> path;
+		// Set Beginning Coordinates to Robot
+		beginPts.x = _robot.x;
+		beginPts.y = _robot.y;
 		path.push_back(beginPts);
 		endPts.x = _balls[iBall].x;
 		endPts.y = _balls[iBall].y;
@@ -109,7 +109,7 @@ void testAlgorithm::analyzeField(Robot robot, vector<Ball> balls)
 		}
 		_paths.push_back(path);
 	}
-	//compareTicks();
+	compareTicks();
 }
 
 void testAlgorithm::analyzeObstacles()
@@ -307,26 +307,31 @@ Coord2D testAlgorithm::calcTurnTicks(double angle, Coord2D cPt, Coord2D nPt)
  */
 void testAlgorithm::compareTicks()
 {
+	_ticks.clear();
 	for(int i = 0; i < _paths.size(); i++) {
 		_ticks.push_back(calculateTicks(_paths[i]));
 	}
-	double sum_of_elems = 99999;		// loading this sum with a very large value
-	double tempSum = 0;
-	int ticksIndex;
-	for(int i = 0; i < _ticks.size(); i++) {
-		// calculate the total ticks of each path, then return the vector ticks that has the smallest ticks
-		for(int j = 0; j < _ticks[i].size(); j++) {
-			tempSum += abs(_ticks[i][j].x);
+	if (_ticks.size() > 0) {
+		double sum = 0;
+		for (int i = 0; i < _ticks[0].size(); i++) {
+			sum += abs(_ticks[0][i].x);
+			_closest = 0;
 		}
-		if(sum_of_elems > tempSum) {
-			// does a comparison of the previous smallest sum with the current sum
-			sum_of_elems = tempSum;
-			_closest = i;
-			// remembers the index of the vector here the path with the lowest amount of ticks are located
+
+		for(int i = 1; i < _ticks.size(); i++) {
+			double tempSum = 0;
+			// calculate the total ticks of each path, then return the vector ticks that has the smallest ticks
+			for(int j = 0; j < _ticks[i].size(); j++) {
+					tempSum += abs(_ticks[i][j].x);
+			}
+			if(sum > tempSum) {
+				// does a comparison of the previous smallest sum with the current sum
+				sum = tempSum;
+				_closest = i;
+				// remembers the index of the vector here the path with the lowest amount of ticks are located
+			}
 		}
 	}
-
-	//return totalTicks[_closest];
 }
 
 /*

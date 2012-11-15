@@ -8,68 +8,67 @@ using namespace std;
 
 void main(int argc, char * argv[])
 {
-
 	CSerial serial;
-	string firstInput;
-	string secondInput;
+	string input;
 	while (serial.Open(1, 57600)) {
-		cin >> firstInput;
-		if (firstInput != "OK") {
-			if (firstInput == "STOP") {
-				char * STOP = {"E"};
-				int stopByte = serial.SendData(STOP, strlen(STOP));
-			} else if (firstInput == "EOL") {
-				char * EOL = {"N"};
-				int eolByte = serial.SendData(EOL, strlen(EOL));
-			} else if (firstInput == "KICK") {
-				char * KICK = {"K"};
-				int kickByte = serial.SendData(KICK, strlen(KICK));
-			} else if (firstInput == "END") {
-				char * END = {"Z"};
-				int endByte = serial.SendData(END, strlen(END));
-			} else {
-				cin >> secondInput;
-				int rightMotor = atoi(firstInput.c_str());
-				int leftMotor = atoi(secondInput.c_str());
-				char * leftDigit = new char[6];
-				leftDigit[5] = '\0';
-				char * rightDigit = new char[6];
-				rightDigit[5] = '\0';
-				
-				if (leftMotor > 0) {
-					for (int i = 0; i < 5; i++) {
-						leftDigit[4-i] = (char)(((int)'0')+leftMotor%10);
-						leftMotor /= 10;
-					}
-				} else {
-					leftMotor = abs(leftMotor);
-					leftDigit[0] = '-';
-					for (int i = 0; i < 4; i++) {
-						leftDigit[4-i] = (char)(((int)'0')+leftMotor%10);
-						leftMotor /= 10;
-					}
-				}
+		cin >> input;
+		if (input == "EXIT") {
+			return;
+		} else if (input == "STOP") {
+			char * STOP = {"E"};
+			serial.SendData(STOP, strlen(STOP));
+		} else if (input == "EOL") {
+			char * EOL = {"R"};
+			serial.SendData(EOL, strlen(EOL));
+		} else if (input == "KICK") {
+			char * KICK = {"K"};
+			serial.SendData(KICK, strlen(KICK));
+		} else if (input == "START") {
+			char * BEGIN = {"I"};
+			serial.SendData(BEGIN, strlen(BEGIN));
 
-				if (rightMotor > 0) {
-					for (int i = 0; i < 5; i++) {
-						rightDigit[4-i] = (char)(((int)'0')+rightMotor%10);
-						rightMotor /= 10;
-					}
-				} else {
-					rightMotor = abs(rightMotor);
-					rightDigit[0] = '-';
-					for (int i = 0; i < 4; i++) {
-						rightDigit[4-i] = (char)(((int)'0')+rightMotor%10);
-						rightMotor /= 10;
-					}
+			int motorDigit;
+			char * motorChar = new char[6];
+			motorChar[5] = '\0';
+
+			// Right Motor
+			cin >> input;
+			motorDigit = atoi(input.c_str());
+				
+			if (motorDigit > 0) {
+				for (int i = 0; i < 5; i++) {
+					motorChar[4-i] = (char)(((int)'0')+motorDigit%10);
+					motorDigit /= 10;
 				}
-				int leftByte = serial.SendData(leftDigit, strlen(leftDigit));
-				int rightByte = serial.SendData(rightDigit, strlen(rightDigit));
+			} else {
+				motorDigit = abs(motorDigit);
+				motorChar[0] = '-';
+				for (int i = 0; i < 4; i++) {
+					motorChar[4-i] = (char)(((int)'0')+motorDigit%10);
+					motorDigit /= 10;
+				}
 			}
+			serial.SendData(motorChar, strlen(motorChar));
+
+			// Right Motor
+			cin >> input;
+			motorDigit = atoi(input.c_str());
+				
+			if (motorDigit > 0) {
+				for (int i = 0; i < 5; i++) {
+					motorChar[4-i] = (char)(((int)'0')+motorDigit%10);
+					motorDigit /= 10;
+				}
+			} else {
+				motorDigit = abs(motorDigit);
+				motorChar[0] = '-';
+				for (int i = 0; i < 4; i++) {
+					motorChar[4-i] = (char)(((int)'0')+motorDigit%10);
+					motorDigit /= 10;
+				}
+			}
+			serial.SendData(motorChar, strlen(motorChar));
 		}
-		char * input = new char[1];
-		int nBytesRead = serial.ReadData(input,1);
-		cout << input;
 		Sleep(100);
 	}
 }

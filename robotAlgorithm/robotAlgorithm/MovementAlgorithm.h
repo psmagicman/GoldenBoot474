@@ -33,7 +33,7 @@ public:
 	int returnRightSize();
 	Coord2D returnClosestBall();
 	vector<Coord2D> returnPath();
-	int returnAngle();
+	int returnAngle() {return angle;};
 	/*vector<double> returnBallDist();
 	vector<double> returnObsDist();*/
 
@@ -67,6 +67,7 @@ private:
 	vector<Ball> algoBalls;
 	//vector<Obstacle> algoObstacle;
 	vector<double> ballsDist;
+	double robotAngle;
 	//vector<double> obsDist;
 	//vector<double> obsRange;
 

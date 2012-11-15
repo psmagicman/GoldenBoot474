@@ -269,7 +269,8 @@ void loop ()
                         _path.clear();
                         poslistFlag =1;
                         Serial.write('1');
-		} else
+		} 
+		else
 		{
 			
 			Serial.print("Begin:  ");

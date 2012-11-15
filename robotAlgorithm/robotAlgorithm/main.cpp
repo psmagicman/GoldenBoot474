@@ -44,7 +44,7 @@ int main() {
 	vector<Ball> balls;
 	vector<Obstacle> obstacles;
 	MovementAlgorithm algos;
-
+	while(1) {
 		cout << "Enter the x coordinate of the robot: ";
 		cin >> robot.x;
 		cout << "Enter the y coordinate of the robot: ";
@@ -99,6 +99,7 @@ int main() {
 			cout << "Path[x] " << i+1 << " = " << path[i].x << endl;
 			cout << "Path[y] " << i+1 << " = " << path[i].y << endl;
 		}
+	}
 	system("PAUSE");
 	return 0;
 }

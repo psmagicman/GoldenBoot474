@@ -281,6 +281,7 @@ void GUI::display()
 						for (int i = 0; i < _tick.size(); i++) {
 							tickMessage += "(" + QString::number(_tick[i].x) + "," + QString::number(_tick[i].y) + ") ";
 						}
+						ui.labelTicks->setText(tickMessage);
 						/*
 						_previousLocation.x = _robot[0].x;
 						_previousLocation.y = _robot[0].y;
