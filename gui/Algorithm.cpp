@@ -197,7 +197,7 @@ Coord2D CAlgorithm::getNewPointAroundObstacle(Obstacle obstacle, Coord2D beginPt
 
 	// Step 2
 	Coord2D tempNewPoint2; // Stores the tangent Coord for end point
-	if ( dist(beginPts.x, tempEndPoint[0].x, beginPts.y, tempEndPoint[0].y) < dist(beginPts.x, tempEndPoint[1].x, beginPts.y, tempEndPoint[1].y) )
+	if ( dist(tempNewPoint1.x, tempEndPoint[0].x, tempNewPoint1.y, tempEndPoint[0].y) < dist(tempNewPoint1.x, tempEndPoint[1].x, tempNewPoint1.y, tempEndPoint[1].y) )
 		tempNewPoint2 = tempEndPoint[0];
 	else
 		tempNewPoint2 = tempEndPoint[1];

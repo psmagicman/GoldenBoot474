@@ -10,7 +10,7 @@ int main()
 	Robot point;
 	vector<Obstacle> obstacles;
 	vector<Ball> balls;
-	testAlgorithm algorithm;
+	CAlgorithm algorithm;
 
 	while (true) {
 		string input = "";
@@ -47,7 +47,7 @@ int main()
 			balls[i].y = atof(input.c_str());
 		}
 		
-		algorithm = testAlgorithm(obstacles);
+		algorithm = CAlgorithm(obstacles);
 		algorithm.analyzeField(point, balls);
 		//vector<Coord2D> test = algorithm.getTangentPointOfObstacle(obstacle, point);
 		vector<Coord2D> test = algorithm.getClosestPath();
