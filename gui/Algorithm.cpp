@@ -289,7 +289,7 @@ Coord2D testAlgorithm::calcTurnTicks(double angle, Coord2D cPt, Coord2D nPt)
 	tempTick = tempTick/ONE_TICK;
 	tempTick = tempTick * 2.0;
 	tempTick = abs(tempTick);
-	if((cPt.x > nPt.x && cPt.y < nPt.y) || (cPt.x < nPt.x && cPt.y < nPt.y) || (cPt.x < nPt.x && cPt.y > nPt.y) || (cPt.x > nPt.x && cPt.y > nPt.y)) {			
+	if((angleRelative(nPt, cPt)*(180/PI)) > 0 && (angleRelative(nPt, cPt)*(180/PI)) < 180) {			
 		// left turn
 		tempTicks.x = tempTick;
 		tempTicks.y = -tempTick;
@@ -343,8 +343,8 @@ vector<Coord2D> testAlgorithm::calculateTicks(vector<Coord2D> path)
 	Coord2D tempTicks;
 	double opp = dist(path[0].x, path[1].x, path[0].y, path[1].y);
 	double adj = dist(path[0].x, path[1].x, path[0].y, path[0].y);
-	double firstAngle = atan(abs(opp/adj))*(180/PI);
-	firstAngle = firstAngle - _robot.angle*(180/PI);
+	double firstAngle = angleWithOrigin(path[1]);
+	firstAngle = (firstAngle - _robot.angle)*(180/PI);
 	tempTicks = calcTurnTicks(firstAngle, path[0], path[1]);
 	ticks.push_back(tempTicks);
 	tempTicks = calcForwardTicks(dist(path[0].x, path[1].x, path[0].y, path[1].y));
