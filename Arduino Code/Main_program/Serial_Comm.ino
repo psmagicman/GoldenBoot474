@@ -5,7 +5,7 @@ void serialEvent(){
 }
 
 boolean CheckforE(){
-        if(Serial.available() > 0){
+        //if(Serial.available() > 0){
          
            if( Serial.peek() == 'E'){
                  emergency = 1;
@@ -25,8 +25,8 @@ boolean CheckforE(){
                  return TRUE;
            }
           else return FALSE;
-        }
-        else return FALSE;
+        //}
+        //else return FALSE;
 }
 
 void ReadInput(){

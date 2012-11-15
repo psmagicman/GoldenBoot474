@@ -9,20 +9,46 @@ void CatchtheBall()
           }
          Sensor();
          Serial.println(SenseDistance);
-         
-         if( GrabDir == RIGHT){
-           RightTurn(70,70);
+         if(SenseDistance > 17){
+           if( GrabDir == RIGHT){
+              RightTurn(70,70);
+            }
+           if(GrabDir == LEFT){
+             LeftTurn(70,70);
+           }
          }
-         if(GrabDir == LEFT){
-           LeftTurn(70,70);
-         }
-         
-         Sensor();
-         if(SenseDistance <= 20){
-           if(GrabDir == LEFT || GrabDir == RIGHT){
-             GrabDir = 100;
+         else{
+           if(GrabDir == LEFT){
+           delay(100);
+           Stop();
+           GrabDir=100;
+           enc1_Count=0;
+           enc2_Count=0;
+           abspos_1 =1;
+           abspos_2 =1;
+           while(enc1_Count <= abspos_1 && enc2_Count <= abspos_2){
+             RightTurn(70,70);
+             }
+             Stop();
              delay(300);
            }
+           else if(GrabDir == RIGHT){
+             Stop();
+             delay(100);
+             GrabDir=100;
+             enc1_Count=0;
+             enc2_Count=0;
+             abspos_1 =1;
+             abspos_2 =1;
+             while(enc1_Count <= abspos_1 && enc2_Count <= abspos_2){
+               LeftTurn(70,70);
+             }
+             Stop();
+             delay(300);
+           }
+           else{}
+             //GrabDir = 100;
+             //delay(300);
            //abspos_1 =20;
            //abspos_2 =20;
            //enc1_Count =0;

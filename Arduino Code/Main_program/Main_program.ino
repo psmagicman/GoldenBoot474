@@ -25,6 +25,9 @@
 #define TRUE 1
 #define RIGHT 1
 #define LEFT 0
+#define MIDDLE 2
+#define ON 1
+#define OFF 0
 
 
 using namespace std;
