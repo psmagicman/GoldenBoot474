@@ -1,5 +1,6 @@
 void CatchtheBall()
 { 
+  //int flag = 0;
   int caught =0;
   Reset();
   while(caught == 0){
@@ -7,53 +8,93 @@ void CatchtheBall()
           Reset();
           break;
           }
-         Sensor();
-         Serial.println(SenseDistance);
-         if(SenseDistance > 17){
-           if( GrabDir == RIGHT){
-              RightTurn(70,70);
-            }
-           if(GrabDir == LEFT){
-             LeftTurn(70,70);
-           }
-         }
-         else{
-           if(GrabDir == LEFT){
-           delay(100);
-           Stop();
-           GrabDir=100;
-           enc1_Count=0;
-           enc2_Count=0;
-           abspos_1 =1;
-           abspos_2 =1;
-           while(enc1_Count <= abspos_1 && enc2_Count <= abspos_2){
-             RightTurn(70,70);
+        Sensor();
+        if( GrabDir == LEFTONE){
+        if(SenseDistance > 20){
+          LeftTurn(70,70);
+          if(enc1_Count >= 24 && enc2_Count >= 24){
+            Stop();
+            enc1_Count = 0;
+            enc2_Count = 0;
+            GrabDir = RIGHTONE;
+            Serial.println("Ball is on my right");
+          }
+          
+        }
+        else {
+          Stop();
+          delay(300);
+          GrabDir = LEFTTWO;
+          Serial.println("Found Ball");
+        }
+        }
+        
+        if(GrabDir == LEFTTWO){
+          if(SenseDistance <= 20){
+            LeftTurn(70,70);
+            
+          }
+          else{
+            Serial.println("Edge of Ball,,,,turning back");
+            Stop();
+            delay(300);
+            enc1_Count=0;
+            enc2_Count=0;
+            abspos_1 =8;
+            abspos_2 =8;
+            sumError1=0;
+            sumError2=0;
+            while(enc1_Count <= abspos_1 && enc2_Count <= abspos_2){
+               RightTurn(70,70);
              }
              Stop();
              delay(300);
-           }
-           else if(GrabDir == RIGHT){
-             Stop();
-             delay(100);
-             GrabDir=100;
-             enc1_Count=0;
-             enc2_Count=0;
-             abspos_1 =1;
-             abspos_2 =1;
-             while(enc1_Count <= abspos_1 && enc2_Count <= abspos_2){
+             GrabDir = MIDDLE;
+            }
+        }
+        
+        if( GrabDir == RIGHTONE){
+        if(SenseDistance > 20){
+          RightTurn(70,70);
+        }
+        else {
+          Stop();
+          delay(300);
+          GrabDir = RIGHTTWO;
+          Serial.println("Found Ball");
+        }
+        }
+        
+        if(GrabDir == RIGHTTWO){
+          if(SenseDistance <= 20){
+            RightTurn(70,70);
+          }
+          else{
+            Serial.println("Edge of Ball,,,,turning back");
+            Stop();
+            delay(300);
+            enc1_Count=0;
+            enc2_Count=0;
+            abspos_1 =3;
+            abspos_2 =3;
+            sumError1=0;
+            sumError2=0;
+            while(enc1_Count <= abspos_1 && enc2_Count <= abspos_2){
                LeftTurn(70,70);
              }
              Stop();
              delay(300);
-           }
-           else{}
-             //GrabDir = 100;
-             //delay(300);
-           //abspos_1 =20;
-           //abspos_2 =20;
-           //enc1_Count =0;
-           //enc2_Count =0;
-           //Stop();
+             GrabDir = MIDDLE;
+             enc1_Count =0;
+             enc2_Count =0;
+            }
+        }
+        
+        Serial.println(SenseDistance);
+        
+        
+        if(GrabDir == MIDDLE){
+           Serial.println("accelerating");
            Accelerate(pwm_1,pwm_2);
          }
         
@@ -79,10 +120,10 @@ void CatchBallDistance()
    //Turn right 45 deg
   enc1_Count = 0; 
   enc2_Count = 0;
-  abspos_1 = 23;
-  abspos_2 = 23;
-   while((enc1_Count < abspos_1) && (enc2_Count < abspos_2))
-     {RightTurn(100,100);
+  abspos_1 = 1;
+  abspos_2 = 1;
+   while((enc1_Count <= abspos_1) && (enc2_Count <= abspos_2))
+     {RightTurn(70,70);
      }
    Stop();
    
@@ -91,10 +132,10 @@ void CatchBallDistance()
    //Turn left 90 deg
    enc1_Count = 0; 
    enc2_Count = 0;
-   abspos_1 = 48;
-   abspos_2 = 48;
+   abspos_1 = 2;
+   abspos_2 = 2;
     while((enc1_Count < abspos_1) && (enc2_Count < abspos_2))
-     {LeftTurn(100,100);
+     {LeftTurn(70,70);
      }
    Stop();
  

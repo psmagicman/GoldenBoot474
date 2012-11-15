@@ -23,9 +23,11 @@
 #define EXTEND 1023
 #define FALSE 0 
 #define TRUE 1
-#define RIGHT 1
-#define LEFT 0
-#define MIDDLE 2
+#define RIGHTONE 1
+#define RIGHTTWO 2
+#define LEFTONE 3
+#define LEFTTWO 4
+#define MIDDLE 5
 #define ON 1
 #define OFF 0
 

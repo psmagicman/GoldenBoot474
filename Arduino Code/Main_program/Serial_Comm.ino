@@ -38,8 +38,8 @@ void ReadInput(){
                 CheckforE();
                 
                 if(Serial.peek() == 'G'){
-                        Serial.println("Grabbing the ball to my right");
-                        GrabDir =RIGHT;
+                        Serial.println("Grabbing the ball");
+                        GrabDir =LEFTONE;
                         while(Serial.available()){
 		                Serial.read();
 			}
@@ -47,7 +47,7 @@ void ReadInput(){
                        // CatchBallDirection();
                 }
                 
-                                if(Serial.peek() == 'L'){
+                /*                if(Serial.peek() == 'L'){
                         Serial.println("Grabbing the ball to my left");
                         GrabDir =LEFT;
                         while(Serial.available()){
@@ -55,7 +55,7 @@ void ReadInput(){
 			}
                         CatchtheBall();
                         //CatchBallDirection();
-                }
+                }*/
                           
                  else if(Serial.peek() == 'K'){
                         Serial.println("Kicking the ball ");
