@@ -10,7 +10,7 @@ void CatchtheBall()
           }
         Sensor();
         if( GrabDir == LEFTONE){
-        if(SenseDistance > 20){
+        if(SenseDistance > TENNISBALL){
           LeftTurn(70,70);
           if(enc1_Count >= 24 && enc2_Count >= 24){
             Stop();
@@ -30,7 +30,7 @@ void CatchtheBall()
         }
         
         if(GrabDir == LEFTTWO){
-          if(SenseDistance <= 20){
+          if(SenseDistance <= TENNISBALL){
             LeftTurn(70,70);
             
           }
@@ -54,8 +54,15 @@ void CatchtheBall()
         }
         
         if( GrabDir == RIGHTONE){
-        if(SenseDistance > 20){
+        if(SenseDistance > TENNISBALL){
           RightTurn(70,70);
+          if(enc1_Count >= 47 && enc2_Count >= 47){
+            Stop();
+            Reset();
+            Serial.write(2);
+            Serial.println("Ball is not here");
+            break;
+          }
         }
         else {
           Stop();
@@ -66,8 +73,9 @@ void CatchtheBall()
         }
         
         if(GrabDir == RIGHTTWO){
-          if(SenseDistance <= 20){
+          if(SenseDistance <= TENNISBALL){
             RightTurn(70,70);
+            
           }
           else{
             Serial.println("Edge of Ball,,,,turning back");
@@ -75,8 +83,8 @@ void CatchtheBall()
             delay(300);
             enc1_Count=0;
             enc2_Count=0;
-            abspos_1 =3;
-            abspos_2 =3;
+            abspos_1 =6;
+            abspos_2 =6;
             sumError1=0;
             sumError2=0;
             while(enc1_Count <= abspos_1 && enc2_Count <= abspos_2){
@@ -87,19 +95,38 @@ void CatchtheBall()
              GrabDir = MIDDLE;
              enc1_Count =0;
              enc2_Count =0;
+             abspos_1 = 0;
+             abspos_2 = 0;
+             pwm_1 = 255;
+             pwm_2 = 255;
             }
         }
         
         Serial.println(SenseDistance);
-        
-        
+        Sensor();
         if(GrabDir == MIDDLE){
-           Serial.println("accelerating");
-           Accelerate(pwm_1,pwm_2);
-         }
+             if(SenseDistance <= TENNISBALL){
+               Serial.println("accelerating");
+               Accelerate(pwm_1,pwm_2);
+             }
+             else{
+               Serial.println("Scan AGAIN");
+               GrabDir = LEFTONE;
+               enc1_Count=0;
+               enc2_Count=0;
+               abspos_1 =1;
+               abspos_2 =1;
+               sumError1=0;
+               sumError2=0;
+               while(enc1_Count <= abspos_1 && enc2_Count <= abspos_2){
+                     RightTurn(70,70);
+               }
+             }
+        }
         
         if(SenseDistance <= 4){
                 Stop();
+                Serial.write(1);
                 Serial.println("Ball in the caster .");
                 Serial.println(SenseDistance);
                 caught=1;
