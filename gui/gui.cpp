@@ -83,6 +83,7 @@ void GUI::init()
 	_task2 = false;
 	_task3 = false;
 	_final = false;
+	_prevTask = 0;
 
 	_pathIndex = 0;
 
@@ -174,29 +175,30 @@ void GUI::display()
 			double tempAngle;
 			if (abs(leftAngle - rightAngle) > CV_PI) {
 				tempAngle = 0;
-				_robotAngle = 0;
 			} else {
 				tempAngle = (leftAngle + rightAngle)/2;
-				_robotAngle = (leftAngle + rightAngle)/2;
 			}
-
-			if (abs(tempAngle - _robotAngles[0]) < CV_PI || _robotAngles[_robotAngles.size()-1] == -1) {
-				_robotAngles[0] = tempAngle;
-				for (int i = _robotAngles.size()-1; i > 0; i--) {
-					_robotAngles[i] = _robotAngles[i-1];
+			
+			_robotAngles[0] = tempAngle;
+			for (int i = _robotAngles.size()-1; i > 0; i--) {
+				_robotAngles[i] = _robotAngles[i-1];
+			}
+			
+			_robotAngle = 0;
+			int angleSize = 0;
+			for (int i = 0; i < _robotAngles.size(); i++) {
+				if (abs(_robotAngles[i]-_robotAngles[0]) < PI/2) {
+					_robotAngle += _robotAngles[i];
+					angleSize++;
 				}
 			}
-			
-			//_robotAngle = 0;
-			for (int i = 0; i < _robotAngles.size(); i++) {
-				//_robotAngle += _robotAngles[i];
-			}
-			//_robotAngle /= _robotAngles.size();
+			_robotAngle /= angleSize;
 			
 			ui.labelRobotAngle->setText("Left Angle: " + QString::number((int)(leftAngle*180/CV_PI)) + "   Right Angle: " + QString::number((int)(rightAngle*180/CV_PI)) + "   Combined Angle: " + QString::number((int)(_robotAngles[0]*180/CV_PI)) + "   Corrected Angle: " + QString::number((int)(_robotAngle*180/CV_PI)));
+
 			// Algorithm
 			//detectProblems();
-			if ((_task1 || _task2 || _task3)/* && _arduino->read() == "1"*/) {
+			if (_task1 || _task2 || _task3) {
 				if (_balls.size() > 0 && _robot.size() > 0) { 
 					Robot robot;
 					vector<Ball> balls;
@@ -220,9 +222,11 @@ void GUI::display()
 						obstacles[i].x = (double)_obstacles[i].x * xRatio;
 						obstacles[i].y = (double)(FINAL_HEIGHT - _obstacles[i].y) * yRatio; // Flip the Y-axis
 					}
-
+					
+					_testAlgorithm = testAlgorithm(obstacles);
 					// Task 1 : Move Towards a Single Ball and Touch it
 					if (_task1) {
+						_prevTask = 1;
 						_algorithm = MovementAlgorithm(robot, balls);
 						_path.clear();
 						_pathIndex = 0;
@@ -257,12 +261,26 @@ void GUI::display()
 							_arduino->write("EOL");
 							message += " EOL";
 						}
-						log(message);
+						ui.labelTicks->setText(message);
 						_task1 = false;
 					}
 
 					// Task 2 : Move Towards a Single Ball with 2 Obstacles and Touch it
 					if (_task2) {
+						_prevTask = 2;
+						_testAlgorithm.analyzeField(robot,balls);
+						_path.clear();
+						_path = _testAlgorithm.getClosestPath();
+						vector<Coord2D> _tick = _testAlgorithm.getClosestTick();
+						for (int i = 0; i < _path.size(); i++) {
+							_path[i].x /= 2;
+							_path[i].y /= 2;
+							_path[i].y = FINAL_HEIGHT - _path[i].y;
+						}
+						QString tickMessage = "Ticks: ";
+						for (int i = 0; i < _tick.size(); i++) {
+							tickMessage += "(" + QString::number(_tick[i].x) + "," + QString::number(_tick[i].y) + ") ";
+						}
 						/*
 						_previousLocation.x = _robot[0].x;
 						_previousLocation.y = _robot[0].y;
@@ -288,6 +306,7 @@ void GUI::display()
 
 					// Task 3 : Move all Balls to Goal with 4 Obstacles
 					if (_task3) {
+						_prevTask = 3;
 						/*
 						if (_state == 0) {
 							_previousLocation.x = _robot[0].x;
@@ -411,6 +430,9 @@ void GUI::detectProblems()
 				}
 				
 				if (abs(obstacleAngle - _robotAngle) < 0.1) {
+					if (_prevTask == 1) _task1 = true;
+					else if (_prevTask == 2) _task2 = true;
+					else if (_prevTask == 3) _task3 = true;
 					log("STOP - OBSTACLE IN FRONT");
 				}
 			}
@@ -427,12 +449,14 @@ void GUI::detectProblems()
 			Coord2D C;
 			C.x = _path[_pathIndex].x;
 			C.x = _path[_pathIndex].y;
-			//log(QString::number(distFromRoute));
-			/*
-			if (distFromRoute > 10) {
-				log("STOP - NO LONGER ON-ROUTE");
+			if (distFromLine(A,B,C) < 10) {
+				/*
+				if (_prevTask == 1) _task1 = true;
+				else if (_prevTask == 2) _task2 = true;
+				else if (_prevTask == 3) _task3 = true;
+				*/
+				log ("STOP - NO LONGER ON-ROUTE");
 			}
-			*/
 		}
 	}
 }
@@ -502,11 +526,20 @@ void GUI::displayMain()
 	}
 
 	// Draw Pathing
+	QString pathMessage = "Path: ";
+	if (_path.size() > 0) {
+		pathMessage += "(" + QString::number((int)_path[0].x*2) + "," + QString::number((int)(FINAL_HEIGHT - _path[0].y)*2) + ")";
+	}
 	for (int i = 0; i < _path.size()-1 && _path.size() > 0; i++) {
 		p.setPen(QPen(QColor(Qt::yellow), 5));
+		pathMessage += "(" + QString::number((int)_path[i+1].x*2) + "," + QString::number((int)(FINAL_HEIGHT - _path[i+1].y)*2) + ")";
 		p.drawLine(_path[i].x, _path[i].y, _path[i+1].x, _path[i+1].y);
+		p.setPen(QPen(QColor(Qt::darkYellow), 5));
+		p.drawArc(_path[i].x-1, _path[i].y-1, 2, 2, 0, 16*360);
+		p.drawArc(_path[i+1].x-1, _path[i+1].y-1, 2, 2, 0, 16*360);
 	}
 	p.end();
+	ui.labelPaths->setText(pathMessage);
 
 	ui.topView->resize(FINAL_WIDTH, FINAL_HEIGHT);
 	ui.topView->setPixmap(QPixmap::fromImage(qimage));

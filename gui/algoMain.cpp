@@ -7,8 +7,9 @@ using namespace std;
 
 int main()
 {
-	Coord2D point;
-	Obstacle obstacle;
+	Robot point;
+	vector<Obstacle> obstacles;
+	vector<Ball> balls;
 	testAlgorithm algorithm;
 
 	while (true) {
@@ -20,15 +21,40 @@ int main()
 		cin >> input;
 		point.y = atof(input.c_str());
 
-		cout << "Obstacle X: ";
+		cout << "Obstacle Sizes: ";
 		cin >> input;
-		obstacle.x = atof(input.c_str());
-		cout << "Obstacle Y: ";
+		obstacles.clear();
+		obstacles.resize(atoi(input.c_str()));
+		for (int i = 0; i < obstacles.size(); i++) {
+			cout << "Obstacle X: ";
+			cin >> input;
+			obstacles[i].x = atof(input.c_str());
+			cout << "Obstacle Y: ";
+			cin >> input;
+			obstacles[i].y = atof(input.c_str());
+		}
+
+		cout << "Num of Balls: ";
 		cin >> input;
-		obstacle.y = atof(input.c_str());
-		cout << "Obstacle Rad: ";
-		cin >> input;
-		obstacle.rad = atof(input.c_str());
+		balls.clear();
+		balls.resize(atoi(input.c_str()));
+		for (int i = 0; i < balls.size(); i++) {
+			cout << "Ball X: ";
+			cin >> input;
+			balls[i].x = atof(input.c_str());
+			cout << "Ball Y: ";
+			cin >> input;
+			balls[i].y = atof(input.c_str());
+		}
+		
+		algorithm = testAlgorithm(obstacles);
+		algorithm.analyzeField(point, balls);
+		//vector<Coord2D> test = algorithm.getTangentPointOfObstacle(obstacle, point);
+		vector<Coord2D> test = algorithm.getClosestPath();
+		for (int i = 0; i < test.size(); i++) {
+			cout << test[i].x << " " << test[i].y << endl;
+		}
+		
 
 		cout << endl;
 	}

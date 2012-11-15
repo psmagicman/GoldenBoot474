@@ -30,11 +30,11 @@
 
 <ballAmax>1250</ballAmax>
 
-<obstacles1Hmin>10</obstacles1Hmin>
+<obstacles1Hmin>20</obstacles1Hmin>
 
-<obstacles1Hmax>40</obstacles1Hmax>
+<obstacles1Hmax>30</obstacles1Hmax>
 
-<obstacles1Smin>100</obstacles1Smin>
+<obstacles1Smin>150</obstacles1Smin>
 
 <obstacles1Smax>255</obstacles1Smax>
 

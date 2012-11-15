@@ -9,7 +9,7 @@ testAlgorithm::testAlgorithm(vector<Obstacle> obstacles)
 {
 	_obstacles = obstacles;
 	for (int i = 0; i < _obstacles.size(); i++) {
-		_obstacles[i].rad = _obstacleRadius*2;
+		_obstacles[i].rad = _obstacleRadius*3;
 	}
 	analyzeObstacles();
 	_closest = -1;
@@ -85,12 +85,14 @@ void testAlgorithm::analyzeField(Robot robot, vector<Ball> balls)
 					Coord2D tempObstaclePts;
 					tempObstaclePts.x = _obstacles[iObstacle].x;
 					tempObstaclePts.y = _obstacles[iObstacle].y;
-					if ( cosineLaw(
-							dist(beginPts.x, endPts.x, beginPts.y, endPts.y), 
-							dist(beginPts.x, tempObstaclePts.x, beginPts.y, tempObstaclePts.y),
-							dist(endPts.x, tempObstaclePts.x, endPts.y, tempObstaclePts.y)
-							) < PI/2 && // Check if the Angle between the Obstacle and the Path is less than 90 degrees. If it is, that means it can intercept with the path
-							distFromLine(tempObstaclePts, endPts, beginPts) < _obstacles[iObstacle].rad && // Check if the distance of the Obstacle to the line is less than the radius of the Obstacle
+					double angleObstaclePath = cosineLaw(
+													dist(beginPts.x, endPts.x, beginPts.y, endPts.y), 
+													dist(beginPts.x, tempObstaclePts.x, beginPts.y, tempObstaclePts.y),
+													dist(endPts.x, tempObstaclePts.x, endPts.y, tempObstaclePts.y)
+												)*180/PI;
+					double distObstaclePath = distFromLine(tempObstaclePts, endPts, beginPts);
+					if (	angleObstaclePath < 90 && // Check if the Angle between the Obstacle and the Path is less than 90 degrees. If it is, that means it can intercept with the path
+							distObstaclePath < _obstacles[iObstacle].rad && // Check if the distance of the Obstacle to the line is less than the radius of the Obstacle
 							dist(obstaclePts.x, beginPts.x, obstaclePts.y, beginPts.y) > dist(_obstacles[iObstacle].x, beginPts.x, _obstacles[iObstacle].y, beginPts.y) // Check if the newer obstacle is closer
 						) 
 					{
@@ -98,7 +100,7 @@ void testAlgorithm::analyzeField(Robot robot, vector<Ball> balls)
 					}
 				}
 				// If an obstacle is detected to be in-between the path, add a new point to the path
-				if (obstaclePts.x > 0 && obstaclePts.y > 0) {
+				if (obstaclePts.x >= 0 && obstaclePts.y >= 0) {
 					Coord2D newPath = getNewPointAroundObstacle(obstaclePts,beginPts,endPts);
 					path[path.size()-1] = newPath;
 					path.push_back(endPts);
@@ -107,6 +109,7 @@ void testAlgorithm::analyzeField(Robot robot, vector<Ball> balls)
 		}
 		_paths.push_back(path);
 	}
+	//compareTicks();
 }
 
 void testAlgorithm::analyzeObstacles()
@@ -213,7 +216,7 @@ Coord2D testAlgorithm::getNewPointAroundObstacle(Obstacle obstacle, Coord2D begi
 // getTangetPointOfObstacle - Returns the two points on the circle that is tangent to the point
 vector<Coord2D> testAlgorithm::getTangentPointOfObstacle(Obstacle obstacle, Coord2D point)
 {
-	double lenBetweenObstaclePath = obstacle.rad;
+	double lenBetweenObstaclePath = obstacle.rad*1.1;
 	double lenBetweenPointObstacle = dist(point.x, obstacle.x, point.y, obstacle.y);
 	double lenBetweenPointPath = sqrtf(pow(lenBetweenPointObstacle,2) - pow(lenBetweenObstaclePath,2));
 	double angleObstaclePath = acos( (pow(lenBetweenPointPath,2) + pow(lenBetweenPointObstacle,2) - pow(lenBetweenObstaclePath,2))/(2*lenBetweenPointPath*lenBetweenPointObstacle));
@@ -221,13 +224,13 @@ vector<Coord2D> testAlgorithm::getTangentPointOfObstacle(Obstacle obstacle, Coor
 	double xDiff = obstacle.x - point.x;
 	double yDiff = obstacle.y - point.y;
 	double angleObstacle = 0;
-	if (yDiff < 0.01) {
+	if (abs(yDiff) < 0.01) {
 		if (xDiff > 0) {
 			angleObstacle = 0;
 		} else {
 			angleObstacle = PI;
 		}
-	} else if (xDiff < 0.01) {
+	} else if (abs(xDiff) < 0.01) {
 		if (yDiff > 0) {
 			angleObstacle = PI/2;
 		} else {
@@ -302,19 +305,18 @@ Coord2D testAlgorithm::calcTurnTicks(double angle, Coord2D cPt, Coord2D nPt)
 /*
  * compares the total amount of ticks for each path
  */
-vector<Coord2D> testAlgorithm::compareTicks()
+void testAlgorithm::compareTicks()
 {
-	vector<vector<Coord2D> > totalTicks;
 	for(int i = 0; i < _paths.size(); i++) {
-		totalTicks.push_back(calculateTicks(_paths[i]));
+		_ticks.push_back(calculateTicks(_paths[i]));
 	}
 	double sum_of_elems = 99999;		// loading this sum with a very large value
 	double tempSum = 0;
 	int ticksIndex;
-	for(int i = 0; i < totalTicks.size(); i++) {
+	for(int i = 0; i < _ticks.size(); i++) {
 		// calculate the total ticks of each path, then return the vector ticks that has the smallest ticks
-		for(int j = 0; j < totalTicks[i].size(); j++) {
-			tempSum += abs(totalTicks[i][j].x);
+		for(int j = 0; j < _ticks[i].size(); j++) {
+			tempSum += abs(_ticks[i][j].x);
 		}
 		if(sum_of_elems > tempSum) {
 			// does a comparison of the previous smallest sum with the current sum
@@ -323,7 +325,8 @@ vector<Coord2D> testAlgorithm::compareTicks()
 			// remembers the index of the vector here the path with the lowest amount of ticks are located
 		}
 	}
-	return totalTicks[_closest];
+
+	//return totalTicks[_closest];
 }
 
 /*

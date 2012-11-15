@@ -34,8 +34,8 @@ public:
 	vector<Coord2D>		getClosestTick();
 	vector<Coord2D>		getPathToGoal();
 	vector<Coord2D>		getTickToGoal();
-
 	
+	vector<Coord2D>		getTangentPointOfObstacle(Obstacle obstacle, Coord2D point);
 private:
 	Robot				_robot;
 	vector<Ball>		_balls;
@@ -47,10 +47,9 @@ private:
 
 	void analyzeObstacles(); 
 	Coord2D				getNewPointAroundObstacle(Obstacle obstacle, Coord2D beginPts, Coord2D endPts);
-	vector<Coord2D>		getTangentPointOfObstacle(Obstacle obstacle, Coord2D point);
 
 	vector<Coord2D> calculateTicks(vector<Coord2D>);
-	vector<Coord2D> compareTicks();
+	void compareTicks();
 	Coord2D calcForwardTicks(double);
 	Coord2D calcTurnTicks(double, Coord2D, Coord2D);
 };

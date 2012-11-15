@@ -696,17 +696,17 @@
         </item>
         <item row="0" column="2">
          <layout class="QGridLayout" name="gridLayout_18">
-          <item row="3" column="0">
-           <widget class="QPushButton" name="buttonTask2">
+          <item row="7" column="0">
+           <widget class="QPushButton" name="buttonFinal">
             <property name="text">
-             <string>Task 2</string>
+             <string>Final</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="0">
-           <widget class="QPushButton" name="buttonTask1">
+          <item row="5" column="0">
+           <widget class="QPushButton" name="buttonTask2">
             <property name="text">
-             <string>Task 1</string>
+             <string>Task 2</string>
             </property>
            </widget>
           </item>
@@ -718,29 +718,39 @@
            </widget>
           </item>
           <item row="4" column="0">
+           <widget class="QPushButton" name="buttonTask1">
+            <property name="text">
+             <string>Task 1</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="labelPaths">
+            <property name="text">
+             <string>TextLabel</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="0">
            <widget class="QPushButton" name="buttonTask3">
             <property name="text">
              <string>Task 3</string>
             </property>
            </widget>
           </item>
-          <item row="5" column="0">
-           <widget class="QPushButton" name="buttonFinal">
+          <item row="3" column="0">
+           <widget class="QLabel" name="labelRobotAngle">
             <property name="text">
-             <string>Final</string>
+             <string>TextLabel</string>
             </property>
            </widget>
           </item>
-          <item row="1" column="0">
-           <layout class="QHBoxLayout" name="horizontalLayout">
-            <item>
-             <widget class="QLabel" name="labelRobotAngle">
-              <property name="text">
-               <string>TextLabel</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
+          <item row="2" column="0">
+           <widget class="QLabel" name="labelTicks">
+            <property name="text">
+             <string>TextLabel</string>
+            </property>
+           </widget>
           </item>
          </layout>
         </item>

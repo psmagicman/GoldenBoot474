@@ -15,6 +15,7 @@
 #include "MovementAlgorithm.h"
 #include "Webcam.h"
 #include "ThresholdFile.h"
+#include "Algorithm.h"
 
 class GUI : public QMainWindow
 {
@@ -60,12 +61,14 @@ private:
 	QTimer * _timer;
 	
 	MovementAlgorithm _algorithm;
+	testAlgorithm _testAlgorithm;
 	ArduinoCOMM * _arduino;
 	
 	bool _task1;
 	bool _task2;
 	bool _task3;
 	bool _final;
+	int _prevTask;
 
 	int _state;
 	int _pathIndex;
