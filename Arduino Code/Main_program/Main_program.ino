@@ -1,8 +1,6 @@
 /*This code is the robot control code of "Team 8 - Golden boot"
 */
 
-
-
 //HEADER FILES
 #include <stdio.h>
 #include <stdlib.h>
@@ -228,7 +226,7 @@ void KicktheBall()
          enc2_Count =0;
          pwm_1=255;
          pwm_2=255;
-         Serial.println("Reverse ");
+         Serial.println("Accelerate ");
          while( enc1_Count < pos_1 && enc2_Count < pos_2) 
          { 
            if( CheckforE() == TRUE){ 

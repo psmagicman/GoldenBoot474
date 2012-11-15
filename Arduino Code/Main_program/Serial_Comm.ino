@@ -44,6 +44,7 @@ void ReadInput(){
 		                Serial.read();
 			}
                         CatchtheBall();
+                       // CatchBallDirection();
                 }
                 
                                 if(Serial.peek() == 'L'){
@@ -53,6 +54,7 @@ void ReadInput(){
 		                Serial.read();
 			}
                         CatchtheBall();
+                        //CatchBallDirection();
                 }
                           
                  else if(Serial.peek() == 'K'){
