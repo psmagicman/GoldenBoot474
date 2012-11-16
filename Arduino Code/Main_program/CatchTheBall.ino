@@ -103,6 +103,9 @@ void CatchtheBall()
         }
         
         Serial.println(SenseDistance);
+        
+        Sensor();
+        Sensor();
         Sensor();
         if(GrabDir == MIDDLE){
              if(SenseDistance <= TENNISBALL){

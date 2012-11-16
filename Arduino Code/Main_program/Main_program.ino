@@ -28,7 +28,7 @@
 #define LEFTONE 3
 #define LEFTTWO 4
 #define MIDDLE 5
-#define TENNISBALL 20
+#define TENNISBALL 25
 #define ON 1
 #define OFF 0
 
