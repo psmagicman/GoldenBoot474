@@ -53,8 +53,8 @@ void ReadInput(){
                         while(Serial.available()){
 		                Serial.read();
 			}
-                       //CatchtheBall();
-                       CatchBallDirection();
+                       CatchtheBall();
+                       //CatchBallDirection();
                 }
                 
                 /*                if(Serial.peek() == 'L'){
