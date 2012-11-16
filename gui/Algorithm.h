@@ -46,11 +46,11 @@ private:
 	void analyzeObstacles(); 
 	Coord2D				getNewPointAroundObstacle(Obstacle obstacle, Coord2D beginPts, Coord2D endPts);
 
-	vector<Coord2D> calculateTicks(vector<Coord2D>);
+	/*vector<Coord2D> calculateTicks(vector<Coord2D>);
 	void compareTicks();
 	Coord2D calcForwardTicks(double);
 	Coord2D calcTurnTicks(double);
-	double detFirstAngle(Coord2D, Coord2D);
+	double detFirstAngle(Coord2D, Coord2D);*/
 };
 
 #endif

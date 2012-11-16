@@ -15,7 +15,7 @@ CAlgorithm::CAlgorithm(vector<Obstacle> obstacles)
 	_closest = -1;
 }
 
-vector<Coord2D> CAlgorithm::getClosestPath()
+/*vector<Coord2D> CAlgorithm::getClosestPath()
 {
 	vector<Coord2D> empty;
 	empty.clear();
@@ -33,7 +33,7 @@ vector<Coord2D> CAlgorithm::getClosestTick()
 		return _ticks[_closest];
 	else
 		return empty;
-}
+}*/
 
 vector<Coord2D> CAlgorithm::getPathToGoal()
 {
@@ -291,7 +291,7 @@ vector<Coord2D> CAlgorithm::getTangentPointOfObstacle(Obstacle obstacle, Coord2D
 	return newPoints;
 }
 
-Coord2D CAlgorithm::calcForwardTicks(double dist)
+/*Coord2D CAlgorithm::calcForwardTicks(double dist)
 {
 	Coord2D tempTicks;
 	double tempTick;
@@ -325,12 +325,12 @@ Coord2D CAlgorithm::calcTurnTicks(double angle)
 		tempTicks.y = -tempTick;
 	}
 	return tempTicks;
-}
+}*/
 
 /*
  * compares the total amount of ticks for each path
  */
-void CAlgorithm::compareTicks()
+/*void CAlgorithm::compareTicks()
 {
 	_ticks.clear();
 	for(int i = 0; i < _paths.size(); i++) {
@@ -358,12 +358,12 @@ void CAlgorithm::compareTicks()
 			}
 		}
 	}
-}
+}*/
 
 /*
  * calculates the ticks of the path passed into the function
  */
-vector<Coord2D> CAlgorithm::calculateTicks(vector<Coord2D> path)
+/*vector<Coord2D> CAlgorithm::calculateTicks(vector<Coord2D> path)
 {
 	vector<Coord2D> ticks;
 	Coord2D tempTicks;
@@ -405,4 +405,4 @@ double CAlgorithm::detFirstAngle(Coord2D targetPt, Coord2D basePt)
 	else if(tempAngle > 180)
 		tempAngle = tempAngle - 360;
 	return tempAngle;
-}
+}*/
