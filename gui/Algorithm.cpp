@@ -61,6 +61,12 @@ void CAlgorithm::analyzeField(Robot robot, vector<Ball> balls)
 	Coord2D beginPts; // Beginning Coordinates of a path
 	Coord2D endPts; // Ending Coordinates of a path
 
+	for (int i = 0; i < _obstacles.size(); i++) {
+		if (dist(robot.x, _obstacles[i].x, robot.y, _obstacles[i].y) < _safetyRadius)
+		{
+			_balls.clear();
+		}
+	}
 	// Cycle through all the Balls, and construct a Path to each ball
 	for (int iBall = 0; iBall < _balls.size(); iBall++) {
 		vector<Coord2D> path;
@@ -123,7 +129,9 @@ void CAlgorithm::analyzeField(Robot robot, vector<Ball> balls)
 		}
 		_paths.push_back(path);
 	}
-	compareTicks();
+
+	if (_balls.size() > 0)
+		compareTicks();
 }
 
 void CAlgorithm::analyzeObstacles()
@@ -287,14 +295,15 @@ Coord2D CAlgorithm::calcForwardTicks(double dist)
 {
 	Coord2D tempTicks;
 	double tempTick;
-	tempTick = ((dist/100)/ONE_TICK);
-	tempTick * 2.0;
+	tempTick = ((dist/50)/ONE_TICK);
+	tempTick = tempTick * 2.0;
+	// x is left y is right
 	tempTicks.x = tempTick;
 	tempTicks.y = tempTick;
 	return tempTicks;
 }
 
-Coord2D CAlgorithm::calcTurnTicks(double angle, Coord2D cPt, Coord2D nPt)
+Coord2D CAlgorithm::calcTurnTicks(double angle)
 {
 	Coord2D tempTicks;
 	double tempTick;
@@ -303,15 +312,17 @@ Coord2D CAlgorithm::calcTurnTicks(double angle, Coord2D cPt, Coord2D nPt)
 	tempTick = tempTick/ONE_TICK;
 	tempTick = tempTick * 2.0;
 	tempTick = abs(tempTick);
-	if((angleRelative(nPt, cPt)*(180/PI)) > 0 && (angleRelative(nPt, cPt)*(180/PI)) < 180) {			
+	//if((angleRelative(nPt, cPt)*(180/PI)) > 0 && (angleRelative(nPt, cPt)*(180/PI)) < 180) {
+	// x is left y is right
+	if(angle > 0.0 && angle < 180.0) {
 		// left turn
-		tempTicks.x = tempTick;
-		tempTicks.y = -tempTick;
+		tempTicks.x = -tempTick;
+		tempTicks.y = tempTick;
 	}
 	else {
 		// right turn
-		tempTicks.x = -tempTick;
-		tempTicks.y = tempTick;
+		tempTicks.x = tempTick;
+		tempTicks.y = -tempTick;
 	}
 	return tempTicks;
 }
@@ -332,7 +343,7 @@ void CAlgorithm::compareTicks()
 			_closest = 0;
 		}
 
-		for(int i = 1; i < _ticks.size(); i++) {
+		for(int i = 0; i < _ticks.size(); i++) {
 			double tempSum = 0;
 			// calculate the total ticks of each path, then return the vector ticks that has the smallest ticks
 			for(int j = 0; j < _ticks[i].size(); j++) {
@@ -356,28 +367,42 @@ vector<Coord2D> CAlgorithm::calculateTicks(vector<Coord2D> path)
 {
 	vector<Coord2D> ticks;
 	Coord2D tempTicks;
-	double opp = dist(path[0].x, path[1].x, path[0].y, path[1].y);
-	double adj = dist(path[0].x, path[1].x, path[0].y, path[0].y);
-	double firstAngle = angleWithOrigin(path[1]);
-	firstAngle = (firstAngle - _robot.angle)*(180/PI);
-	tempTicks = calcTurnTicks(firstAngle, path[0], path[1]);
-	ticks.push_back(tempTicks);
+	double firstAngle = detFirstAngle(path[1], path[0]);
+	if(firstAngle > 0.01 || firstAngle < -0.01) {
+		tempTicks = calcTurnTicks(firstAngle);
+		ticks.push_back(tempTicks);
+	}
 	tempTicks = calcForwardTicks(dist(path[0].x, path[1].x, path[0].y, path[1].y));
 	ticks.push_back(tempTicks);
 
 	for(int i = 1; i < path.size()-1; i++) {
-		double angle, a, b, c;
+		double angleA, angleB, angleFinal, a, b, c;
 		a = dist(path[i].x,path[i-1].x,path[i].y,path[i-1].y);
 		b = dist(path[i].x,path[i+1].x,path[i].y,path[i+1].y);
 		c = dist(path[i-1].x,path[i+1].x,path[i-1].y,path[i+1].y);
-		if(i < path.size()-1) {
-			angle = cosineLaw(a, b, c);
-			angle = 180 - angle;
-			tempTicks = calcTurnTicks(angle, path[i], path[i+1]);
-			ticks.push_back(tempTicks);
-		}
-		tempTicks = calcForwardTicks(a);
+		angleA = angleRelative(path[i-1], path[i]) * (180/PI);
+		angleB = angleRelative(path[i+1], path[i]) * (180/PI);
+		if(angleA < angleB)
+			angleA = angleA + 360;
+		angleFinal = 180 - (angleA - angleB);
+		if(angleA < angleB)
+			angleFinal = -angleFinal;
+		tempTicks = calcTurnTicks(angleFinal);
+		ticks.push_back(tempTicks);
+		tempTicks = calcForwardTicks(b);
 		ticks.push_back(tempTicks);
 	}
 	return ticks;
+}
+
+double CAlgorithm::detFirstAngle(Coord2D targetPt, Coord2D basePt)
+{
+	double tempAngle = angleRelative(targetPt, basePt);
+	tempAngle = tempAngle - _robot.angle;
+	tempAngle = tempAngle * (180/PI);
+	if(tempAngle < -180)
+		tempAngle = tempAngle + 360;
+	else if(tempAngle > 180)
+		tempAngle = tempAngle - 360;
+	return tempAngle;
 }

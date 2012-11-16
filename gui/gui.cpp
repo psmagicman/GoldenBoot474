@@ -166,7 +166,7 @@ void GUI::display()
 			processRobot();
 
 			// Algorithm
-			//detectProblems();
+			detectProblems();
 			if (_task1 || _task2 || _task3 || _final) {
 				if (_balls.size() > 0 && _robot.size() > 0) {
 
@@ -202,9 +202,6 @@ void GUI::display()
 						doFinal();
 						_final = false;
 					}
-				}
-				else {
-					log("ERROR: No Balls or Robot detected");
 				}
 			}
 			displayMain();
@@ -271,17 +268,20 @@ vector<Point2f> GUI::combinePts(vector<Point2f> pts1, vector<Point2f> pts2, doub
 		combined = pts2;
 		tempPts = pts1;
 	}
-	for (int i = 0; i < tempPts.size(); i++) {
-		for (int j = 0; j < combined.size(); j++) {
-			if (dist(tempPts[i].x, combined[j].x, tempPts[i].y, combined[j].y) < distLimit) {
-				combined[j] = Point2f(
-					(combined[j].x + tempPts[i].x)/2 , (combined[j].y + tempPts[i].y)/2
-					);
-				break;
+	for (int i = 0; i < combined.size(); i++) {
+		double distance;
+		int index = -1;
+		for (int j = 0; j < tempPts.size(); j++) {
+			double tempDistance = dist(tempPts[j].x, combined[i].x, tempPts[j].y, combined[i].y);
+			if (tempDistance < distLimit && tempDistance < distance) {
+				index = j;
 			}
-			if (j == combined.size()-1) {
-				combined.push_back(tempPts[i]);
-			}
+		}
+		if (index >= 0) {
+			combined[i] = Point2f(
+				(combined[i].x + tempPts[index].x)/2 , (combined[i].y + tempPts[index].y)/2
+				);
+		} else {
 		}
 	}
 	return combined;
@@ -455,20 +455,29 @@ void GUI::restartTask()
 
 void GUI::detectProblems()
 {
-	if (_robot.size() > 0) {
+	bool hasProblems = false;
+	if (_robot.size() > 1) {
 		// Detect Obstacles in Front
 		for (int i = 0; i < _obstacles.size(); i++) {
 			double robotX = _robot[1].x;
 			double robotY = _robot[1].y;
-			if (dist(robotX, _obstacles[i].x, robotY, _obstacles[i].y) < 25) {
+			if (dist(robotX, _obstacles[i].x, robotY, _obstacles[i].y) < _safetyRadius) {
+				Coord2D robotCoord;
+				robotCoord.x = robotX;
+				robotCoord.y = robotY;
+				Coord2D obstacleCoord;
+				obstacleCoord.x = _obstacles[i].x;
+				obstacleCoord.y = _obstacles[i].y;
+				double obstacleAngle = angleRelative(obstacleCoord, robotCoord);
+				/*
 				double obstacleAngle = 0;
 				double xDiff = _obstacles[i].x - robotX;
 				double yDiff = _obstacles[i].y - robotY;
-				if (abs(xDiff) < 0.5) {
+				if (abs(xDiff) < 0.1) {
 					if (yDiff > 0) obstacleAngle = CV_PI/2;
 					else obstacleAngle = 3*CV_PI/2;
 				}
-				else if(abs(yDiff) < 0.5) {
+				else if(abs(yDiff) < 0.1) {
 					if (xDiff > 0) obstacleAngle = 0;
 					else obstacleAngle = CV_PI;
 				}
@@ -478,10 +487,11 @@ void GUI::detectProblems()
 					else if (_obstacles[i].y < robotY && _obstacles[i].x < robotX) obstacleAngle = CV_PI/2 + obstacleAngle;
 					else if (_obstacles[i].y < robotY && _obstacles[i].x > robotX) obstacleAngle = 2*CV_PI - obstacleAngle;
 				}
-				
-				if (abs(obstacleAngle - _robotAngle) < 0.1) {
+				*/
+				if (abs(obstacleAngle - _robotAngle) < 1.0) {
 					log("STOP - OBSTACLE IN FRONT");
 					restartTask();
+					hasProblems = true;
 				}
 			}
 		}
@@ -500,19 +510,31 @@ void GUI::detectProblems()
 			if (distFromLine(A,B,C) < 10) {
 				log ("STOP - NO LONGER ON-ROUTE");
 				restartTask();
+				hasProblems = true;
 			}
 		}
 
-		for (int i = 0; i < _balls.size(); i++) {
-			if ( dist(_targetBall.x, _balls[i].x, _targetBall.y, _balls[i].y) < 25 ) {
-				break;
-			}
-			if (i == _balls.size() -1) {
-				log ("STOP - TARGET BALL LOCATION MOVED");
-				restartTask();
+		/*
+		if (_path.size() > 0) {
+			for (int i = 0; i < _balls.size(); i++) {
+				if ( dist(_targetBall.x, _balls[i].x, _targetBall.y, _balls[i].y) < 25 ) {
+					break;
+				}
+				if (i == _balls.size() -1) {
+					log ("STOP - TARGET BALL LOCATION MOVED");
+					restartTask();
+				}
 			}
 		}
-		
+		*/
+	}
+	else {
+		log ("ERROR: NO ROBOT DETECTED");
+		hasProblems = true;
+	}
+
+	if (!hasProblems) {
+		log("No Problems :)");
 	}
 }
 
@@ -559,6 +581,42 @@ void GUI::displayMain()
 	p.drawRect(QRect(FINAL_WIDTH*2.5/8.0,FINAL_HEIGHT*7.0/8.0,FINAL_WIDTH*3.0/8.0,FINAL_HEIGHT/8.0));
 	p.drawLine(QLine(0, FINAL_HEIGHT/2.0, FINAL_WIDTH, FINAL_HEIGHT/2.0));
 
+	// Draw Obstacles
+	for (int i = 0; i < _obstacles.size(); i++) {
+		p.setPen(QPen(QColor(Qt::red),5));
+		p.drawArc(_obstacles[i].x-_obstacleRadius, _obstacles[i].y-_obstacleRadius, _obstacleRadius*2, _obstacleRadius*2, 0, 16*360);
+	}
+	vector<Obstacle> newObstacles = _algorithm.getObstacles();
+	for (int i = 0; i < newObstacles.size(); i++) {
+		p.setPen(QPen(QColor(Qt::darkRed),2));
+		p.drawArc(newObstacles[i].x-newObstacles[i].rad, (FINAL_HEIGHT - newObstacles[i].y) -newObstacles[i].rad, newObstacles[i].rad*2, newObstacles[i].rad*2, 0, 16*360);
+	}
+
+	// Draw Pathing
+	vector<vector<Coord2D> > allPaths = _algorithm.getAllPaths();
+	for (int i = 0; i < allPaths.size(); i++) {
+		for (int j = 0; j < allPaths[i].size()-1; j++) {
+			p.setPen(QPen(QColor(Qt::darkYellow), 5));
+			p.drawLine(allPaths[i][j].x, FINAL_HEIGHT - allPaths[i][j].y, allPaths[i][j+1].x, FINAL_HEIGHT - allPaths[i][j+1].y);
+			p.setPen(QPen(QColor(Qt::black), 5));
+			p.drawArc(allPaths[i][j].x-1, FINAL_HEIGHT - allPaths[i][j].y-1, 2, 2, 0, 16*360);
+			p.drawArc(allPaths[i][j+1].x-1, FINAL_HEIGHT - allPaths[i][j+1].y-1, 2, 2, 0, 16*360);
+		}
+	}
+
+	QString pathMessage = "Path: ";
+	if (_path.size() > 0) {
+		pathMessage += "(" + QString::number((int)_path[0].x) + "," + QString::number((int)(FINAL_HEIGHT - _path[0].y)) + ")";
+	}
+	for (int i = 0; i < _path.size()-1 && _path.size() > 0; i++) {
+		p.setPen(QPen(QColor(Qt::yellow), 5));
+		pathMessage += "(" + QString::number((int)_path[i+1].x) + "," + QString::number((int)(FINAL_HEIGHT - _path[i+1].y)) + ")";
+		p.drawLine(_path[i].x, _path[i].y, _path[i+1].x, _path[i+1].y);
+		p.setPen(QPen(QColor(Qt::black), 5));
+		p.drawArc(_path[i].x-1, _path[i].y-1, 2, 2, 0, 16*360);
+		p.drawArc(_path[i+1].x-1, _path[i+1].y-1, 2, 2, 0, 16*360);
+	}
+	ui.labelPaths->setText(pathMessage);
 
 	// Draw Balls
 	for (int i = 0; i < _balls.size(); i++) {
@@ -573,34 +631,8 @@ void GUI::displayMain()
 		p.setPen(QPen(QColor(Qt::darkBlue),5));
 		p.drawLine(_robot[1].x, _robot[1].y, _robot[1].x + cos(_robotAngle)*20, _robot[1].y - sin(_robotAngle)*20);
 	}
-
-	// Draw Obstacles
-	for (int i = 0; i < _obstacles.size(); i++) {
-		p.setPen(QPen(QColor(Qt::red),5));
-		p.drawArc(_obstacles[i].x-_obstacleRadius, _obstacles[i].y-_obstacleRadius, _obstacleRadius*2, _obstacleRadius*2, 0, 16*360);
-	}
-	vector<Obstacle> newObstacles = _algorithm.getObstacles();
-	for (int i = 0; i < newObstacles.size(); i++) {
-		p.setPen(QPen(QColor(Qt::darkRed),2));
-		p.drawArc(newObstacles[i].x-newObstacles[i].rad, (FINAL_HEIGHT - newObstacles[i].y) -newObstacles[i].rad, newObstacles[i].rad*2, newObstacles[i].rad*2, 0, 16*360);
-	}
-
-	// Draw Pathing
-	QString pathMessage = "Path: ";
-	if (_path.size() > 0) {
-		pathMessage += "(" + QString::number((int)_path[0].x) + "," + QString::number((int)(FINAL_HEIGHT - _path[0].y)) + ")";
-	}
-	for (int i = 0; i < _path.size()-1 && _path.size() > 0; i++) {
-		p.setPen(QPen(QColor(Qt::yellow), 5));
-		pathMessage += "(" + QString::number((int)_path[i+1].x) + "," + QString::number((int)(FINAL_HEIGHT - _path[i+1].y)) + ")";
-		p.drawLine(_path[i].x, _path[i].y, _path[i+1].x, _path[i+1].y);
-		p.setPen(QPen(QColor(Qt::darkYellow), 5));
-		p.drawArc(_path[i].x-1, _path[i].y-1, 2, 2, 0, 16*360);
-		p.drawArc(_path[i+1].x-1, _path[i+1].y-1, 2, 2, 0, 16*360);
-	}
+	
 	p.end();
-	ui.labelPaths->setText(pathMessage);
-
 	ui.topView->resize(FINAL_WIDTH, FINAL_HEIGHT);
 	ui.topView->setPixmap(QPixmap::fromImage(qimage));
 }

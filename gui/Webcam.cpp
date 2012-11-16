@@ -237,18 +237,19 @@ void Webcam::calculateObstacles()
 		}
 
 		_obstaclesPtsCam.clear();
-		for (int i = 0; i < obstaclesTopPts.size(); i++) {
-			for (int j = 0; j < obstaclesBotPts.size(); j++) {
+		for (int i = 0; i < obstaclesBotPts.size(); i++) {
+			for (int j = 0; j < obstaclesTopPts.size(); j++) {
 				if (
-					abs(obstaclesTopPts[i].y - obstaclesBotPts[j].y) < 100	&&
-					abs(obstaclesTopPts[i].x - obstaclesBotPts[j].x) < 50 
-					) 
-				{
-					if (dist(obstaclesTopPts[i].x , obstaclesBotPts[j].x, obstaclesTopPts[i].y, obstaclesBotPts[j].y) < 75) {
+					obstaclesTopPts[j].y < obstaclesBotPts[i].y &&
+					abs(obstaclesTopPts[j].y - obstaclesBotPts[i].y) < 100	&&
+					abs(obstaclesTopPts[j].x - obstaclesBotPts[i].x) < 30 
+					) {
+					if (dist(obstaclesTopPts[j].x , obstaclesBotPts[i].x, obstaclesTopPts[j].y, obstaclesBotPts[i].y) < 75) {
 						_obstaclesPtsCam.push_back(Point2f(
-							2*obstaclesBotPts[j].x - obstaclesTopPts[i].x,
-							2*obstaclesBotPts[j].y - obstaclesTopPts[i].y - obstaclesTopHeight[i]
+							2*obstaclesBotPts[i].x - obstaclesTopPts[j].x,
+							2*obstaclesBotPts[i].y - obstaclesTopPts[j].y - obstaclesTopHeight[j]
 							));
+							break;
 					}
 				}
 			}

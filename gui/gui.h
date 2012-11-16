@@ -82,7 +82,7 @@ private:
 	Point2f				_targetBall;
 	vector<Point2f>		_obstacles;
 	vector<Point2f>		_robot;
-	vector <Coord2D>	_path;
+	vector<Coord2D>		_path;
 	double				_robotAngle;
 	vector<double>		_robotAngles;
 

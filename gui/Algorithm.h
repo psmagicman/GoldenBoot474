@@ -22,6 +22,7 @@ public:
 	Robot				getRobot(){return _robot;};
 	vector<Ball>		getBalls(){return _balls;};
 	vector<Obstacle>	getObstacles(){return _obstacles;};
+	vector<vector<Coord2D> > getAllPaths(){return _paths;};
 	
 	Ball				getClosestBall(){return _closestBall;};
 
@@ -48,7 +49,8 @@ private:
 	vector<Coord2D> calculateTicks(vector<Coord2D>);
 	void compareTicks();
 	Coord2D calcForwardTicks(double);
-	Coord2D calcTurnTicks(double, Coord2D, Coord2D);
+	Coord2D calcTurnTicks(double);
+	double detFirstAngle(Coord2D, Coord2D);
 };
 
 #endif
