@@ -1,4 +1,10 @@
+/*
+This function resets the memory buffer
+*/
+//Function Definition 
+void Reset();
 
+//Function Declaration
 void Reset(){
 	Stop(); 
 	//   enc1_Count =0;

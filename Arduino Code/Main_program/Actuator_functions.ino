@@ -1,13 +1,6 @@
-
 /*
-This sections contains the functions used to activate the Linear actuator ---- TESTED IT WORKS !!!!!
+This sections contains the functions used to activate the Linear actuator 
 */
-// Variable definition 
-#define LOW 0
-#define HIGH 1
-#define PWM_MAX 255
-#define RETRACT 72
-#define EXTEND 1023
 
 //Function Declaration
 void Actuator_Activate();
@@ -31,9 +24,6 @@ void Actuator_Activate() //Pulls the rod in
 void Actuator_Read() //Reads the rod value when it's out or in
 {
   actuator_length = analogRead(actuator_input);
- // Serial.print('\n');
- // Serial.print("Actuator value analog : ");
- // Serial.print(actuator_length);
 }
 
 void ActuatorControl(int length)
@@ -65,38 +55,3 @@ void ActuatorControl(int length)
             digitalWrite(actuator_enable, LOW);
 }
             
-/*
-//LOOP --DELETE after testing
-void loop ()
-{ char c;
-  if(Serial.available() > 0)
-  {c=Serial.read();
-   if (c == 'a')
-    {Actuator_Activate();
-    // delay(2500);
-    Serial.print('\n');
-   // Serial.print(c);
-    Serial.print("Eject");
-    Serial.print("After activation ");
-    Actuator_Read();
-    }
-  
-   
-  if (c == 'e')
-  {Actuator_Deactivate();
-  Serial.print('\n');
-    //Serial.print(c);
-    Serial.print("Retract");
- //     delay(2500);
-    Serial.print('\n');
-  Serial.print("After de-activation ");
- Actuator_Read();
-   }
- 
-  }
-  
-//  Serial.write(1);
- // Serial.write("DONE");
-  
-}
-*/

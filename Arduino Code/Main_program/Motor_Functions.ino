@@ -1,4 +1,17 @@
+//Function Declaration
+void Accelerate(int pwm_1, int pwm_2);
+void RightTurn(int pwm_1, int pwm_2);
+void LeftTurn(int pwm_1, int pwm_2);
+void Reverse(int pwm_1, int pwm_2);
+void Stop();
+void Movement();
+void Position();
+void Check();
+void MotorControl();
+void enc1();
+void enc2();
 
+//Function Definition
 void Accelerate(int pwm_1, int pwm_2) 
 {
 	analogWrite(enablepin_1, pwm_1);
@@ -49,7 +62,6 @@ void Stop()
 	digitalWrite(motor2_pin_2, LOW);
 }
 
-
 //Interrupt Function
 void enc1()
 {
@@ -68,10 +80,6 @@ void enc2()
 
 void Check()
 { 
-//  int error;
-// int lastError = 0;
- //int sumError = 0;
-// float adjustment = 0;
 	if( enc1_Count == enc2_Count){
             motor =0;
             if (pos_1 != pos_2)
@@ -224,9 +232,7 @@ void MotorControl(){
                     else if(motor ==2 ){
                       Serial.println("Faster Left");}
                     else{}
-                    
-                        
-                
+                                  
   		if (poslistFlag == 1) {
                         Stop();
                         delay(300);

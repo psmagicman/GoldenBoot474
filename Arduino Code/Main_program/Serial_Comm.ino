@@ -1,5 +1,15 @@
-/*This code determines the serial communication
+/*
+This code lists the functions responsible for the serial communication
 */
+
+//Function Declaration 
+void serialEvent();
+boolean CheckforE();
+void ReadInput();
+boolean CheckGarbbage(char value[6]);
+void Readposition();
+
+//Function Definition
 void serialEvent(){
         CheckforE();
 }
