@@ -1,0 +1,13 @@
+
+
+
+E:	Emergency stop + Reset
+
+I: 	input 10bits of motor ticks 
+	(first 5:Right motor, second 5:Left motor)
+
+R:	Run the robot (Needs input vector first).  	Otherwise nothing happens.
+
+K:	Kick the ball
+
+G:	Grab the ball.
