@@ -98,6 +98,7 @@
     <ClCompile Include="GoldenBoot474.cpp" />
     <ClCompile Include="gui.cpp" />
     <ClCompile Include="ThresholdFile.cpp" />
+    <ClCompile Include="Ticks.cpp" />
     <ClCompile Include="XMLReader.cpp" />
     <ClCompile Include="QuickSort.cpp" />
     <ClCompile Include="tinyxml2.cpp" />
@@ -134,6 +135,7 @@
     <ClInclude Include="GeneratedFiles\ui_gui.h" />
     <ClInclude Include="GLOBALS.h" />
     <ClInclude Include="ThresholdFile.h" />
+    <ClInclude Include="Ticks.h" />
     <ClInclude Include="XMLReader.h" />
     <ClInclude Include="QuickSort.h" />
     <ClInclude Include="tinyxml2.h" />

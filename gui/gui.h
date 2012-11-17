@@ -16,6 +16,7 @@
 #include "Webcam.h"
 #include "ThresholdFile.h"
 #include "Algorithm.h"
+#include "Ticks.h"
 
 class GUI : public QMainWindow
 {
@@ -50,18 +51,19 @@ private slots:
 private:
 	Ui::GUIClass ui;
 
-	Webcam * _cam1;
-	Webcam * _cam2;
+	Webcam *		_cam1;
+	Webcam *		_cam2;
 
 	ThresholdFile * _thresholdLeft;
 	ThresholdFile * _thresholdRight;
 
-	QLabel * _progressLabel;
-	QProgressBar * _progressBar;
-	QTimer * _timer;
+	QLabel *		_progressLabel;
+	QProgressBar *	_progressBar;
+	QTimer *		_timer;
 	
-	CAlgorithm _algorithm;
-	ArduinoCOMM * _arduino;
+	CAlgorithm		_algorithm;
+	Ticks			_ticks;
+	ArduinoCOMM *	_arduino;
 	
 	bool _task1;
 	bool _task2;
@@ -85,6 +87,7 @@ private:
 	vector<Coord2D>		_path;
 	double				_robotAngle;
 	vector<double>		_robotAngles;
+	Coord2D				_goal;
 
 	Robot				_algoRobot;
 	vector<Ball>		_algoBalls;
@@ -106,7 +109,11 @@ private:
 	void taskInit();
 	void restartTask();
 
+	void getBall();
+	void score();
+
 	vector<Point2f> combinePts(vector<Point2f> pts1, vector<Point2f> pts2, double distLimit);
+	vector<Point2f> combineRobotPts(vector<Point2f> pts1, vector<Point2f> pts2);
 	void readLeftThreshold();
 	void readRightThreshold();
 	

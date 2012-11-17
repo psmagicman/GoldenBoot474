@@ -13,7 +13,7 @@ class Ticks
 {
 public:
 	Ticks();
-	Ticks(Robot, vector<vector<Coord2D>>);
+	Ticks(Robot);
 	
 	void compareTicks(vector<vector<Coord2D>>);
 

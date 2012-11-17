@@ -85,6 +85,39 @@ double angleRelative(Coord2D targetPt, Coord2D basePt)
 	return 0;
 }
 
+double angleRelative2(Coord2D targetPt, Coord2D basePt)
+{
+	double xDiff = targetPt.x - basePt.x;
+	double yDiff = targetPt.y - basePt.y;
+	yDiff = - yDiff;
+	if (abs(yDiff) < 0.01) {
+		if (xDiff > 0) {
+			return 0;
+		} else {
+			return PI;
+		}
+	} else if (abs(xDiff) < 0.01) {
+		if (yDiff > 0) {
+			return PI/2;
+		} else {
+			return 3*PI/2;
+		}
+	} else {
+		double angle = atan(abs(yDiff)/abs(xDiff));
+		if (yDiff > 0 && xDiff < 0) {
+			angle = PI-angle;
+		}
+		else if (yDiff < 0 && xDiff < 0) {
+			angle = PI+angle;
+		}
+		else if (yDiff < 0 && xDiff > 0) {
+			angle = 2*PI-angle;
+		}
+		return angle;
+	}
+	return 0;
+}
+
 double cosineLaw(double lenA, double lenB, double lenC)
 {
 	return acos( (lenA*lenA + lenB*lenB - lenC*lenC)/(2*lenA*lenB) );

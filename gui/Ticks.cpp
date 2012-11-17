@@ -11,11 +11,10 @@ Ticks::Ticks()
 /*
  * initializes the object with the robot starting position and the list of paths to check
  */
-Ticks::Ticks(Robot robot, vector<vector<Coord2D>> paths)
+Ticks::Ticks(Robot robot)
 {
 	_closest = -1;
 	_robot = robot;
-	_paths = paths;
 }
 
 vector<Coord2D> Ticks::getPath()
@@ -43,6 +42,7 @@ vector<Coord2D> Ticks::getTicks()
  */
 void Ticks::compareTicks(vector<vector<Coord2D>> paths)
 {
+	_paths = paths;
 	_ticks.clear();	// clear the _ticks vector everytime this function is invoked
 	// the for loop fills the _ticks vector with the number of ticks needed for each path
 	for(int i = 0; i < paths.size(); i++) {
@@ -59,7 +59,7 @@ void Ticks::compareTicks(vector<vector<Coord2D>> paths)
 		for(int i = 0; i < _ticks.size(); i++) {
 			double tempSum = 0;
 			// calculate the total ticks of each path, then return the vector ticks that has the smallest ticks
-			for(int j = 0; j < _ticks[i][j].x; j++) {
+			for(int j = 1; j < _ticks[i].size(); j++) {
 				tempSum += abs(_ticks[i][j].x);
 			}
 			if(sum > tempSum) {

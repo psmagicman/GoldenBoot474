@@ -18,6 +18,7 @@ public:
 	CAlgorithm(vector<Obstacle> obstacles);
 
 	void analyzeField(Robot robot, vector<Ball> balls);
+	vector<Coord2D>		getPathToGoal(Robot robot, Coord2D goal);
 
 	Robot				getRobot(){return _robot;};
 	vector<Ball>		getBalls(){return _balls;};
@@ -26,12 +27,6 @@ public:
 	
 	Ball				getClosestBall(){return _closestBall;};
 
-	vector<Coord2D>		getClosestPath();
-	vector<Coord2D>		getClosestTick();
-	vector<Coord2D>		getPathToGoal();
-	vector<Coord2D>		getTickToGoal();
-	
-	vector<Coord2D>		getTangentPointOfObstacle(Obstacle obstacle, Coord2D point);
 private:
 	Robot				_robot;
 	vector<Ball>		_balls;
@@ -45,12 +40,8 @@ private:
 
 	void analyzeObstacles(); 
 	Coord2D				getNewPointAroundObstacle(Obstacle obstacle, Coord2D beginPts, Coord2D endPts);
-
-	/*vector<Coord2D> calculateTicks(vector<Coord2D>);
-	void compareTicks();
-	Coord2D calcForwardTicks(double);
-	Coord2D calcTurnTicks(double);
-	double detFirstAngle(Coord2D, Coord2D);*/
+	vector<Coord2D>		getTangentPointOfObstacle(Obstacle obstacle, Coord2D point);
+	vector<Coord2D>		getPathToPoint(Coord2D point, double distance = 0);
 };
 
 #endif

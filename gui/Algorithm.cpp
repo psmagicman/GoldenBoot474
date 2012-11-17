@@ -15,40 +15,10 @@ CAlgorithm::CAlgorithm(vector<Obstacle> obstacles)
 	_closest = -1;
 }
 
-/*vector<Coord2D> CAlgorithm::getClosestPath()
+vector<Coord2D> CAlgorithm::getPathToGoal(Robot robot, Coord2D goal)
 {
-	vector<Coord2D> empty;
-	empty.clear();
-	if (_closest >= 0)
-		return _paths[_closest];
-	else
-		return empty;
-}
-
-vector<Coord2D> CAlgorithm::getClosestTick()
-{
-	vector<Coord2D> empty;
-	empty.clear();
-	if (_closest >= 0)
-		return _ticks[_closest];
-	else
-		return empty;
-}*/
-
-vector<Coord2D> CAlgorithm::getPathToGoal()
-{
-	vector<Coord2D> empty;
-	empty.clear();
-
-	return empty;
-}
-
-vector<Coord2D> CAlgorithm::getTickToGoal()
-{
-	vector<Coord2D> empty;
-	empty.clear();
-
-	return empty;
+	_robot = robot;	
+	return getPathToPoint(goal,20);
 }
 
 void CAlgorithm::analyzeField(Robot robot, vector<Ball> balls)
@@ -57,9 +27,6 @@ void CAlgorithm::analyzeField(Robot robot, vector<Ball> balls)
 	_robot = robot;
 	_balls = balls;
 	_paths.clear();
-	
-	Coord2D beginPts; // Beginning Coordinates of a path
-	Coord2D endPts; // Ending Coordinates of a path
 
 	for (int i = 0; i < _obstacles.size(); i++) {
 		if (dist(robot.x, _obstacles[i].x, robot.y, _obstacles[i].y) < _safetyRadius)
@@ -69,9 +36,6 @@ void CAlgorithm::analyzeField(Robot robot, vector<Ball> balls)
 	}
 	// Cycle through all the Balls, and construct a Path to each ball
 	for (int iBall = 0; iBall < _balls.size(); iBall++) {
-		vector<Coord2D> path;
-		path.clear();
-		/*
 		bool validBall = true;
 		for (int i = 0; i < _obstacles.size(); i++) {
 			if ( dist(_balls[iBall].x, _obstacles[i].x, _balls[iBall].y, _obstacles[i].y) <= _obstacles[i].rad) {
@@ -79,59 +43,75 @@ void CAlgorithm::analyzeField(Robot robot, vector<Ball> balls)
 				break;
 			}
 		}
-		if (!validBall) {
-			_paths.push_back(path);
-			continue;
+		if (validBall) {
+			// Set Beginning Coordinates to Robot
+			Coord2D ballPoint;
+			ballPoint.x = _balls[iBall].x;
+			ballPoint.y = _balls[iBall].y;
+			_paths.push_back(getPathToPoint(ballPoint,20));
 		}
-		*/
-		// Set Beginning Coordinates to Robot
-		beginPts.x = _robot.x;
-		beginPts.y = _robot.y;
-		path.push_back(beginPts);
-		endPts.x = _balls[iBall].x;
-		endPts.y = _balls[iBall].y;
-		path.push_back(endPts);
-		// If there are obstacles in the field, detect if there are any obstacles in the way
-		if (_obstacles.size() > 0) {
-			// Loop through the path (Look at pop_back and push_back at the bottom. If there are obstacles detected along the way, then a newPath will be pushed
-			for (int iPath = 0; iPath < path.size()-1; iPath++) {
-				// Select Obstacles that are between the Robot to the Ball
-				beginPts = path[iPath]; // Reassign Beginning Coordinates to the last saved path coordinate
-				// Create a Obstacle variable that is far outside of the arena
-				Obstacle obstaclePts;
-				obstaclePts.x = -_width;
-				obstaclePts.y = -_height;
-				for (int iObstacle = 0; iObstacle < _obstacles.size(); iObstacle++) {
-					Coord2D tempObstaclePts;
-					tempObstaclePts.x = _obstacles[iObstacle].x;
-					tempObstaclePts.y = _obstacles[iObstacle].y;
-					double angleObstaclePath = cosineLaw(
-													dist(beginPts.x, endPts.x, beginPts.y, endPts.y), 
-													dist(beginPts.x, tempObstaclePts.x, beginPts.y, tempObstaclePts.y),
-													dist(endPts.x, tempObstaclePts.x, endPts.y, tempObstaclePts.y)
-												)*180/PI;
-					double distObstaclePath = distFromLine(tempObstaclePts, endPts, beginPts);
-					if (	angleObstaclePath < 90 && // Check if the Angle between the Obstacle and the Path is less than 90 degrees. If it is, that means it can intercept with the path
-							distObstaclePath < _obstacles[iObstacle].rad && // Check if the distance of the Obstacle to the line is less than the radius of the Obstacle
-							dist(obstaclePts.x, beginPts.x, obstaclePts.y, beginPts.y) > dist(_obstacles[iObstacle].x, beginPts.x, _obstacles[iObstacle].y, beginPts.y) // Check if the newer obstacle is closer
-						) 
-					{
-						obstaclePts = _obstacles[iObstacle]; // Closest Obstacle and it's length to the path is less than its radius
-					}
-				}
-				// If an obstacle is detected to be in-between the path, add a new point to the path
-				if (obstaclePts.x >= 0 && obstaclePts.y >= 0) {
-					Coord2D newPath = getNewPointAroundObstacle(obstaclePts,beginPts,endPts);
-					path[path.size()-1] = newPath;
-					path.push_back(endPts);
+	}
+}
+
+vector<Coord2D> CAlgorithm::getPathToPoint(Coord2D point, double distance)
+{
+	Coord2D beginPts; // Beginning Coordinates of a path
+	Coord2D endPts; // Ending Coordinates of a path
+
+	beginPts.x = _robot.x;
+	beginPts.y = _robot.y;
+	endPts.x = point.x;
+	endPts.y = point.y;
+
+	vector<Coord2D> path;
+	path.push_back(beginPts);
+	path.push_back(endPts);
+
+	// If there are obstacles in the field, detect if there are any obstacles in the way
+	if (_obstacles.size() > 0) {
+		// Loop through the path (Look at pop_back and push_back at the bottom. If there are obstacles detected along the way, then a newPath will be pushed
+		for (int iPath = 0; iPath < path.size()-1; iPath++) {
+			// Select Obstacles that are between the Robot to the Ball
+			beginPts = path[iPath]; // Reassign Beginning Coordinates to the last saved path coordinate
+			// Create a Obstacle variable that is far outside of the arena
+			Obstacle obstaclePts;
+			obstaclePts.x = -_width;
+			obstaclePts.y = -_height;
+			for (int iObstacle = 0; iObstacle < _obstacles.size(); iObstacle++) {
+				Coord2D tempObstaclePts;
+				tempObstaclePts.x = _obstacles[iObstacle].x;
+				tempObstaclePts.y = _obstacles[iObstacle].y;
+				double angleObstaclePath = cosineLaw(
+												dist(beginPts.x, endPts.x, beginPts.y, endPts.y), 
+												dist(beginPts.x, tempObstaclePts.x, beginPts.y, tempObstaclePts.y),
+												dist(endPts.x, tempObstaclePts.x, endPts.y, tempObstaclePts.y)
+											)*180/PI;
+				double distObstaclePath = distFromLine(tempObstaclePts, endPts, beginPts);
+				if (	angleObstaclePath < 90 && // Check if the Angle between the Obstacle and the Path is less than 90 degrees. If it is, that means it can intercept with the path
+						distObstaclePath < _obstacles[iObstacle].rad && // Check if the distance of the Obstacle to the line is less than the radius of the Obstacle
+						dist(obstaclePts.x, beginPts.x, obstaclePts.y, beginPts.y) > dist(_obstacles[iObstacle].x, beginPts.x, _obstacles[iObstacle].y, beginPts.y) // Check if the newer obstacle is closer
+					) 
+				{
+					obstaclePts = _obstacles[iObstacle]; // Closest Obstacle and it's length to the path is less than its radius
 				}
 			}
+			// If an obstacle is detected to be in-between the path, add a new point to the path
+			if (obstaclePts.x >= 0 && obstaclePts.y >= 0) {
+				Coord2D newPath = getNewPointAroundObstacle(obstaclePts,beginPts,endPts);
+				path[path.size()-1] = newPath;
+				path.push_back(endPts);
+			}
 		}
-		_paths.push_back(path);
 	}
 
-	if (_balls.size() > 0)
-		compareTicks();
+	double angleBeforeLastPoint = angleRelative(path[path.size()-1], path[path.size()-2]);
+	double lastLength = dist(path[path.size()-1].x, path[path.size()-2].x, path[path.size()-1].y, path[path.size()-2].y);
+	if (lastLength > distance) {
+		endPts.x = endPts.x - distance*cos(angleBeforeLastPoint);
+		endPts.y = endPts.y - distance*sin(angleBeforeLastPoint);
+		path[path.size()-1] = endPts;
+	}
+	return path;
 }
 
 void CAlgorithm::analyzeObstacles()
@@ -290,119 +270,3 @@ vector<Coord2D> CAlgorithm::getTangentPointOfObstacle(Obstacle obstacle, Coord2D
 
 	return newPoints;
 }
-
-/*Coord2D CAlgorithm::calcForwardTicks(double dist)
-{
-	Coord2D tempTicks;
-	double tempTick;
-	tempTick = ((dist/50)/ONE_TICK);
-	tempTick = tempTick * 2.0;
-	// x is left y is right
-	tempTicks.x = tempTick;
-	tempTicks.y = tempTick;
-	return tempTicks;
-}
-
-Coord2D CAlgorithm::calcTurnTicks(double angle)
-{
-	Coord2D tempTicks;
-	double tempTick;
-	tempTick = 2*PI*BOT_WIDTH;
-	tempTick = tempTick*angle/360;
-	tempTick = tempTick/ONE_TICK;
-	tempTick = tempTick * 2.0;
-	tempTick = abs(tempTick);
-	//if((angleRelative(nPt, cPt)*(180/PI)) > 0 && (angleRelative(nPt, cPt)*(180/PI)) < 180) {
-	// x is left y is right
-	if(angle > 0.0 && angle < 180.0) {
-		// left turn
-		tempTicks.x = -tempTick;
-		tempTicks.y = tempTick;
-	}
-	else {
-		// right turn
-		tempTicks.x = tempTick;
-		tempTicks.y = -tempTick;
-	}
-	return tempTicks;
-}*/
-
-/*
- * compares the total amount of ticks for each path
- */
-/*void CAlgorithm::compareTicks()
-{
-	_ticks.clear();
-	for(int i = 0; i < _paths.size(); i++) {
-		_ticks.push_back(calculateTicks(_paths[i]));
-	}
-	if (_ticks.size() > 0) {
-		double sum = 0;
-		for (int i = 0; i < _ticks[0].size(); i++) {
-			sum += abs(_ticks[0][i].x);
-			_closest = 0;
-		}
-
-		for(int i = 0; i < _ticks.size(); i++) {
-			double tempSum = 0;
-			// calculate the total ticks of each path, then return the vector ticks that has the smallest ticks
-			for(int j = 0; j < _ticks[i].size(); j++) {
-					tempSum += abs(_ticks[i][j].x);
-			}
-			if(sum > tempSum) {
-				// does a comparison of the previous smallest sum with the current sum
-				sum = tempSum;
-				_closest = i;
-				_closestBall = _balls[_closest];
-				// remembers the index of the vector here the path with the lowest amount of ticks are located
-			}
-		}
-	}
-}*/
-
-/*
- * calculates the ticks of the path passed into the function
- */
-/*vector<Coord2D> CAlgorithm::calculateTicks(vector<Coord2D> path)
-{
-	vector<Coord2D> ticks;
-	Coord2D tempTicks;
-	double firstAngle = detFirstAngle(path[1], path[0]);
-	if(firstAngle > 0.01 || firstAngle < -0.01) {
-		tempTicks = calcTurnTicks(firstAngle);
-		ticks.push_back(tempTicks);
-	}
-	tempTicks = calcForwardTicks(dist(path[0].x, path[1].x, path[0].y, path[1].y));
-	ticks.push_back(tempTicks);
-
-	for(int i = 1; i < path.size()-1; i++) {
-		double angleA, angleB, angleFinal, a, b, c;
-		a = dist(path[i].x,path[i-1].x,path[i].y,path[i-1].y);
-		b = dist(path[i].x,path[i+1].x,path[i].y,path[i+1].y);
-		c = dist(path[i-1].x,path[i+1].x,path[i-1].y,path[i+1].y);
-		angleA = angleRelative(path[i-1], path[i]) * (180/PI);
-		angleB = angleRelative(path[i+1], path[i]) * (180/PI);
-		if(angleA < angleB)
-			angleA = angleA + 360;
-		angleFinal = 180 - (angleA - angleB);
-		if(angleA < angleB)
-			angleFinal = -angleFinal;
-		tempTicks = calcTurnTicks(angleFinal);
-		ticks.push_back(tempTicks);
-		tempTicks = calcForwardTicks(b);
-		ticks.push_back(tempTicks);
-	}
-	return ticks;
-}
-
-double CAlgorithm::detFirstAngle(Coord2D targetPt, Coord2D basePt)
-{
-	double tempAngle = angleRelative(targetPt, basePt);
-	tempAngle = tempAngle - _robot.angle;
-	tempAngle = tempAngle * (180/PI);
-	if(tempAngle < -180)
-		tempAngle = tempAngle + 360;
-	else if(tempAngle > 180)
-		tempAngle = tempAngle - 360;
-	return tempAngle;
-}*/
