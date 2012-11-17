@@ -1,10 +1,7 @@
-/*
-This program is a property of "Team 8 - Golden boot" taking the EECE 474/375.
-The entire Arduino code is distributed among different sections in order to facilitate ease of debugging the code 
-This is the start up / main code of the program 
+/*This code is the robot control code of "Team 8 - Golden boot"
 */
 
-//----------------------------HEADER FILES
+//HEADER FILES
 #include <stdio.h>
 #include <stdlib.h>
 #include <Servo.h>
@@ -15,14 +12,15 @@ This is the start up / main code of the program
 #include <vector>
 #include <pnew.cpp>
 
-//---------------------------VARIABLE DEFINITION
+
+
 #define LOW 0
 #define HIGH 1
+#define rate 100
 #define MOVE 1
 #define STANDBY 0
 #define RETRACT 72
 #define EXTEND 1023
-#define PWM_MAX 255
 #define FALSE 0 
 #define TRUE 1
 #define RIGHTONE 1
@@ -33,18 +31,28 @@ This is the start up / main code of the program
 #define TENNISBALL 25
 #define ON 1
 #define OFF 0
+#define GRABFLAG 99999
+#define KICKFLAG 88888
+
 
 using namespace std;
 
 vector<int> path;
 vector<vector<int> > _path;
 
-//Function Declaration
+//Functions 
 void setup();
+void Accelerate(int pwm_1, int pwm_2);
+void RightTurn(int pwm_1, int pwm_2);
+void LeftTurn(int pwm_1, int pwm_2);
+void Reverse(int pwm_1, int pwm_2);
+void Stop();
+void Movement();
+void Position();
+void Check();
 
-//---------------------------------GLOBAL VARIBLES USED
-//Sensor
-int sensorPin = A6;                                                      
+//SENSOR
+int sensorPin = A6;   
 int ledPin = 13;      // select the pin for the LED
 int sensorValue = 0;  // variable to store the value coming from the sensor
 int bufferA = 0;
@@ -53,7 +61,7 @@ int bufferC = 0;
 int sensorValAvg = 0;
 int SenseDistance = 0;
 
-//Linear Actuator
+//Pins needed for the Linear Actuator
 int actuator_pin1 = 12;
 int actuator_pin2 = 13;
 int actuator_input = A7;
@@ -82,6 +90,8 @@ int pos_2 = 0;
 int abspos_1 =0;
 int abspos_2 =0;
 int poslist =0;
+int slowdown1 =0;
+int slowdown2 =0;
 
 
 //Flags
@@ -97,14 +107,14 @@ volatile int enc2_Count=0;
 volatile int tempdebug1 =0;
 volatile int tempdebug2 =0;
 
-volatile int error;
+volatile int error1;
+volatile int error2;
 volatile int sumError1 =0;
 volatile int sumError2 =0;
 int KI = 5;
 int KP = 70;
 int motor = 0;
 
-//=============================================================Setup function
 void setup() {
 
 	Serial.begin(57600);
@@ -145,7 +155,9 @@ void setup() {
 }
 
 
-//================================================= Main loop
+//_____________________________________________________________________________
+
+
 
 void loop () 
 {
@@ -156,6 +168,112 @@ void loop ()
 	else{
                 ReadInput();
         }
-} 
+} //Close the loop
 
 
+
+void KicktheBall()
+{ 
+   Reset();
+   int flag1 = 1; 
+   int i;  
+   int flag = 1; 
+      
+   //Get instructions from image processing to kick the ball  
+   digitalWrite(actuator_enable, HIGH); 
+   Actuator_Read();
+   while (actuator_length < EXTEND )
+        {
+         if( CheckforE() == TRUE){
+            flag = 1;
+            break;
+            
+         }
+         Actuator_Activate();  
+         Actuator_Read();
+         flag= 0; 
+        }
+   //delay(300);
+  /* if (flag ==0 )
+     {
+      Serial.println("Actuator is fully out");                
+      pos_1 = 80; 
+      pos_2 = 80; 
+      pwm_1=255;
+      pwm_2=255; 
+      abspos_1 = 80;
+      abspos_2 = 80;
+      enc1_Count =0;
+      enc2_Count =0;
+      Serial.println("Accelerate");
+      while (enc1_Count < pos_1 && enc2_Count < pos_2)   
+           { 
+             if( CheckforE() == TRUE){ 
+                flag = 1;
+                break;
+             }
+             Reverse(pwm_1,pwm_2); 
+             //Position();
+             Serial.println();
+             Serial.print("Encoder1:  ");
+             Serial.print(enc1_Count);
+             Serial.print("Encoder2:  ");
+             Serial.print(enc2_Count);
+           } */ 
+      //Stop();
+     //}           
+     //while(flag1 == 1) 
+         // {  
+     //delay(300);  
+     Sensor();
+     if(SenseDistance >= 4 && flag == 0)
+       {
+         Serial.println("Actuator is fully in "); 
+         pos_1 = 150; 
+         pos_2 = 150; 
+         abspos_1 =150;
+         abspos_2 =150;
+         enc1_Count =0;
+         enc2_Count =0;
+         pwm_1=255;
+         pwm_2=255;
+         Serial.println("Accelerate ");
+         while( enc1_Count < pos_1 && enc2_Count < pos_2) 
+         { 
+           if( CheckforE() == TRUE){ 
+             flag = 1;
+             break;
+           }
+           Accelerate(pwm_1, pwm_2); 
+           //Position();
+           Serial.println();
+           Serial.print("Encoder1:  ");
+           Serial.print(enc1_Count);
+           Serial.print("Encoder2:  ");
+           Serial.print(enc2_Count);
+          }
+          delay(300);
+          if (flag ==0)
+            {
+             Serial.println("Ball just out of the caster ");
+             //  Serial.println(SenseDistance);            
+             Actuator_Read();
+             while (actuator_length > RETRACT )
+             { 
+               if( CheckforE() == TRUE){ 
+                   flag =1; 
+                   break;
+               }
+               Actuator_Deactivate(); 
+               Actuator_Read(); 
+               flag = 0; 
+             }
+             delay(300); 
+            } 
+      }
+      Serial.println("Done with the ball kicking") ;      
+      enc1_Count =0;
+      enc2_Count =0;
+      digitalWrite(actuator_enable, LOW); 
+      Reset();
+}

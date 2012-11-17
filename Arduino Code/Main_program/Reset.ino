@@ -1,10 +1,4 @@
-/*
-This function resets the memory buffer
-*/
-//Function Definition 
-void Reset();
 
-//Function Declaration
 void Reset(){
 	Stop(); 
 	//   enc1_Count =0;
@@ -25,6 +19,8 @@ void Reset(){
         poslistFlag = 1;
         sumError1 =0;
         sumError2 =0;
+        slowdown1 =0;
+        slowdown2 =0;
         
         ActuatorControl(RETRACT);
         Serial.println("Robot Reset()");

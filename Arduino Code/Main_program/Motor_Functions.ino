@@ -1,17 +1,4 @@
-//Function Declaration
-void Accelerate(int pwm_1, int pwm_2);
-void RightTurn(int pwm_1, int pwm_2);
-void LeftTurn(int pwm_1, int pwm_2);
-void Reverse(int pwm_1, int pwm_2);
-void Stop();
-void Movement();
-void Position();
-void Check();
-void MotorControl();
-void enc1();
-void enc2();
 
-//Function Definition
 void Accelerate(int pwm_1, int pwm_2) 
 {
 	analogWrite(enablepin_1, pwm_1);
@@ -62,6 +49,7 @@ void Stop()
 	digitalWrite(motor2_pin_2, LOW);
 }
 
+
 //Interrupt Function
 void enc1()
 {
@@ -80,12 +68,16 @@ void enc2()
 
 void Check()
 { 
+//  int error;
+// int lastError = 0;
+ //int sumError = 0;
+// float adjustment = 0;
 	if( enc1_Count == enc2_Count){
             motor =0;
             if (pos_1 != pos_2)
               {
                 
-                if( (enc1_Count >= abspos_1*0.85) && (enc2_Count >= abspos_2*0.85)){  //Slow down before stopping
+                if( (enc1_Count >= slowdown1) && (enc2_Count >= slowdown2)){  //Slow down before stopping
                   pwm_1 = 70;
                   pwm_2 = 70;
                   
@@ -106,29 +98,30 @@ void Check()
 		  pwm_2 = 255; //Adjust to taste
              //   }
               }
-		error = 0;
+		error1 = 0;
+                error2 = 0;
 	}
 	else if(enc1_Count > enc2_Count)
 	{ 
                 motor =1;
                 
-		error = (enc1_Count - enc2_Count);
+		error1 = (enc1_Count - enc2_Count);
 	        //adjustment = (KP*error + KD*(error - lastError)+ KI*sumError);
 		//pwm_2 += error*30+KI*sumError1;
-		pwm_1 -= (error*KP+KI*sumError1);  
+		pwm_1 -= (error1*KP+KI*sumError1);  
 		//  lastError = error;
-		  sumError1 += error;
+		  sumError1 += error1;
 	}
 	else if(enc1_Count < enc2_Count)
 	{      
                 motor = 2;
                 
-		error = (enc2_Count  - enc1_Count); 
+		error2 = (enc2_Count  - enc1_Count); 
 		// adjustment = KP*error + KD*(error - lastError)+ KI*sumError;
-		pwm_2 -= (error*KP+KI*sumError2);
+		pwm_2 -= (error2*KP+KI*sumError2);
 		//pwm_1 += error*60+KI*sumError2; 
 		  // lastError = error;
-		   sumError2 += error;
+		   sumError2 += error2;
 	}
 	else 
 	{
@@ -139,10 +132,10 @@ void Check()
 		pwm_1 = 255;
 	if (pwm_2 >= 255)
 		pwm_2 = 255;
-    if (pwm_1 <= 50)
-		pwm_1 = 50;
-    if (pwm_2 <= 50)
-		pwm_2 = 50;
+    if (pwm_1 <= 0)
+		pwm_1 = 0;
+    if (pwm_2 <= 0)
+		pwm_2 = 0;
 }
 
 void Movement()
@@ -232,7 +225,9 @@ void MotorControl(){
                     else if(motor ==2 ){
                       Serial.println("Faster Left");}
                     else{}
-                                  
+                    
+                        
+                
   		if (poslistFlag == 1) {
                         Stop();
                         delay(300);
@@ -241,19 +236,22 @@ void MotorControl(){
 			pos_2 = _path[poslist][1];
                         //abspos_1 = abs(pos_1);
                         //abspos_2 = abs(pos_2);
-                        if(( (abs(pos_1) <= 10) && (pos_1 != 0)) || ((abs(pos_2) <= 10) && (pos_2 !=0))){
+                        if(( (abs(pos_1) <= 2) && (pos_1 != 0)) || ((abs(pos_2) <= 2) && (pos_2 !=0))){
                           abspos_1 =1;
                           abspos_2 =1;
+                        
                         }
                         else{
-                          //abspos_1 = abs(pos_1)-(abs(pos_1)*0.07+1);
-                          //abspos_2 = abs(pos_2)-(abs(pos_2)*0.07+1);
-                          abspos_1 =abs(pos_1)-9;
-                          abspos_2 =abs(pos_2)-9;
+                          //abspos_1 = abs(pos_1)-(abs(pos_1)*0.07+4);
+                          //abspos_2 = abs(pos_2)-(abs(pos_2)*0.07+4);
+                          abspos_1 =abs(pos_1)-1;
+                          abspos_2 =abs(pos_2)-1;
 		        }
+                        slowdown1 =abspos_1*0.7;
+                        slowdown2 =abspos_2*0.7;
 
                         poslist++;
-                        Serial.println("ENCODER");
+                        Serial.println("ENCODER END");
                         Serial.println(enc1_Count);
                         Serial.println(enc2_Count);
                         
@@ -285,7 +283,9 @@ void MotorControl(){
 			Serial.print("Begin:  ");
 			Serial.print('\n');
 			Serial.print("Error : ");
-			Serial.print(error);
+			Serial.print(error1);
+                        Serial.print('\t');
+                        Serial.print(error2);
 			Serial.print('\n');
 			
 			Movement();

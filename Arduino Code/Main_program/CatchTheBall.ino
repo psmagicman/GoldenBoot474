@@ -1,10 +1,3 @@
-/*
-This function performs the function of catching the ball 
-*/
-//Function declartion
-void CatchtheBall();
-
-//Function definition
 void CatchtheBall()
 { 
   //int flag = 0;
@@ -147,7 +140,7 @@ void CatchtheBall()
         Reset();
 }
 
-/*
+
 void CatchBallDistance()
 { int distance_1,distance_2,distance_3;
   int caught =0;
@@ -230,4 +223,4 @@ void CatchBallDistance()
          }
   }
 }
-*/
+

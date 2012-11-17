@@ -1,15 +1,5 @@
-/*
-This code lists the functions responsible for the serial communication
+/*This code determines the serial communication
 */
-
-//Function Declaration 
-void serialEvent();
-boolean CheckforE();
-void ReadInput();
-boolean CheckGarbbage(char value[6]);
-void Readposition();
-
-//Function Definition
 void serialEvent(){
         CheckforE();
 }
@@ -53,8 +43,8 @@ void ReadInput(){
                         while(Serial.available()){
 		                Serial.read();
 			}
-                       CatchtheBall();
-                       //CatchBallDirection();
+                        CatchtheBall();
+                       // CatchBallDirection();
                 }
                 
                 /*                if(Serial.peek() == 'L'){
@@ -63,8 +53,8 @@ void ReadInput(){
                         while(Serial.available()){
 		                Serial.read();
 			}
-                       // CatchtheBall();
-                        CatchBallDirection();
+                        CatchtheBall();
+                        //CatchBallDirection();
                 }*/
                           
                  else if(Serial.peek() == 'K'){
