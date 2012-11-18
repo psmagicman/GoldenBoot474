@@ -65,10 +65,12 @@
     <ClCompile Include="algoMain.cpp" />
     <ClCompile Include="Algorithm.cpp" />
     <ClCompile Include="GLOBALS.cpp" />
+    <ClCompile Include="Ticks.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Algorithm.h" />
     <ClInclude Include="GLOBALS.h" />
+    <ClInclude Include="Ticks.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
