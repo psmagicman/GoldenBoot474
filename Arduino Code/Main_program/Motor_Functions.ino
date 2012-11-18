@@ -236,38 +236,66 @@ void MotorControl(){
 			pos_2 = _path[poslist][1];
                         //abspos_1 = abs(pos_1);
                         //abspos_2 = abs(pos_2);
-                        if(( (abs(pos_1) <= 2) && (pos_1 != 0)) || ((abs(pos_2) <= 2) && (pos_2 !=0))){
+                        if( pos_1 == GRABFLAG && pos_2 == GRABFLAG){
+                          //poslist++;
+                          CatchtheBall();
+                           pos_1 = 0;
+                           pos_2 = 0;
+                          //poslist++;
+                          //poslistFlag = 1;
+                        }
+                        else if( pos_1 == KICKFLAG && pos_2 == KICKFLAG){
+                          KicktheBall();
+                          Serial.println("Finished Kicking");
+                           
+                        }
+                        else if(( (abs(pos_1) <= 5) && (pos_1 != 0)) || ((abs(pos_2) <= 5) && (pos_2 !=0))){
                           abspos_1 =1;
                           abspos_2 =1;
-                        
-                        }
+                          Serial.println("ENCODER END");
+                          Serial.println(enc1_Count);
+                          Serial.println(enc2_Count);
+                          pwm_1 =255;
+                          pwm_2 =255;
+	  	  	  poslistFlag = 0;  
+	       		  enc1_Count = 0;
+			  enc2_Count = 0;
+                          sumError1= 0;
+                          sumError2 =0;
+                          }
                         else{
                           //abspos_1 = abs(pos_1)-(abs(pos_1)*0.07+4);
                           //abspos_2 = abs(pos_2)-(abs(pos_2)*0.07+4);
-                          abspos_1 =abs(pos_1)-1;
-                          abspos_2 =abs(pos_2)-1;
-		        }
-                        slowdown1 =abspos_1*0.7;
-                        slowdown2 =abspos_2*0.7;
-
-                        poslist++;
-                        Serial.println("ENCODER END");
-                        Serial.println(enc1_Count);
-                        Serial.println(enc2_Count);
+                          abspos_1 =abs(pos_1)-4;
+                          abspos_2 =abs(pos_2)-4;
+		          slowdown1 =abspos_1*0.7;
+                          slowdown2 =abspos_2*0.7;
+                          //poslist++;
+                          Serial.println("ENCODER END");
+                          Serial.println(enc1_Count);
+                          Serial.println(enc2_Count);
                         
-                        
-                        pwm_1 =255;
-                        pwm_2 =255;
-			poslistFlag = 0;  
-			enc1_Count = 0;
-			enc2_Count = 0;
-                        sumError1= 0;
-                        sumError2 =0;
-                        if(abspos_1 != abspos_2){
-                          poslist = _path.size()+1;
+                          pwm_1 =255;
+                          pwm_2 =255;
+			  poslistFlag = 0;  
+			  enc1_Count = 0;
+			  enc2_Count = 0;
+                          sumError1= 0;
+                          sumError2 =0;
                         }
-		} 
-		if( poslist == (_path.size()+1)){
+                poslist++;
+                Serial.println("Poslist and Size");
+               
+                Serial.println(poslist);
+                Serial.println('\t');
+                Serial.println(_path.size());
+                if(abspos_1 != abspos_2){
+                   poslist = _path.size()+1;
+                }
+                
+		}
+
+		if( poslist >= (_path.size()+1)){
 			//state = STANDBY;
                        // enc1_Count=0;
                        // enc2_Count=0;
@@ -277,8 +305,9 @@ void MotorControl(){
                        // _path.clear();
                         //poslistFlag =1;
                         Serial.write('1');
-		} else
-		{
+		} 
+                
+		if(poslistFlag == 0){
 			
 			Serial.print("Begin:  ");
 			Serial.print('\n');

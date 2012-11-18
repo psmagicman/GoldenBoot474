@@ -39,11 +39,21 @@ void ReadInput(){
                 
                 if(Serial.peek() == 'G'){
                         Serial.println("Grabbing the ball");
-                        GrabDir =LEFTONE;
+                        
+                        pos_1 = GRABFLAG;
+			path.clear();
+			path.push_back(pos_1);
+
+                        pos_2 = GRABFLAG;
+			path.push_back(pos_2);
+			_path.push_back(path);
+                        Serial.println(path[0]);
+                        Serial.println('\t');
+                        Serial.println(path[1]);
                         while(Serial.available()){
 		                Serial.read();
 			}
-                        CatchtheBall();
+                        //CatchtheBall();
                        // CatchBallDirection();
                 }
                 
@@ -59,10 +69,19 @@ void ReadInput(){
                           
                  else if(Serial.peek() == 'K'){
                         Serial.println("Kicking the ball ");
+
+                        pos_1 = KICKFLAG;
+			path.clear();
+			path.push_back(pos_1);
+
+                        pos_2 = KICKFLAG;
+			path.push_back(pos_2);
+			_path.push_back(path);
+
                         while(Serial.available()){
 		                Serial.read();
 			}
-                        KicktheBall();
+                        //KicktheBall();
                 }
                 
 		else if(Serial.peek() == 'R'){

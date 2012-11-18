@@ -31,8 +31,8 @@
 #define TENNISBALL 25
 #define ON 1
 #define OFF 0
-#define GRABFLAG 99999
-#define KICKFLAG 88888
+#define GRABFLAG 11111
+#define KICKFLAG 22222
 
 
 using namespace std;
@@ -174,7 +174,7 @@ void loop ()
 
 void KicktheBall()
 { 
-   Reset();
+   //Reset();
    int flag1 = 1; 
    int i;  
    int flag = 1; 
@@ -275,5 +275,5 @@ void KicktheBall()
       enc1_Count =0;
       enc2_Count =0;
       digitalWrite(actuator_enable, LOW); 
-      Reset();
+      //Reset();
 }

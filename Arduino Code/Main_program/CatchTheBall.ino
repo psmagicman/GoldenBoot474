@@ -2,7 +2,8 @@ void CatchtheBall()
 { 
   //int flag = 0;
   int caught =0;
-  Reset();
+  GrabDir =LEFTONE;
+ //Reset();
   while(caught == 0){
         if( CheckforE() == TRUE){ 
           Reset();
