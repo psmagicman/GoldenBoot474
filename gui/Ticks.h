@@ -19,6 +19,7 @@ public:
 
 	vector<Coord2D> getPath();
 	vector<Coord2D> getTicks();
+	int				getClosestIndex(){return _closest;};
 	
 private:
 	int _closest;

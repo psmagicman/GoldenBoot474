@@ -60,11 +60,20 @@ private:
 	QLabel *		_progressLabel;
 	QProgressBar *	_progressBar;
 	QTimer *		_timer;
+	QTime			_time;
+	QString			_progressText;
+	int				_prevTime;
+	int				_prevFPS;
 	
 	CAlgorithm		_algorithm;
 	Ticks			_ticks;
 	ArduinoCOMM *	_arduino;
+	// READ
+	// 0 - STOPPED
+	// 1 - BALL RECEIVED
+	// 2 - FINISHED KICKING
 	
+	bool _obstaclesProcessed;
 	bool _task1;
 	bool _task2;
 	bool _task3;
@@ -72,6 +81,10 @@ private:
 	int _prevTask;
 
 	int _state;
+	// State 0 : Looking for Ball
+	// State 1 : Waiting for Ball Received Signal
+	// State 2 : Looking for Goal
+	// State 3 : Looking for Scored Signal
 	int _pathIndex;
 
 	int _ballsToScore;

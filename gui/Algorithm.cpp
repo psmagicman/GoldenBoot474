@@ -34,22 +34,22 @@ void CAlgorithm::analyzeField(Robot robot, vector<Ball> balls)
 			_balls.clear();
 		}
 	}
-	// Cycle through all the Balls, and construct a Path to each ball
-	for (int iBall = 0; iBall < _balls.size(); iBall++) {
-		bool validBall = true;
-		for (int i = 0; i < _obstacles.size(); i++) {
-			if ( dist(_balls[iBall].x, _obstacles[i].x, _balls[iBall].y, _obstacles[i].y) <= _obstacles[i].rad) {
-				validBall = false;
+	// Remove Balls that are outside of "Dangerous Fields"
+	for (int i = 0; i < _balls.size(); i++) {
+		for (int j = 0; j < _obstacles.size(); j++) {
+			if ( dist(_balls[i].x, _obstacles[j].x, _balls[i].y, _obstacles[j].y) <= _obstacles[j].rad) {
+				_balls.erase(_balls.begin()+i);
+				i--;
 				break;
 			}
 		}
-		if (validBall) {
-			// Set Beginning Coordinates to Robot
-			Coord2D ballPoint;
-			ballPoint.x = _balls[iBall].x;
-			ballPoint.y = _balls[iBall].y;
-			_paths.push_back(getPathToPoint(ballPoint,20));
-		}
+	}
+	// Cycle through all the Valid Balls, and construct a Path to each ball
+	for (int iBall = 0; iBall < _balls.size(); iBall++) {
+		Coord2D ballPoint;
+		ballPoint.x = _balls[iBall].x;
+		ballPoint.y = _balls[iBall].y;
+		_paths.push_back(getPathToPoint(ballPoint,20));
 	}
 }
 
@@ -89,6 +89,7 @@ vector<Coord2D> CAlgorithm::getPathToPoint(Coord2D point, double distance)
 				double distObstaclePath = distFromLine(tempObstaclePts, endPts, beginPts);
 				if (	angleObstaclePath < 90 && // Check if the Angle between the Obstacle and the Path is less than 90 degrees. If it is, that means it can intercept with the path
 						distObstaclePath < _obstacles[iObstacle].rad && // Check if the distance of the Obstacle to the line is less than the radius of the Obstacle
+						dist(beginPts.x, endPts.x, beginPts.y, endPts.y) > dist(beginPts.x, _obstacles[iObstacle].x, beginPts.y, _obstacles[iObstacle].y) &&
 						dist(obstaclePts.x, beginPts.x, obstaclePts.y, beginPts.y) > dist(_obstacles[iObstacle].x, beginPts.x, _obstacles[iObstacle].y, beginPts.y) // Check if the newer obstacle is closer
 					) 
 				{

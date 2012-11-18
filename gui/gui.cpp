@@ -6,8 +6,11 @@ GUI::GUI(QWidget *parent, Qt::WFlags flags)
 	ui.setupUi(this);
 
 	// Start Recording!
+	_time.start();
+	_prevFPS = _time.elapsed();
+	_prevTime = _time.elapsed();
 	init();
-	_timer->start(50);
+	_timer->start();
 }
 
 GUI::~GUI()
@@ -103,6 +106,8 @@ void GUI::init()
 	_goal.x = 0;
 
 	log("MAIN PROGRAM - Initializing ... COMPLETE");
+
+	_obstaclesProcessed = false;
 }
 
 void GUI::display()
@@ -163,7 +168,10 @@ void GUI::display()
 				displayImage(_cam2->getNormal(), ui.rightRaw);
 			}
 			// Process Both Cameras
-			_obstacles = combinePts(_cam1->getObstacles(), _cam2->getObstacles(), 50);
+			if (!_obstaclesProcessed) {
+				_obstacles = combinePts(_cam1->getObstacles(), _cam2->getObstacles(), 50);
+				_obstaclesProcessed = true;
+			}
 			processBalls();
 			processRobot();
 
@@ -184,18 +192,21 @@ void GUI::display()
 
 					// Task 1 : Move Towards a Single Ball and Touch it
 					if (_task1) {
+						log("Doing Task 1 ...");
 						doTask1();
 						_task1 = false;
 					}
 
 					// Task 2 : Move Towards a Single Ball with 2 Obstacles and Touch it
 					if (_task2) {
+						log("Doing Task 2 ...");
 						doTask2();
 						_task2 = false;
 					}
 
 					// Task 3 : Move all Balls to Goal with 4 Obstacles
 					if (_task3) {
+						log("Doing Task 3 ...");
 						doTask3();
 						_task3 = false;
 					}
@@ -215,6 +226,7 @@ void GUI::display()
 			log ("ERROR: No Cameras Detected");
 		}
 	}
+	log("");
 }
 
 void GUI::processRobot()
@@ -287,20 +299,23 @@ vector<Point2f> GUI::combinePts(vector<Point2f> pts1, vector<Point2f> pts2, doub
 		tempPts = pts1;
 	}
 	for (int i = 0; i < combined.size(); i++) {
-		double distance;
 		int index = -1;
 		for (int j = 0; j < tempPts.size(); j++) {
 			double tempDistance = dist(tempPts[j].x, combined[i].x, tempPts[j].y, combined[i].y);
-			if (tempDistance < distLimit && tempDistance < distance) {
+			if (tempDistance < distLimit) {
 				index = j;
+				break;
 			}
 		}
 		if (index >= 0) {
 			combined[i] = Point2f(
 				(combined[i].x + tempPts[index].x)/2 , (combined[i].y + tempPts[index].y)/2
 				);
-		} else {
+			tempPts.erase(tempPts.begin()+index);
 		}
+	}
+	for (int i = 0; i < tempPts.size(); i++) {
+		combined.push_back(tempPts[i]);
 	}
 	return combined;
 }
@@ -344,16 +359,44 @@ void GUI::doTask2()
 void GUI::doTask3()
 {
 	_prevTask = 3;
-	//getBall();
-	score();
+	if (_state == 0) {
+		getBall();
+		_state = 1;
+	} else if (_state == 1) {
+		if (_arduino->read() == "1") _state = 2;
+	} else if (_state == 2) {
+		score();
+		// TODO: CHECK IF BALL IS SCORED
+	}
 }
 
 void GUI::doFinal()
 {
+	_prevTask = 4;
+	_ballsToScore = 3; // 3 Balls to Score
+	_ballsScored = 0;
+	if (_ballsScored < _ballsToScore) {
+		if (_state == 0) {
+			getBall();
+			_state = 1;
+		} else if (_state == 1) {
+			if (_arduino->read() == "1") _state = 2;
+		} else if (_state == 2) {
+			score();
+			_state = 3;
+		} else if (_state == 3) {
+			if (_arduino->read() == "2") {
+				// TODO: CHECK IF BALL IS SCORED
+				_ballsScored++;
+				_state = 0;
+			}
+		}
+	}
 }
 
 void GUI::getBall()
 {
+	stopRobot();
 	_algorithm.analyzeField(_algoRobot,_algoBalls);
 	_ticks.compareTicks(_algorithm.getAllPaths());
 	_path.clear();
@@ -361,8 +404,8 @@ void GUI::getBall()
 	for (int i = 0; i < _path.size(); i++) _path[i].y = FINAL_HEIGHT - _path[i].y;
 	vector<Coord2D> tick = _ticks.getTicks();	
 
-	_targetBall.x = _algorithm.getClosestBall().x;
-	_targetBall.y = FINAL_HEIGHT - _algorithm.getClosestBall().y;
+	_targetBall.x = _algorithm.getBalls()[_ticks.getClosestIndex()].x;
+	_targetBall.y = FINAL_HEIGHT - _algorithm.getBalls()[_ticks.getClosestIndex()].y;
 	
 	QString tickMessage = "Ticks: ";
 	for (int i = 0; i < tick.size(); i++) {
@@ -379,13 +422,15 @@ void GUI::getBall()
 		_arduino->write((string)LTicksStr);
 	}
 	if (tick.size() > 0) {
-		_arduino->write("EOL");
+		_arduino->write("GRAB");
+		_arduino->write("RUN");
 	}
 	ui.labelTicks->setText(tickMessage);
 }
 
 void GUI::score()
 {
+	stopRobot();
 	_path = _algorithm.getPathToGoal(_algoRobot,_goal);
 	vector<vector<Coord2D> > tempPath;
 	tempPath.push_back(_path);
@@ -408,7 +453,8 @@ void GUI::score()
 		_arduino->write((string)LTicksStr);
 	}
 	if (tick.size() > 0) {
-		_arduino->write("EOL");
+		_arduino->write("KICK");
+		_arduino->write("RUN");
 	}
 	ui.labelTicks->setText(tickMessage);
 }
@@ -417,26 +463,12 @@ void GUI::stopRobot()
 {
 	double robotChange = 0;
 	double robotLimit = 10;
+	_arduino->write("STOP");
+	/*
 	do {
 		_arduino->write("STOP");
-		_cam1->capture();
-		_cam1->calculateFinal();
-		_cam2->capture();
-		_cam2->calculateFinal();
-		vector<Point2f> prevRobotPos = combineRobotPts(_cam1->getRobot(), _cam2->getRobot());
-		Sleep(100);
-		_arduino->write("STOP");
-		_cam1->capture();
-		_cam1->calculateFinal();
-		_cam2->capture();
-		_cam2->calculateFinal();
-		vector<Point2f> currRobotPos = combineRobotPts(_cam1->getRobot(), _cam2->getRobot());
-		if (prevRobotPos.size() == 2 && currRobotPos.size() == 2) {
-			robotChange = dist(currRobotPos[1].x, prevRobotPos[1].x, currRobotPos[1].y, prevRobotPos[1].y);
-		} else {
-			robotChange = robotLimit;
-		}
-	} while (robotChange > robotLimit);	
+	} while (_arduino->read() != "0");	
+	*/
 }
 
 void GUI::taskInit()
@@ -483,52 +515,57 @@ void GUI::detectProblems()
 				double angleThreshold = CV_PI/2;
 				if (abs(obstacleAngle - _robotAngle) < angleThreshold || abs(obstacleAngle - _robotAngle) > (2*CV_PI-angleThreshold)) {
 					log("STOP - OBSTACLE IN FRONT");
-					restartTask();
 					hasProblems = true;
+					restartTask();
 				}
 			}
 		}
 		// Detect if Robot is still On-Route
 		// cosTheta = A DOT B / (LEN(A) * LEN(B))
-		if (_path.size() > 1) {
-			if (_pathIndex < _path.size()) {
-				if ( dist(_robot[1].x, _path[_pathIndex].x, _robot[1].y, _path[_pathIndex].y) < 25 ) {
-					_pathIndex++;
+		if (_prevTask > 0) {
+			if (_path.size() > 1) {
+				if (_pathIndex < _path.size() && _pathIndex >= 0) {
+					if ( dist(_robot[1].x, _path[_pathIndex].x, _robot[1].y, _path[_pathIndex].y) < 25 ) {
+						_pathIndex++;
+					}
+					if (_pathIndex < _path.size() && _pathIndex > 0) {
+							Coord2D A;
+							A.x = _robot[1].x;
+							A.y = _robot[1].y;
+							Coord2D B;
+							B.x = _path[_pathIndex].x;
+							B.y = _path[_pathIndex].y;
+							Coord2D C;
+							C.x = _path[_pathIndex-1].x;
+							C.y = _path[_pathIndex-1].y;
+							double distanceFromLine = distFromLine(A,B,C);
+							double distanceFromB = dist(A.x, B.x, A.y, B.y);
+							double distanceFromC = dist(A.x, C.x, A.y, C.y);
+							if (distanceFromLine > 5 && distanceFromB > 5 && distanceFromC > 5) {
+								log ("STOP - NO LONGER ON-ROUTE");
+								hasProblems = true;
+								restartTask();
+							}
+					} else {
+						log("BALL ACQUIRED");
+						_prevTask = 0;
+					}
 				}
-				if (_pathIndex < _path.size()) {
-						Coord2D A;
-						A.x = _robot[1].x;
-						A.y = _robot[1].y;
-						Coord2D B;
-						B.x = _path[_pathIndex].x;
-						B.y = _path[_pathIndex].y;
-						Coord2D C;
-						C.x = _path[_pathIndex-1].x;
-						C.y = _path[_pathIndex-1].y;
-						double distanceFromLine = distFromLine(A,B,C);
-						double distanceFromB = dist(A.x, B.x, A.y, B.y);
-						double distanceFromC = dist(A.x, C.x, A.y, C.y);
-						if (distanceFromLine > 5 && distanceFromB > 5 && distanceFromC > 5) {
-							log ("STOP - NO LONGER ON-ROUTE");
-							restartTask();
-							hasProblems = true;
-						}
+			}
+
+			if (_path.size() > 0) {
+				for (int i = 0; i < _balls.size(); i++) {
+					if ( dist(_targetBall.x, _balls[i].x, _targetBall.y, _balls[i].y) < 10 ) {
+						break;
+					}
+					if (i == _balls.size() -1) {
+						log ("STOP - TARGET BALL LOCATION MOVED");
+						hasProblems = true;
+						restartTask();
+					}
 				}
 			}
 		}
-		/*
-		if (_path.size() > 0) {
-			for (int i = 0; i < _balls.size(); i++) {
-				if ( dist(_targetBall.x, _balls[i].x, _targetBall.y, _balls[i].y) < 10 ) {
-					break;
-				}
-				if (i == _balls.size() -1) {
-					log ("STOP - TARGET BALL LOCATION MOVED");
-					restartTask();
-				}
-			}
-		}
-		*/
 	}
 	else {
 		log ("ERROR: NO ROBOT DETECTED");
@@ -536,7 +573,7 @@ void GUI::detectProblems()
 	}
 
 	if (!hasProblems) {
-		log("No Problems :)");
+		//log("No Problems :)");
 	}
 }
 
@@ -595,35 +632,36 @@ void GUI::displayMain()
 	}
 
 	// Draw Pathing
-	vector<vector<Coord2D> > allPaths = _algorithm.getAllPaths();
-	for (int i = 0; i < allPaths.size(); i++) {
-		for (int j = 0; j < allPaths[i].size()-1; j++) {
-			p.setPen(QPen(QColor(Qt::darkYellow), 5));
-			p.drawLine(allPaths[i][j].x, FINAL_HEIGHT - allPaths[i][j].y, allPaths[i][j+1].x, FINAL_HEIGHT - allPaths[i][j+1].y);
-			p.setPen(QPen(QColor(Qt::black), 5));
-			p.drawArc(allPaths[i][j].x-1, FINAL_HEIGHT - allPaths[i][j].y-1, 2, 2, 0, 16*360);
-			p.drawArc(allPaths[i][j+1].x-1, FINAL_HEIGHT - allPaths[i][j+1].y-1, 2, 2, 0, 16*360);
+	if (_prevTask > 0) {
+		vector<vector<Coord2D> > allPaths = _algorithm.getAllPaths();
+		for (int i = 0; i < allPaths.size(); i++) {
+			for (int j = 0; j < allPaths[i].size()-1; j++) {
+				p.setPen(QPen(QColor(Qt::darkYellow), 5));
+				p.drawLine(allPaths[i][j].x, FINAL_HEIGHT - allPaths[i][j].y, allPaths[i][j+1].x, FINAL_HEIGHT - allPaths[i][j+1].y);
+				p.setPen(QPen(QColor(Qt::black), 5));
+				p.drawArc(allPaths[i][j].x-1, FINAL_HEIGHT - allPaths[i][j].y-1, 2, 2, 0, 16*360);
+				p.drawArc(allPaths[i][j+1].x-1, FINAL_HEIGHT - allPaths[i][j+1].y-1, 2, 2, 0, 16*360);
+			}
 		}
-	}
 
-	QString pathMessage = "Path: ";
-	if (_path.size() > 0) {
-		pathMessage += "(" + QString::number((int)_path[0].x) + "," + QString::number((int)(FINAL_HEIGHT - _path[0].y)) + ")";
+		QString pathMessage = "Path: ";
+		if (_path.size() > 0) {
+			pathMessage += "(" + QString::number((int)_path[0].x) + "," + QString::number((int)(FINAL_HEIGHT - _path[0].y)) + ")";
+		}
+		for (int i = 0; i < _path.size()-1 && _path.size() > 0; i++) {
+			p.setPen(QPen(QColor(Qt::yellow), 5));
+			pathMessage += "(" + QString::number((int)_path[i+1].x) + "," + QString::number((int)(FINAL_HEIGHT - _path[i+1].y)) + ")";
+			p.drawLine(_path[i].x, _path[i].y, _path[i+1].x, _path[i+1].y);
+			p.setPen(QPen(QColor(Qt::black), 5));
+			p.drawArc(_path[i].x-1, _path[i].y-1, 2, 2, 0, 16*360);
+			p.drawArc(_path[i+1].x-1, _path[i+1].y-1, 2, 2, 0, 16*360);
+		}
+		if (_pathIndex < _path.size() && _pathIndex > 0) {
+			p.setPen(QPen(QColor(Qt::white),2));
+			p.drawLine(_path[_pathIndex-1].x, _path[_pathIndex-1].y, _path[_pathIndex].x, _path[_pathIndex].y);
+		}
+		ui.labelPaths->setText(pathMessage);
 	}
-	for (int i = 0; i < _path.size()-1 && _path.size() > 0; i++) {
-		p.setPen(QPen(QColor(Qt::yellow), 5));
-		pathMessage += "(" + QString::number((int)_path[i+1].x) + "," + QString::number((int)(FINAL_HEIGHT - _path[i+1].y)) + ")";
-		p.drawLine(_path[i].x, _path[i].y, _path[i+1].x, _path[i+1].y);
-		p.setPen(QPen(QColor(Qt::black), 5));
-		p.drawArc(_path[i].x-1, _path[i].y-1, 2, 2, 0, 16*360);
-		p.drawArc(_path[i+1].x-1, _path[i+1].y-1, 2, 2, 0, 16*360);
-	}
-	if (_pathIndex < _path.size() && _pathIndex > 0) {
-		p.setPen(QPen(QColor(Qt::white),2));
-		p.drawLine(_path[_pathIndex-1].x, _path[_pathIndex-1].y, _path[_pathIndex].x, _path[_pathIndex].y);
-	}
-	ui.labelPaths->setText(pathMessage);
-
 	// Draw Balls
 	for (int i = 0; i < _balls.size(); i++) {
 		p.setPen(QPen(QColor(Qt::green),5));
@@ -660,6 +698,7 @@ void GUI::on_leftObstacles_triggered()
 {
 	log("LEFT CAMERA - Getting Obstacles ...");
 	_cam1->calculateObstacles();
+	_obstaclesProcessed = false;
 	log("LEFT CAMERA - Getting Obstacles ... COMPLETE");
 }
 
@@ -687,6 +726,7 @@ void GUI::on_rightObstacles_triggered()
 {
 	log("RIGHT CAMERA - Getting Obstacles ...");
 	_cam2->calculateObstacles();
+	_obstaclesProcessed = false;
 	log("RIGHT CAMERA - Getting Obstacles ... COMPLETE");
 }
 
@@ -967,5 +1007,15 @@ void GUI::writeRightThreshold()
 
 void GUI::log(QString text)
 {
-	_progressLabel->setText(text);
+	if (text == "") {
+		_progressLabel->setText(_progressText + " [Received " + QString::number((_time.elapsed()-_prevTime)/1000.0)+"s Ago][Time Elapsed: "+QString::number(_time.elapsed()/1000)+"s]["+QString::number(1000/(_time.elapsed()-_prevFPS))+"FPS]");
+	} else {
+		_progressText = text;
+		_prevTime = _time.elapsed();
+		if ((_time.elapsed()-_prevFPS) < 1) {
+			_prevFPS = _time.elapsed()-1;
+		}
+		_progressLabel->setText(_progressText + " [Received " + QString::number((_time.elapsed()-_prevTime)/1000.0)+"s Ago][Time Elapsed: "+QString::number(_time.elapsed()/1000)+"s]["+QString::number(1000/(_time.elapsed()-_prevFPS))+"FPS]");
+	}
+	_prevFPS = _time.elapsed();
 }
