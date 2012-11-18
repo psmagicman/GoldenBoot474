@@ -60,7 +60,7 @@ void CatchtheBall()
           if(enc1_Count >= 47 && enc2_Count >= 47){
             Stop();
             Reset();
-            Serial.write(2);
+            Serial.print(3);
             logln("Ball is not here");
             break;
           }
@@ -130,7 +130,7 @@ void CatchtheBall()
         
         if(SenseDistance <= 4){
                 Stop();
-                Serial.write(1);
+                Serial.print(2);
                 logln("Ball in the caster .");
                 logln(SenseDistance);
                 caught=1;

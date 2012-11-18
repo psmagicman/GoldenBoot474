@@ -21,7 +21,7 @@ boolean CheckforE(){
                  //poslistFlag = 1;
                  //path.clear();
                  //_path.clear();
-                 Serial.write('0');
+                 Serial.print(1);
                  return TRUE;
            }
           else return FALSE;

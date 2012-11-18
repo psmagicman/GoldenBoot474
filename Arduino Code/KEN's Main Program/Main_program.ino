@@ -272,7 +272,7 @@ void KicktheBall()
             } 
       }
       logln("Done with the ball kicking") ;   
-      Serial.write('3');   
+      Serial.print(4);   
       enc1_Count =0;
       enc2_Count =0;
       digitalWrite(actuator_enable, LOW); 
