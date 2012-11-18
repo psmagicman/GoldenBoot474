@@ -463,7 +463,7 @@ void GUI::stopRobot()
 {
 	double robotChange = 0;
 	double robotLimit = 10;
-	_arduino->write("STOP");
+	//_arduino->write("STOP");
 	/*
 	do {
 		_arduino->write("STOP");
