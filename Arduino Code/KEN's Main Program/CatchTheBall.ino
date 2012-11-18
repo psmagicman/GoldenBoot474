@@ -141,7 +141,7 @@ void CatchtheBall()
         Reset();
 }
 
-/*
+
 void CatchBallDistance()
 { int distance_1,distance_2,distance_3;
   int caught =0;
@@ -178,7 +178,7 @@ void CatchBallDistance()
       {
         log1("Shotest distance is :  ");
         log1(distance_1);
-        logln();
+        logln(' ');
         //distance_short = distance_1; 
         //Turn right 45 degree
        enc1_Count = 0; 
@@ -194,7 +194,7 @@ void CatchBallDistance()
       {
         log1("Shotest distance is :  ");
         log1(distance_2);
-        logln();
+        logln(' ');
         //distance_short = distance_2; 
          //Turn right 90 degree
          enc1_Count = 0; 
@@ -209,7 +209,7 @@ void CatchBallDistance()
     else
      {log1("Shotest distance is :  ");
       log1(distance_3);
-      logln();
+      logln(' ');
      }
      // distance_short = distance_3; 
        //Stay in the same position  
@@ -220,10 +220,8 @@ void CatchBallDistance()
                 Stop();
                 logln("Ball in the caster .");
                 logln(SenseDistance);
-                Serial.write('1');
                 caught=1;
-                
          }
   }
 }
-*/
+

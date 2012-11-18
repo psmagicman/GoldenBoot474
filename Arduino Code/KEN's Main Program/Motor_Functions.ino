@@ -288,7 +288,8 @@ void MotorControl(){
                
                 logln(poslist);
                 logln('\t');
-                logln(_path.size());
+                int temp = _path.size();
+                logln(temp);
                 if(abspos_1 != abspos_2){
                    poslist = _path.size()+1;
                 }
@@ -304,7 +305,7 @@ void MotorControl(){
                        // path.clear();
                        // _path.clear();
                         //poslistFlag =1;
-                        Serial.write('1');
+                        //Serial.write('1');
 		} 
                 
 		if(poslistFlag == 0){
@@ -345,3 +346,6 @@ void MotorControl(){
 			log1('\n');
 		}
 	}
+
+
+

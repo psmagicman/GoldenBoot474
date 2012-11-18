@@ -27,22 +27,14 @@ void Sensor() {
   sensorValAvg = (bufferA+bufferB+bufferC)/3;
   
   //Write to serial output
-//  Serial.print("sensor value = ");
-//  Serial.println(sensorValAvg); 
+//  log1("sensor value = ");
+//  logln(sensorValAvg); 
   
   // Convert ADC data into distance value
    SenseDistance = (2914/(sensorValAvg+5))-1;
-  //Serial.println(SenseDistance); 
+  //logln(SenseDistance); 
    
-  // turn the ledPin on
- // digitalWrite(ledPin, HIGH);  
-  
-  // stop the program for <sensorValue> milliseconds:
-//  delay(sensorValue);          
-  
-  // turn the ledPin off:        
-//  digitalWrite(ledPin, LOW);   
-  
+
   // stop the program for for <sensorValue> milliseconds:
   //delay(sensorValue);                  
 }

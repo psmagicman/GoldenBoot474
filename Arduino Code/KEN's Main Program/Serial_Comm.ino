@@ -177,19 +177,19 @@ void Readposition()
 			log1(enc2_Count);
 		        log1('\n');
       			log1("pos_1 = ");
-		        log1(pos_1, DEC);
-			logln();
+		        log1(pos_1);
+			logln(' ');
 
 			log1("pos_2 = ");
-			log1(pos_2, DEC);
+			log1(pos_2);
 			//  log1(path[0]);
 			//  log1(path[1]);
-			logln();
+			logln(' ');
 			//state = 1;
 			input1done = 0;
 			input2done = 1;
-			log1(state,DEC );
-			logln();
+			log1(state);
+			logln(' ');
                         break;
                         }
                         else{

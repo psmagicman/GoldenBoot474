@@ -1,6 +1,6 @@
 /*This code is the robot control code of "Team 8 - Golden boot"
 */
- 
+
 //HEADER FILES
 #include <stdio.h>
 #include <stdlib.h>
@@ -13,6 +13,7 @@
 #include <pnew.cpp>
 
 
+#define DEBUG 0
 #define LOW 0
 #define HIGH 1
 #define rate 100
@@ -33,7 +34,6 @@
 #define GRABFLAG 11111
 #define KICKFLAG 22222
 
-#define DEBUG 1
 
 using namespace std;
 
@@ -50,12 +50,6 @@ void Stop();
 void Movement();
 void Position();
 void Check();
-void log1(String message);
-void log1(int value);
-void log1(char character);
-void logln(String message);
-void logln(int value);
-void logln(char character);
 
 //SENSOR
 int sensorPin = A6;   
@@ -124,8 +118,8 @@ int motor = 0;
 void setup() {
 
 	Serial.begin(57600);
-	logln("Welcome to motor control");
-	
+	log1("Welcome to motor control");
+	log1('\n');
 
 	//Initialize all the pins
 	pinMode(motor1_pin_1, OUTPUT);
@@ -277,13 +271,18 @@ void KicktheBall()
              delay(300); 
             } 
       }
-      logln("Done with the ball kicking") ; 
-      Serial.write('3');     
+      logln("Done with the ball kicking") ;   
+      Serial.write('3');   
       enc1_Count =0;
       enc2_Count =0;
       digitalWrite(actuator_enable, LOW); 
       //Reset();
 }
+
+
+
+
+
 
 void log1(String message)
 {
@@ -306,17 +305,17 @@ void log1(char character)
 void logln(String message)
 {
 	if(DEBUG)
-		Serial.print(message);
+		Serial.println(message);
 }
 
 void logln(int value)
 {
   if(DEBUG)
-    Serial.print(value);
+    Serial.println(value);
 }
 
 void logln(char character)
 {
   if(DEBUG)
-    Serial.print(character);
+    Serial.println(character);
 }
