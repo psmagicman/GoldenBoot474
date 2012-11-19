@@ -8,13 +8,13 @@
 
 <arenaVmin>0</arenaVmin>
 
-<arenaVmax>80</arenaVmax>
+<arenaVmax>128</arenaVmax>
 
 <arenaAmin>200</arenaAmin>
 
 <arenaAmax>0</arenaAmax>
 
-<ballHmin>32</ballHmin>
+<ballHmin>37</ballHmin>
 
 <ballHmax>50</ballHmax>
 
@@ -26,7 +26,7 @@
 
 <ballVmax>255</ballVmax>
 
-<ballAmin>100</ballAmin>
+<ballAmin>200</ballAmin>
 
 <ballAmax>1250</ballAmax>
 

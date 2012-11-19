@@ -17,6 +17,16 @@
 #define BOT_WIDTH 0.172244
 #define ONE_TICK 0.0113
 
+#define TASKS_READY		0
+#define STP1_REQUEST	1
+#define STP1_RESPOND	2
+#define BALL_REQUEST	3
+#define	BALL_RESPOND	4
+#define STP2_REQUEST	5
+#define STP2_RESPOND	6
+#define GOAL_REQUEST	7
+#define GOAL_RESPOND	8
+
 extern const int calibrationSize;
 
 extern const double _ballRadius;

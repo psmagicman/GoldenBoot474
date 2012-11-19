@@ -3,6 +3,7 @@
 
 #include <string>
 #include <QtGui>
+#include <qobject.h>
 
 using namespace std;
 

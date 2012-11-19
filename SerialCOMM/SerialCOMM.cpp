@@ -14,18 +14,24 @@ void main(int argc, char * argv[])
 		cin >> input;
 		if (input == "EXIT") {
 			return;
+		} else if (input == "GRAB") {
+			char * GRAB = {"G"};
+			if(serial.SendData(GRAB, strlen(GRAB)))
+				cout << GRAB << " ";
 		} else if (input == "STOP") {
 			char * STOP = {"E"};
-			serial.SendData(STOP, strlen(STOP));
-		} else if (input == "EOL") {
+			if(serial.SendData(STOP, strlen(STOP)))
+				cout << STOP << " ";
+		} else if (input == "RUN") {
 			char * EOL = {"R"};
-			serial.SendData(EOL, strlen(EOL));
+			if(serial.SendData(EOL, strlen(EOL)))
+				cout << EOL << " ";
 		} else if (input == "KICK") {
 			char * KICK = {"K"};
-			serial.SendData(KICK, strlen(KICK));
+			if(serial.SendData(KICK, strlen(KICK)))
+				cout << KICK << " ";
 		} else if (input == "START") {
 			char * BEGIN = {"I"};
-			serial.SendData(BEGIN, strlen(BEGIN));
 
 			int motorDigit;
 			char * motorChar = new char[6];
@@ -34,41 +40,52 @@ void main(int argc, char * argv[])
 			// Right Motor
 			cin >> input;
 			motorDigit = atoi(input.c_str());
-				
-			if (motorDigit > 0) {
-				for (int i = 0; i < 5; i++) {
-					motorChar[4-i] = (char)(((int)'0')+motorDigit%10);
-					motorDigit /= 10;
+			if (motorDigit != 0) {
+				if(serial.SendData(BEGIN, strlen(BEGIN)))
+					cout << BEGIN << " ";
+
+				if (motorDigit > 0) {
+					for (int i = 0; i < 5; i++) {
+						motorChar[4-i] = (char)(((int)'0')+motorDigit%10);
+						motorDigit /= 10;
+					}
+				} else {
+					motorDigit = abs(motorDigit);
+					motorChar[0] = '-';
+					for (int i = 0; i < 4; i++) {
+						motorChar[4-i] = (char)(((int)'0')+motorDigit%10);
+						motorDigit /= 10;
+					}
 				}
-			} else {
-				motorDigit = abs(motorDigit);
-				motorChar[0] = '-';
-				for (int i = 0; i < 4; i++) {
-					motorChar[4-i] = (char)(((int)'0')+motorDigit%10);
-					motorDigit /= 10;
-				}
+				if(serial.SendData(motorChar, strlen(motorChar)))
+					cout << motorChar << " ";
 			}
-			serial.SendData(motorChar, strlen(motorChar));
 
 			// Right Motor
 			cin >> input;
 			motorDigit = atoi(input.c_str());
-				
-			if (motorDigit > 0) {
-				for (int i = 0; i < 5; i++) {
-					motorChar[4-i] = (char)(((int)'0')+motorDigit%10);
-					motorDigit /= 10;
+			if (motorDigit != 0) {
+				if (motorDigit > 0) {
+					for (int i = 0; i < 5; i++) {
+						motorChar[4-i] = (char)(((int)'0')+motorDigit%10);
+						motorDigit /= 10;
+					}
+				} else {
+					motorDigit = abs(motorDigit);
+					motorChar[0] = '-';
+					for (int i = 0; i < 4; i++) {
+						motorChar[4-i] = (char)(((int)'0')+motorDigit%10);
+						motorDigit /= 10;
+					}
 				}
-			} else {
-				motorDigit = abs(motorDigit);
-				motorChar[0] = '-';
-				for (int i = 0; i < 4; i++) {
-					motorChar[4-i] = (char)(((int)'0')+motorDigit%10);
-					motorDigit /= 10;
-				}
+				if(serial.SendData(motorChar, strlen(motorChar)))
+					cout << motorChar << " ";
 			}
-			serial.SendData(motorChar, strlen(motorChar));
 		}
-		Sleep(100);
+		char * readBuffer = new char[1];
+		readBuffer[0] = '0';
+		if (serial.ReadData(readBuffer,1)) {
+			cout << ":" << atoi(&readBuffer[0]) << endl;
+		}
 	}
 }

@@ -43,10 +43,19 @@ private slots:
 	void writeLeftThreshold();
 	void writeRightThreshold();
 
-	void task1() {_task1 = true; _ballsToScore = 1; _ballsScored = 0;};
-	void task2() {_task2 = true; _ballsToScore = 1; _ballsScored = 0;};
-	void task3() {_task3 = true; _ballsToScore = 1; _ballsScored = 0;};
-	void final() {_final = true; _ballsToScore = 3; _ballsScored = 0;};
+	void clear() {_task1 = false; _task2 = false; _task3 = false; _final = false; _state = 0; stopRobot(); log("CLEAR");};
+	void task1() {_task1 = true; _ballsToScore = 1; _ballsScored = 0; _state = 0; log("Doing Task1 ...");};
+	void task2() {_task2 = true; _ballsToScore = 1; _ballsScored = 0; _state = 0; log("Doing Task2 ...");};
+	void task3() {_task3 = true; _ballsToScore = 1; _ballsScored = 0; _state = 0; log("Doing Task3 ...");};
+	void final() {_final = true; _ballsToScore = 3; _ballsScored = 0; _state = 0; log("Doing Final ...");};
+
+	void readProcess();
+
+	void testGrab(){writeProcess("GRAB");};
+	void testStop(){stopRobot();};
+	void testSend();
+	void testKick(){writeProcess("KICK");};
+	void testRun(){writeProcess("RUN");};
 
 private:
 	Ui::GUIClass ui;
@@ -57,6 +66,7 @@ private:
 	ThresholdFile * _thresholdLeft;
 	ThresholdFile * _thresholdRight;
 
+	QProcess *		_arduino;
 	QLabel *		_progressLabel;
 	QProgressBar *	_progressBar;
 	QTimer *		_timer;
@@ -64,27 +74,28 @@ private:
 	QString			_progressText;
 	int				_prevTime;
 	int				_prevFPS;
+	int				_prevStop;
+	int				_prevRun;
+	int				_prevTaskTime;
 	
 	CAlgorithm		_algorithm;
 	Ticks			_ticks;
-	ArduinoCOMM *	_arduino;
-	// READ
-	// 0 - STOPPED
-	// 1 - BALL RECEIVED
-	// 2 - FINISHED KICKING
 	
 	bool _obstaclesProcessed;
 	bool _task1;
 	bool _task2;
 	bool _task3;
 	bool _final;
-	int _prevTask;
+	bool _run;
 
 	int _state;
-	// State 0 : Looking for Ball
-	// State 1 : Waiting for Ball Received Signal
-	// State 2 : Looking for Goal
-	// State 3 : Looking for Scored Signal
+	// State 0 : Stoppin Robot
+	// State 1 : Waiting for Stop Confirmation
+	// State 2 : Looking for Ball
+	// State 3 : Looking for Ball Acquired Confirmation
+	// State 4 : Looking for Goal
+	// State 5 : Looking for Goal Confirmation
+
 	int _pathIndex;
 
 	int _ballsToScore;
@@ -130,6 +141,7 @@ private:
 	void readLeftThreshold();
 	void readRightThreshold();
 	
+	void writeProcess(string command);
 	void log(QString text);
 };
 
