@@ -10,6 +10,7 @@ boolean CheckforE(){
            if( Serial.peek() == 'E'){
                  emergency = 1;
                  logln("Emergency");
+                 Serial.print(1);
                  while(Serial.available()){
                    Serial.read();                   
                  }
@@ -21,7 +22,7 @@ boolean CheckforE(){
                  //poslistFlag = 1;
                  //path.clear();
                  //_path.clear();
-                 Serial.print(1);
+                 
                  return TRUE;
            }
           else return FALSE;

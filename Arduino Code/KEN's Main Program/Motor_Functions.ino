@@ -76,27 +76,31 @@ void Check()
             motor =0;
             if (pos_1 != pos_2)
               {
-                
                 if( (enc1_Count >= slowdown1) && (enc2_Count >= slowdown2)){  //Slow down before stopping
                   pwm_1 = 70;
                   pwm_2 = 70;
-                  
                 }
                 else{
-                  pwm_1 =100;
-                  pwm_2 =100;
+                  if(SenseDistance <= 5){
+                    pwm_1 = 255;
+                    pwm_2 = 255;
+                  }
+                  else{
+                    pwm_1 =100;
+                    pwm_2 =100;
+                  }
                 }
               }
              else 
               {
-              /*  if( (enc1_Count*100 >= abspos_1*80) && (enc2_Count*100 >= abspos_2*80)){  //Slow down before Stopping
-                 pwm_1 = 80;
-                  pwm_2 = 80;
-                }
-                else{*/
+                //if( (enc1_Count >= slowdown1) && (enc2_Count >= slowdown2)){  //Slow down before Stopping
+                // pwm_1 = 80;
+                //  pwm_2 = 80;
+                //}
+                //else{
                   pwm_1 = 255;
 		  pwm_2 = 255; //Adjust to taste
-             //   }
+                //}
               }
 		error1 = 0;
                 error2 = 0;
