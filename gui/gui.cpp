@@ -34,18 +34,18 @@ void GUI::init()
 	_arduino = new QProcess(this);
 	
 	// Connect Buttons
-	connect(ui.leftCalibrate, SIGNAL(clicked()), this, SLOT(on_leftCalibrate_triggered()));
-	connect(ui.rightCalibrate, SIGNAL(clicked()), this, SLOT(on_rightCalibrate_triggered()));
+
+	// Webcam Tab - NORMAL
 	connect(ui.leftObstacles, SIGNAL(clicked()), this, SLOT(on_leftObstacles_triggered()));
 	connect(ui.rightObstacles, SIGNAL(clicked()), this, SLOT(on_rightObstacles_triggered()));
 	connect(ui.leftReset, SIGNAL(clicked()), this, SLOT(on_leftReset_triggered()));
 	connect(ui.rightReset, SIGNAL(clicked()), this, SLOT(on_rightReset_triggered()));
-	
+
+	// Webcam Tab - THRESHOLD
 	connect(ui.leftSave, SIGNAL(clicked()), this, SLOT(on_leftsave_triggered()));
 	connect(ui.rightSave, SIGNAL(clicked()), this, SLOT(on_rightsave_triggered()));
 	connect(ui.leftLoad, SIGNAL(clicked()), this, SLOT(on_leftload_triggered()));
 	connect(ui.rightLoad, SIGNAL(clicked()), this, SLOT(on_rightload_triggered()));
-
 	connect(ui.spinLeftHueMin, SIGNAL(valueChanged(int)), this, SLOT(writeLeftThreshold()));
 	connect(ui.spinLeftHueMax, SIGNAL(valueChanged(int)), this, SLOT(writeLeftThreshold()));
 	connect(ui.spinLeftSatMin, SIGNAL(valueChanged(int)), this, SLOT(writeLeftThreshold()));
@@ -53,8 +53,7 @@ void GUI::init()
 	connect(ui.spinLeftValMin, SIGNAL(valueChanged(int)), this, SLOT(writeLeftThreshold()));
 	connect(ui.spinLeftValMax, SIGNAL(valueChanged(int)), this, SLOT(writeLeftThreshold()));
 	connect(ui.spinLeftAreaMin, SIGNAL(valueChanged(int)), this, SLOT(writeLeftThreshold()));
-	connect(ui.spinLeftAreaMax, SIGNAL(valueChanged(int)), this, SLOT(writeLeftThreshold()));
-	
+	connect(ui.spinLeftAreaMax, SIGNAL(valueChanged(int)), this, SLOT(writeLeftThreshold()));	
 	connect(ui.spinRightHueMin, SIGNAL(valueChanged(int)), this, SLOT(writeRightThreshold()));
 	connect(ui.spinRightHueMax, SIGNAL(valueChanged(int)), this, SLOT(writeRightThreshold()));
 	connect(ui.spinRightSatMin, SIGNAL(valueChanged(int)), this, SLOT(writeRightThreshold()));
@@ -64,19 +63,21 @@ void GUI::init()
 	connect(ui.spinRightAreaMin, SIGNAL(valueChanged(int)), this, SLOT(writeRightThreshold()));
 	connect(ui.spinRightAreaMax, SIGNAL(valueChanged(int)), this, SLOT(writeRightThreshold()));
 
+	// Main Tab
 	connect(ui.buttonClear, SIGNAL(clicked()), this, SLOT(clear()));
 	connect(ui.buttonTask1, SIGNAL(clicked()), this, SLOT(task1()));
 	connect(ui.buttonTask2, SIGNAL(clicked()), this, SLOT(task2()));
 	connect(ui.buttonTask3, SIGNAL(clicked()), this, SLOT(task3()));
 	connect(ui.buttonFinal, SIGNAL(clicked()), this, SLOT(final()));
 
-	connect(_arduino, SIGNAL(readyReadStandardOutput()), this, SLOT(readProcess()));
-
+	// Test Tab
 	connect(ui.pushTestGrab, SIGNAL(clicked()), this, SLOT(testGrab()));
 	connect(ui.pushTestSend, SIGNAL(clicked()), this, SLOT(testSend()));
 	connect(ui.pushTestStop, SIGNAL(clicked()), this, SLOT(testStop()));
 	connect(ui.pushTestKick, SIGNAL(clicked()), this, SLOT(testKick()));
 	connect(ui.pushTestRun, SIGNAL(clicked()), this, SLOT(testRun()));
+	
+	connect(_arduino, SIGNAL(readyReadStandardOutput()), this, SLOT(readProcess()));
 
 	// Initialize Timer
 	_timer = new QTimer(this);
@@ -85,17 +86,37 @@ void GUI::init()
 	// Initialize Webcams
 	_cam1 = new Webcam(0);
 	_cam2 = new Webcam(1);
-	_thresholdLeft = new ThresholdFile(_cam1, "LabLeft.xml");
-	_thresholdRight = new ThresholdFile(_cam2, "LabRight.xml");
+	_thresholdLeft = new ThresholdFile(_cam1, "ThresholdLeft.xml");
+	_thresholdRight = new ThresholdFile(_cam2, "ThresholdRight.xml");
 	
 	// Initialize Communication with Arduino
 	_arduino->start("C:/Users/Wilbur/Desktop/GoldenBoot474/Debug/SerialCOMM.exe");
 
+	// Initialize Images
+	_image = cvCreateImage(cvSize(WIDTH, HEIGHT), IPL_DEPTH_8U, 3);
+	_topImage = cvCreateImage(cvSize(FINAL_WIDTH,FINAL_HEIGHT), IPL_DEPTH_8U, 3);
+
+	
+	// Initialize Arenas
+	_arenaLeft = new XMLReader("ArenaLeft.xml");
+	initLeftArena();
+	_arenaRight = new XMLReader("ArenaRight.xml");
+	initRightArena();
+
+	initVariables();
+	log("MAIN PROGRAM - Initializing ... COMPLETE");
+
+}
+
+void GUI::initVariables()
+{
 	_run = false;
 	_task1 = false;
 	_task2 = false;
 	_task3 = false;
 	_final = false;
+	_obstaclesProcessed = false;
+	_state = TASKS_READY;
 
 	_pathIndex = 0;
 
@@ -106,18 +127,66 @@ void GUI::init()
 	for (int i = 0; i < _robotAngles.size(); i++) {
 		_robotAngles[i] = -1;
 	}
-	_state = TASKS_READY;
-
-	// Initialize Images
-	_image = cvCreateImage(cvSize(WIDTH, HEIGHT), IPL_DEPTH_8U, 3);
-	_topImage = cvCreateImage(cvSize(FINAL_WIDTH,FINAL_HEIGHT), IPL_DEPTH_8U, 3);
-
 	_goal.x = 0;
-
 	_progressText = "";
-	log("MAIN PROGRAM - Initializing ... COMPLETE");
+}
 
-	_obstaclesProcessed = false;
+void GUI::initLeftArena()
+{
+	ui.leftArenaBLx->setMaximum(WIDTH);
+	ui.leftArenaBLy->setMaximum(HEIGHT);
+	ui.leftArenaBRx->setMaximum(WIDTH);
+	ui.leftArenaBRy->setMaximum(HEIGHT);
+	ui.leftArenaTLx->setMaximum(WIDTH);
+	ui.leftArenaTLy->setMaximum(HEIGHT);
+	ui.leftArenaTRx->setMaximum(WIDTH);
+	ui.leftArenaTRy->setMaximum(HEIGHT);
+	ui.leftArenaTLx->setValue(atoi(_arenaLeft->getValue("topLeft_X").c_str()));
+	ui.leftArenaTLy->setValue(atoi(_arenaLeft->getValue("topLeft_Y").c_str()));
+	ui.leftArenaTRx->setValue(atoi(_arenaLeft->getValue("topRight_X").c_str()));
+	ui.leftArenaTRy->setValue(atoi(_arenaLeft->getValue("topRight_Y").c_str()));
+	ui.leftArenaBLx->setValue(atoi(_arenaLeft->getValue("botLeft_X").c_str()));
+	ui.leftArenaBLy->setValue(atoi(_arenaLeft->getValue("botLeft_Y").c_str()));
+	ui.leftArenaBRx->setValue(atoi(_arenaLeft->getValue("botRight_X").c_str()));
+	ui.leftArenaBRy->setValue(atoi(_arenaLeft->getValue("botRight_Y").c_str()));
+	connect(ui.leftArenaBLx, SIGNAL(valueChanged(int)), this, SLOT(on_leftCalibrate_triggered()));
+	connect(ui.leftArenaBLy, SIGNAL(valueChanged(int)), this, SLOT(on_leftCalibrate_triggered()));
+	connect(ui.leftArenaBRx, SIGNAL(valueChanged(int)), this, SLOT(on_leftCalibrate_triggered()));
+	connect(ui.leftArenaBRy, SIGNAL(valueChanged(int)), this, SLOT(on_leftCalibrate_triggered()));
+	connect(ui.leftArenaTLx, SIGNAL(valueChanged(int)), this, SLOT(on_leftCalibrate_triggered()));
+	connect(ui.leftArenaTLy, SIGNAL(valueChanged(int)), this, SLOT(on_leftCalibrate_triggered()));
+	connect(ui.leftArenaTRx, SIGNAL(valueChanged(int)), this, SLOT(on_leftCalibrate_triggered()));
+	connect(ui.leftArenaTRy, SIGNAL(valueChanged(int)), this, SLOT(on_leftCalibrate_triggered()));
+	on_leftCalibrate_triggered();
+}
+
+void GUI::initRightArena()
+{
+	ui.rightArenaBLx->setMaximum(WIDTH);
+	ui.rightArenaBLy->setMaximum(HEIGHT);
+	ui.rightArenaBRx->setMaximum(WIDTH);
+	ui.rightArenaBRy->setMaximum(HEIGHT);
+	ui.rightArenaTLx->setMaximum(WIDTH);
+	ui.rightArenaTLy->setMaximum(HEIGHT);
+	ui.rightArenaTRx->setMaximum(WIDTH);
+	ui.rightArenaTRy->setMaximum(HEIGHT);
+	ui.rightArenaTLx->setValue(atoi(_arenaRight->getValue("topLeft_X").c_str()));
+	ui.rightArenaTLy->setValue(atoi(_arenaRight->getValue("topLeft_Y").c_str()));
+	ui.rightArenaTRx->setValue(atoi(_arenaRight->getValue("topRight_X").c_str()));
+	ui.rightArenaTRy->setValue(atoi(_arenaRight->getValue("topRight_Y").c_str()));
+	ui.rightArenaBLx->setValue(atoi(_arenaRight->getValue("botLeft_X").c_str()));
+	ui.rightArenaBLy->setValue(atoi(_arenaRight->getValue("botLeft_Y").c_str()));
+	ui.rightArenaBRx->setValue(atoi(_arenaRight->getValue("botRight_X").c_str()));
+	ui.rightArenaBRy->setValue(atoi(_arenaRight->getValue("botRight_Y").c_str()));
+	connect(ui.rightArenaBLx, SIGNAL(valueChanged(int)), this, SLOT(on_rightCalibrate_triggered()));
+	connect(ui.rightArenaBLy, SIGNAL(valueChanged(int)), this, SLOT(on_rightCalibrate_triggered()));
+	connect(ui.rightArenaBRx, SIGNAL(valueChanged(int)), this, SLOT(on_rightCalibrate_triggered()));
+	connect(ui.rightArenaBRy, SIGNAL(valueChanged(int)), this, SLOT(on_rightCalibrate_triggered()));
+	connect(ui.rightArenaTLx, SIGNAL(valueChanged(int)), this, SLOT(on_rightCalibrate_triggered()));
+	connect(ui.rightArenaTLy, SIGNAL(valueChanged(int)), this, SLOT(on_rightCalibrate_triggered()));
+	connect(ui.rightArenaTRx, SIGNAL(valueChanged(int)), this, SLOT(on_rightCalibrate_triggered()));
+	connect(ui.rightArenaTRy, SIGNAL(valueChanged(int)), this, SLOT(on_rightCalibrate_triggered()));
+	on_rightCalibrate_triggered();
 }
 
 void GUI::display()
@@ -715,15 +784,14 @@ void GUI::displayMain()
 
 void GUI::on_leftCalibrate_triggered()
 {
-	log("LEFT CAMERA - Calibrating ...");
 	_progressBar->setValue(0);
-	for (int i = 0; i < calibrationSize; i++) {
-		_cam1->calibrate(i);
-		display();
-		_progressBar->setValue((i+1)*100/calibrationSize);
-	}
-	_cam1->finishCalibrate();
-	log("LEFT CAMERA - Calibrating ... COMPLETE");
+	_cam1->calibrateArena(
+		cvPoint(ui.leftArenaTLx->value(), ui.leftArenaTLy->value()),
+		cvPoint(ui.leftArenaTRx->value(), ui.leftArenaTRy->value()),
+		cvPoint(ui.leftArenaBLx->value(), ui.leftArenaBLy->value()),
+		cvPoint(ui.leftArenaBRx->value(), ui.leftArenaBRy->value())
+		);
+	on_leftArenaSave_triggered();
 }
 
 void GUI::on_leftObstacles_triggered()
@@ -736,22 +804,21 @@ void GUI::on_leftObstacles_triggered()
 
 void GUI::on_leftReset_triggered()
 {
-	log("LEFT CAMERA - Resetting ...");
+	log("LEFT CAMERA - Resetting Obstacles ...");
 	_cam1->resetCalibrate();
-	log("LEFT CAMERA - Resetting ... COMPLETE");
+	log("LEFT CAMERA - Resetting Obstacles ... COMPLETE");
 }
 
 void GUI::on_rightCalibrate_triggered()
 {
-	log("RIGHT CAMERA - Calibrating ...");
 	_progressBar->setValue(0);
-	for (int i = 0; i < calibrationSize; i++) {
-		_cam2->calibrate(i);
-		display();
-		_progressBar->setValue((i+1)*100/calibrationSize);
-	}
-	_cam2->finishCalibrate();
-	log("RIGHT CAMERA - Calibrating ... COMPLETE");
+	_cam2->calibrateArena(
+		cvPoint(ui.rightArenaTLx->value(), ui.rightArenaTLy->value()),
+		cvPoint(ui.rightArenaTRx->value(), ui.rightArenaTRy->value()),
+		cvPoint(ui.rightArenaBLx->value(), ui.rightArenaBLy->value()),
+		cvPoint(ui.rightArenaBRx->value(), ui.rightArenaBRy->value())
+		);
+	on_rightArenaSave_triggered();
 }
 
 void GUI::on_rightObstacles_triggered()
@@ -764,9 +831,9 @@ void GUI::on_rightObstacles_triggered()
 
 void GUI::on_rightReset_triggered()
 {
-	log("RIGHT CAMERA - Resetting ...");
+	log("RIGHT CAMERA - Resetting Obstacles ...");
 	_cam2->resetCalibrate();
-	log("RIGHT CAMERA - Resetting ... COMPLETE");
+	log("RIGHT CAMERA - Resetting Obstacles ... COMPLETE");
 }
 
 void GUI::readLeftThreshold()
@@ -1035,6 +1102,32 @@ void GUI::writeRightThreshold()
 		_cam2->_robot2Amin = ui.spinRightAreaMin->value();
 		_cam2->_robot2Amax = ui.spinRightAreaMax->value();
 	}
+}
+
+void GUI::on_leftArenaSave_triggered()
+{
+	_arenaLeft->setValue("topLeft_X", itoa(ui.leftArenaTLx->value()));
+	_arenaLeft->setValue("topLeft_Y", itoa(ui.leftArenaTLy->value()));
+	_arenaLeft->setValue("topRight_X", itoa(ui.leftArenaTRx->value()));
+	_arenaLeft->setValue("topRight_Y", itoa(ui.leftArenaTRy->value()));
+	_arenaLeft->setValue("botLeft_X", itoa(ui.leftArenaBLx->value()));
+	_arenaLeft->setValue("botLeft_Y", itoa(ui.leftArenaBLy->value()));
+	_arenaLeft->setValue("botRight_X", itoa(ui.leftArenaBRx->value()));
+	_arenaLeft->setValue("botRight_Y", itoa(ui.leftArenaBRy->value()));
+	_arenaLeft->save();
+}
+
+void GUI::on_rightArenaSave_triggered()
+{
+	_arenaRight->setValue("topLeft_X", itoa(ui.rightArenaTLx->value()));
+	_arenaRight->setValue("topLeft_Y", itoa(ui.rightArenaTLy->value()));
+	_arenaRight->setValue("topRight_X", itoa(ui.rightArenaTRx->value()));
+	_arenaRight->setValue("topRight_Y", itoa(ui.rightArenaTRy->value()));
+	_arenaRight->setValue("botLeft_X", itoa(ui.rightArenaBLx->value()));
+	_arenaRight->setValue("botLeft_Y", itoa(ui.rightArenaBLy->value()));
+	_arenaRight->setValue("botRight_X", itoa(ui.rightArenaBRx->value()));
+	_arenaRight->setValue("botRight_Y", itoa(ui.rightArenaBRy->value()));
+	_arenaRight->save();
 }
 
 void GUI::testSend()

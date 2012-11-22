@@ -17,6 +17,7 @@
 #include "ThresholdFile.h"
 #include "Algorithm.h"
 #include "Ticks.h"
+#include "XMLReader.h"
 
 class GUI : public QMainWindow
 {
@@ -39,6 +40,8 @@ private slots:
 	void on_rightsave_triggered() {_thresholdRight->save();};
 	void on_leftload_triggered() {_thresholdLeft->load();};
 	void on_rightload_triggered() {_thresholdRight->load();};
+	void on_leftArenaSave_triggered();
+	void on_rightArenaSave_triggered();
 
 	void writeLeftThreshold();
 	void writeRightThreshold();
@@ -65,6 +68,8 @@ private:
 
 	ThresholdFile * _thresholdLeft;
 	ThresholdFile * _thresholdRight;
+	XMLReader * _arenaLeft;
+	XMLReader * _arenaRight;
 
 	QProcess *		_arduino;
 	QLabel *		_progressLabel;
@@ -118,6 +123,9 @@ private:
 	vector<Obstacle>	_algoObstacles;
 
 	void init();
+	void initVariables();
+	void initLeftArena();
+	void initRightArena();
 	void processRobot();
 	void processBalls();
 	void displayImage(IplImage * webcamFeed, QLabel * location, int type = 0);

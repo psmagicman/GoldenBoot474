@@ -2,6 +2,10 @@
 #define __GLOBALS__
 
 #include <math.h>
+#include <string>
+#include <sstream>
+
+using namespace std;
 
 #define WIDTH	640
 #define HEIGHT	480
@@ -62,5 +66,7 @@ extern double angleWithOrigin(Coord2D A);
 extern double angleRelative(Coord2D targetPt, Coord2D basePt);
 extern double angleRelative2(Coord2D targetPt, Coord2D basePt);
 extern double cosineLaw(double lenA, double lenB, double lenC);
+extern string itoa(double value);
+extern string itoa(int value);
 
 #endif

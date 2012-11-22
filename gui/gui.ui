@@ -57,50 +57,9 @@
             <item row="1" column="0">
              <layout class="QGridLayout" name="gridLayout_19">
               <item row="1" column="3">
-               <widget class="QCheckBox" name="rightRobotCheck">
-                <property name="text">
-                 <string>Robot</string>
-                </property>
-                <property name="checked">
-                 <bool>true</bool>
-                </property>
-               </widget>
+               <widget class="QSpinBox" name="rightArenaTLx"/>
               </item>
-              <item row="1" column="2">
-               <widget class="QCheckBox" name="rightObstaclesCheck">
-                <property name="text">
-                 <string>Obstacles</string>
-                </property>
-                <property name="checked">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="0">
-               <widget class="QCheckBox" name="rightArenaCheck">
-                <property name="text">
-                 <string>Arena</string>
-                </property>
-                <property name="checked">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="4">
-               <widget class="QPushButton" name="rightCalibrate">
-                <property name="text">
-                 <string>Calibrate</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="5">
-               <widget class="QPushButton" name="rightObstacles">
-                <property name="text">
-                 <string>Find Obstacles</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="1">
+              <item row="2" column="1">
                <widget class="QCheckBox" name="rightBallsCheck">
                 <property name="text">
                  <string>Tennis Balls</string>
@@ -110,24 +69,70 @@
                 </property>
                </widget>
               </item>
-              <item row="1" column="6">
-               <widget class="QPushButton" name="rightReset">
+              <item row="1" column="2">
+               <widget class="QCheckBox" name="rightRobotCheck">
                 <property name="text">
-                 <string>Reset</string>
+                 <string>Robot</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
                 </property>
                </widget>
               </item>
-              <item row="0" column="3">
-               <widget class="QSpinBox" name="rightArenaLx"/>
+              <item row="2" column="2">
+               <widget class="QCheckBox" name="rightObstaclesCheck">
+                <property name="text">
+                 <string>Obstacles</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
               </item>
-              <item row="0" column="4">
-               <widget class="QSpinBox" name="rightArenaLy"/>
+              <item row="1" column="1">
+               <widget class="QCheckBox" name="rightArenaCheck">
+                <property name="text">
+                 <string>Arena</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
               </item>
-              <item row="0" column="5">
-               <widget class="QSpinBox" name="rightArenaRx"/>
+              <item row="2" column="3">
+               <widget class="QSpinBox" name="rightArenaBLx"/>
               </item>
-              <item row="0" column="6">
-               <widget class="QSpinBox" name="rightArenaRy"/>
+              <item row="1" column="7">
+               <widget class="QPushButton" name="rightObstacles">
+                <property name="text">
+                 <string>Find Obstacles</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="4">
+               <widget class="QSpinBox" name="rightArenaBLy"/>
+              </item>
+              <item row="1" column="4">
+               <widget class="QSpinBox" name="rightArenaTLy"/>
+              </item>
+              <item row="2" column="5">
+               <widget class="QSpinBox" name="rightArenaBRx"/>
+              </item>
+              <item row="2" column="6">
+               <widget class="QSpinBox" name="rightArenaBRy"/>
+              </item>
+              <item row="1" column="5">
+               <widget class="QSpinBox" name="rightArenaTRx"/>
+              </item>
+              <item row="1" column="6">
+               <widget class="QSpinBox" name="rightArenaTRy"/>
+              </item>
+              <item row="2" column="7">
+               <widget class="QPushButton" name="rightReset">
+                <property name="text">
+                 <string>Reset Obstacle</string>
+                </property>
+               </widget>
               </item>
              </layout>
             </item>
@@ -359,6 +364,92 @@
             <string>RGB</string>
            </attribute>
            <layout class="QGridLayout" name="gridLayout_3">
+            <item row="1" column="0">
+             <layout class="QGridLayout" name="gridLayout_17" rowstretch="0,0,0,0" rowminimumheight="0,0,0,0">
+              <item row="3" column="1">
+               <widget class="QCheckBox" name="leftBallsCheck">
+                <property name="text">
+                 <string>Tennis Balls</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="7">
+               <widget class="QPushButton" name="leftObstacles">
+                <property name="text">
+                 <string>Find Obstacles</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="3">
+               <widget class="QSpinBox" name="leftArenaBLx"/>
+              </item>
+              <item row="1" column="1">
+               <widget class="QCheckBox" name="leftArenaCheck">
+                <property name="text">
+                 <string>Arena</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="3">
+               <widget class="QSpinBox" name="leftArenaTLx">
+                <property name="maximum">
+                 <number>800</number>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="4">
+               <widget class="QSpinBox" name="leftArenaBLy"/>
+              </item>
+              <item row="1" column="4">
+               <widget class="QSpinBox" name="leftArenaTLy"/>
+              </item>
+              <item row="3" column="5">
+               <widget class="QSpinBox" name="leftArenaBRx"/>
+              </item>
+              <item row="1" column="5">
+               <widget class="QSpinBox" name="leftArenaTRx"/>
+              </item>
+              <item row="3" column="6">
+               <widget class="QSpinBox" name="leftArenaBRy"/>
+              </item>
+              <item row="1" column="6">
+               <widget class="QSpinBox" name="leftArenaTRy"/>
+              </item>
+              <item row="3" column="2">
+               <widget class="QCheckBox" name="leftObstaclesCheck">
+                <property name="text">
+                 <string>Obstacles</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="2">
+               <widget class="QCheckBox" name="leftRobotCheck">
+                <property name="text">
+                 <string>Robot</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="7">
+               <widget class="QPushButton" name="leftReset">
+                <property name="text">
+                 <string>Reset Obstacle</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
             <item row="0" column="0">
              <widget class="QLabel" name="leftRGB">
               <property name="sizePolicy">
@@ -377,83 +468,6 @@
                <string>TextLabel</string>
               </property>
              </widget>
-            </item>
-            <item row="1" column="0">
-             <layout class="QGridLayout" name="gridLayout_17">
-              <item row="1" column="2">
-               <widget class="QCheckBox" name="leftObstaclesCheck">
-                <property name="text">
-                 <string>Obstacles</string>
-                </property>
-                <property name="checked">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="0">
-               <widget class="QCheckBox" name="leftArenaCheck">
-                <property name="text">
-                 <string>Arena</string>
-                </property>
-                <property name="checked">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="1">
-               <widget class="QCheckBox" name="leftBallsCheck">
-                <property name="text">
-                 <string>Tennis Balls</string>
-                </property>
-                <property name="checked">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="5">
-               <widget class="QPushButton" name="leftObstacles">
-                <property name="text">
-                 <string>Find Obstacles</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="4">
-               <widget class="QPushButton" name="leftCalibrate">
-                <property name="text">
-                 <string>Calibrate</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="6">
-               <widget class="QPushButton" name="leftReset">
-                <property name="text">
-                 <string>Reset</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="3">
-               <widget class="QCheckBox" name="leftRobotCheck">
-                <property name="text">
-                 <string>Robot</string>
-                </property>
-                <property name="checked">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="3">
-               <widget class="QSpinBox" name="leftArenaLx"/>
-              </item>
-              <item row="0" column="4">
-               <widget class="QSpinBox" name="leftArenaLy"/>
-              </item>
-              <item row="0" column="5">
-               <widget class="QSpinBox" name="leftArenaRx"/>
-              </item>
-              <item row="0" column="6">
-               <widget class="QSpinBox" name="leftArenaRy"/>
-              </item>
-             </layout>
             </item>
            </layout>
           </widget>

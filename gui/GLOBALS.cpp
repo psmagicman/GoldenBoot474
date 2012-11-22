@@ -122,3 +122,17 @@ double cosineLaw(double lenA, double lenB, double lenC)
 {
 	return acos( (lenA*lenA + lenB*lenB - lenC*lenC)/(2*lenA*lenB) );
 }
+
+string itoa(double value)
+{
+	stringstream ss;
+	ss << value;
+	return ss.str();
+}
+
+string itoa(int value)
+{
+	stringstream ss;
+	ss << value;
+	return ss.str();
+}

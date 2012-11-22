@@ -24,12 +24,9 @@ public:
 	
 	bool capture();
 
-	void calibrate(int index);
-	void finishCalibrate();
-
+	void calibrateArena(CvPoint topLeft, CvPoint topRight, CvPoint botLeft, CvPoint botRight);
 	void calculateObstacles();
 
-	bool isCalibrated() {return _calibrated;};
 	void resetCalibrate();
 
 	void setThresholds(map<string, vector<int> > thresholds);
@@ -130,16 +127,10 @@ private:
 	
 	// Calibration Variables
 	bool _calibrated;
-	int * _topLeftXarray;
-	int * _topLeftYarray;
-	int * _topRightXarray;
-	int * _topRightYarray;
-	int * _botLeftXarray;
-	int * _botLeftYarray;
-	int * _botRightXarray;
-	int * _botRightYarray;
-	map<string, Point2f> _topArenaPts;
-	map<string, Point2f> _botArenaPts;
+	Point2f _topLeftPts;
+	Point2f _topRightPts;
+	Point2f _botLeftPts;
+	Point2f _botRightPts;
 
 	bool _calibratedObstacles;
 	CvSeq * _obstaclesTopContour;

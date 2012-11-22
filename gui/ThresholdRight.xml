@@ -14,7 +14,7 @@
 
 <arenaAmax>0</arenaAmax>
 
-<ballHmin>37</ballHmin>
+<ballHmin>25</ballHmin>
 
 <ballHmax>50</ballHmax>
 
@@ -22,7 +22,7 @@
 
 <ballSmax>255</ballSmax>
 
-<ballVmin>50</ballVmin>
+<ballVmin>100</ballVmin>
 
 <ballVmax>255</ballVmax>
 
@@ -32,13 +32,13 @@
 
 <obstacles1Hmin>20</obstacles1Hmin>
 
-<obstacles1Hmax>30</obstacles1Hmax>
+<obstacles1Hmax>40</obstacles1Hmax>
 
-<obstacles1Smin>150</obstacles1Smin>
+<obstacles1Smin>100</obstacles1Smin>
 
 <obstacles1Smax>255</obstacles1Smax>
 
-<obstacles1Vmin>100</obstacles1Vmin>
+<obstacles1Vmin>150</obstacles1Vmin>
 
 <obstacles1Vmax>255</obstacles1Vmax>
 
@@ -54,7 +54,7 @@
 
 <obstacles2Smax>255</obstacles2Smax>
 
-<obstacles2Vmin>100</obstacles2Vmin>
+<obstacles2Vmin>150</obstacles2Vmin>
 
 <obstacles2Vmax>255</obstacles2Vmax>
 

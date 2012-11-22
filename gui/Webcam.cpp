@@ -79,15 +79,6 @@ void Webcam::init()
 	_robot2Amin = 100;
 	_robot2Amax = 1000;
 	_robotDist = 15;
-	
-	_topLeftXarray = new int[calibrationSize];
-	_topLeftYarray = new int[calibrationSize];
-	_topRightXarray = new int[calibrationSize];
-	_topRightYarray = new int[calibrationSize];
-	_botLeftXarray = new int[calibrationSize];
-	_botLeftYarray = new int[calibrationSize];
-	_botRightXarray = new int[calibrationSize];
-	_botRightYarray = new int[calibrationSize];
 
 	_calibrated = false;
 	_calibratedObstacles = false;
@@ -121,76 +112,19 @@ void Webcam::resetCalibrate()
 	_ballPts.clear();
 }
 
-void Webcam::calibrate(int index)
+void Webcam::calibrateArena(CvPoint topLeft, CvPoint topRight, CvPoint botLeft, CvPoint botRight)
 {
-	if (capture()) {
-		// Detect Arena
-		calculateThreshold("Arena");
-	
-		_topLeftXarray[index] = _normal->width;	_topLeftYarray[index] = _normal->height;
-		_topRightXarray[index] = 0;				_topRightYarray[index] = _normal->height;
-		_botLeftXarray[index] = _normal->width;	_botLeftYarray[index] = 0;
-		_botRightXarray[index] = 0;				_botRightYarray[index] = 0;
-
-		CvSeq * lines = cvHoughLines2(_threshold, _storage, CV_HOUGH_PROBABILISTIC, 1, CV_PI/180, 100, _arenaAmin, _arenaAmax);
-		for (int i = 0; i < lines->total; i++) {
-			CvPoint* line = (CvPoint*)cvGetSeqElem(lines,i);
-			// If Line is top half of image, assign left-most to topLeft, and right-most to topRight
-			if (line[0].y < _threshold->height/2 && line[1].y < _threshold->height/2) {
-				if (_topLeftXarray[index] > line[0].x) {
-					_topLeftXarray[index] = line[0].x;
-					_topLeftYarray[index] = line[0].y;
-				}
-				if (_topRightXarray[index] < line[1].x) {
-					_topRightXarray[index] = line[1].x;
-					_topRightYarray[index] = line[1].y;
-				}
-			}
-			// If line is bottom half of image, assign left-most to botLeft, and right-most to botRight
-			else if (line[0].y > _threshold->height/2 && line[1].y > _threshold->height/2) {
-				if (_botLeftXarray[index] > line[0].x) {
-					_botLeftXarray[index] = line[0].x;
-					_botLeftYarray[index] = line[0].y;
-				} 
-				if (_botRightXarray[index] < line[1].x) {
-					_botRightXarray[index] = line[1].x;
-					_botRightYarray[index] = line[1].y;
-				}
-			}
-		}
-		release();
-	}
-}
-
-void Webcam::finishCalibrate()
-{
-	// Sort all Values through Quicksort
-	myQuickSort.sort(_topLeftXarray, 0 , calibrationSize-1);
-	myQuickSort.sort(_topLeftYarray, 0 , calibrationSize-1);
-	myQuickSort.sort(_topRightXarray, 0 , calibrationSize-1);
-	myQuickSort.sort(_topRightYarray, 0 , calibrationSize-1);
-	myQuickSort.sort(_botLeftXarray, 0 , calibrationSize-1);
-	myQuickSort.sort(_botLeftYarray, 0 , calibrationSize-1);
-	myQuickSort.sort(_botRightXarray, 0 , calibrationSize-1);
-	myQuickSort.sort(_botRightYarray, 0 , calibrationSize-1);
-
-	// Take Median Values to eliminate Errors
-	_topArenaPts["Left"].x = _topLeftXarray[calibrationSize/2]; 
-	_topArenaPts["Left"].y = _topLeftYarray[calibrationSize/2];
-	_topArenaPts["Right"].x = _topRightXarray[calibrationSize/2];
-	_topArenaPts["Right"].y = _topRightYarray[calibrationSize/2];
-	_botArenaPts["Left"].x = _botLeftXarray[calibrationSize/2];
-	_botArenaPts["Left"].y = _botLeftYarray[calibrationSize/2];
-	_botArenaPts["Right"].x = _botRightXarray[calibrationSize/2];
-	_botArenaPts["Right"].y = _botRightYarray[calibrationSize/2];
-
 	// Create Homography Matrix
 	vector<Point2f> cameraPts;
 	vector<Point2f> fieldPts;
-	cameraPts.push_back(_topArenaPts["Left"]);
-	cameraPts.push_back(_topArenaPts["Right"]);
-	cameraPts.push_back(_botArenaPts["Left"]);
-	cameraPts.push_back(_botArenaPts["Right"]);
+	_topLeftPts = topLeft;
+	_topRightPts = topRight;
+	_botLeftPts = botLeft;
+	_botRightPts = botRight;
+	cameraPts.push_back(_topLeftPts);
+	cameraPts.push_back(_topRightPts);
+	cameraPts.push_back(_botLeftPts);
+	cameraPts.push_back(_botRightPts);
 	fieldPts.push_back(cvPoint(0,0));
 	fieldPts.push_back(cvPoint(FINAL_WIDTH,0));
 	fieldPts.push_back(cvPoint(FINAL_WIDTH*2.5/8.0,FINAL_HEIGHT*7.0/8.0));
@@ -232,7 +166,7 @@ void Webcam::calculateObstacles()
 				double m_10 = cvGetSpatialMoment( &moment, 1, 0);
 				double m_01 = cvGetSpatialMoment( &moment, 0, 1);
 				obstaclesTopPts.push_back(cvPoint(m_10/m_00, m_01/m_00));
-				obstaclesTopHeight.push_back(sqrtf(cvContourArea(_obstaclesTopContour)/2));
+				obstaclesTopHeight.push_back(sqrtf(cvContourArea(_obstaclesTopContour)/CV_PI));
 			}
 		}
 
@@ -265,17 +199,8 @@ void Webcam::calculateNormal(bool arena, bool balls, bool obstacles, bool robot,
 {
 	if (arena) {
 		if (_calibrated) {
-			cvLine(_normal, _topArenaPts["Left"], _topArenaPts["Right"], CV_RGB(0,0,255), 1, CV_AA, 0);
-			cvLine(_normal, _botArenaPts["Left"], _botArenaPts["Right"], CV_RGB(0,0,255), 1, CV_AA, 0);
-		} else {
-			calculateThreshold("Arena");
-			CvSeq * lines = cvHoughLines2(_threshold, _storage, CV_HOUGH_PROBABILISTIC, 1, CV_PI/180, 100, _arenaAmin, _arenaAmax);
-			if (draw) {
-				for (int i = 0; i < lines->total; i++) {
-					CvPoint* line = (CvPoint*)cvGetSeqElem(lines,i);
-					cvLine(_normal, line[0], line[1], CV_RGB(0,0,255), 1, CV_AA, 0);
-				}
-			}
+			cvLine(_normal, _topLeftPts, _topRightPts, CV_RGB(0,0,255), 1, CV_AA, 0);
+			cvLine(_normal, _botLeftPts, _botRightPts, CV_RGB(0,0,255), 1, CV_AA, 0);
 		}
 	}
 
