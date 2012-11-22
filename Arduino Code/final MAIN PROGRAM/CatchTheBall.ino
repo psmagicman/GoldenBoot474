@@ -10,6 +10,8 @@ void CatchtheBall()
           break;
           }
         Sensor();
+        Sensor();
+        Sensor();
         if( GrabDir == LEFTONE){
         if(SenseDistance > TENNISBALL){
           LeftTurn(70,70);
@@ -147,6 +149,8 @@ void CatchBallDistance()
   int caught =0;
   while(caught == 0)
   {Sensor();
+   Sensor();
+   Sensor();
    distance_1 = SenseDistance;
    //Turn right 45 deg
   enc1_Count = 0; 
@@ -158,6 +162,8 @@ void CatchBallDistance()
      }
    Stop();
    
+   Sensor();
+   Sensor();
    Sensor(); 
    distance_2 = SenseDistance; 
    //Turn left 90 deg
@@ -170,7 +176,9 @@ void CatchBallDistance()
      }
    Stop();
  
-   Sensor(); 
+   Sensor();
+   Sensor();
+   Sensor();
    distance_3 = SenseDistance; 
    
     //Compare the distances 
@@ -215,6 +223,8 @@ void CatchBallDistance()
        //Stay in the same position  
        
       Accelerate(pwm_1, pwm_2);
+      Sensor();
+      Sensor();
       Sensor();
       if(SenseDistance <= 4){
                 Stop();

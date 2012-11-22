@@ -13,7 +13,7 @@
 #include <pnew.cpp>
 
 
-#define DEBUG 0
+#define DEBUG 1
 #define LOW 0
 #define HIGH 1
 #define rate 100
@@ -74,10 +74,10 @@ int motor2_pin_1 = 5; // H-Bridge input pin 3 for Motor 2 (Left)
 int motor2_pin_2 = 7; // H-bridge input pin 4 for Motor 2
 int enablepin_1 = 6; // H-Bridge enable pin for Motor 1
 int enablepin_2 = 3; // H-Bridge enable pin for Motor 2
-int encoder1_in = A3;
-int encoder2_in = A4; 
-int dir_1 = A3;
-int dir_2 = A5;
+int encoder1_in = A4;
+int encoder2_in = A2; 
+int dir_1 = A5;
+int dir_2 = A3;
 
 int actuator_length; 
 
