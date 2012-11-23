@@ -13,7 +13,7 @@
 #include <pnew.cpp>
 
 
-#define DEBUG 1
+#define DEBUG 0
 #define LOW 0
 #define HIGH 1
 #define rate 100

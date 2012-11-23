@@ -46,7 +46,7 @@ void NEWkick(){
          Actuator_Read();
          flag= 0; 
         }
-   //delay(300);
+     delay(300);
       Sensor();
       Sensor();
       Sensor();

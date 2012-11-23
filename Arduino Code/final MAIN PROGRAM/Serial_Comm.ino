@@ -110,7 +110,9 @@ void Readposition()
    char bytes2[6];
    while(TRUE){
              
-               CheckforE();
+               if (CheckforE() == TRUE){
+                 break;
+               }
                if((Serial.available() == 5)  && (input2done == 1 )){
 			
 			      bytes1[0] = Serial.read();  
@@ -120,6 +122,7 @@ void Readposition()
 			      bytes1[4] = Serial.read();
                               bytes1[5] = '\0';
                               if (CheckGarbbage(bytes1) == FALSE){
+                                  logln("RESET check barbbage");
                                   Reset();
                                   break;
                                }
