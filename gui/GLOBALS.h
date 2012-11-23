@@ -21,6 +21,8 @@ using namespace std;
 #define BOT_WIDTH 0.172244
 #define ONE_TICK 0.0113
 
+#define EMERGENCY_ACT	-2
+#define	EMERGENCY_STOP	-1
 #define TASKS_READY		0
 #define STP1_REQUEST	1
 #define STP1_RESPOND	2
@@ -30,6 +32,11 @@ using namespace std;
 #define STP2_RESPOND	6
 #define GOAL_REQUEST	7
 #define GOAL_RESPOND	8
+
+#define NO_ERRORS		0
+#define	ERR_PATHING		1
+#define ERR_OBSTACLE	2
+#define ERR_BALL		3
 
 extern const int calibrationSize;
 

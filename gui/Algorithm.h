@@ -17,6 +17,8 @@ public:
 	CAlgorithm();
 	CAlgorithm(vector<Obstacle> obstacles);
 
+	
+	void setOpponent(Obstacle opponent);
 	void analyzeField(Robot robot, vector<Ball> balls);
 	vector<Coord2D>		getPathToGoal(Robot robot, Coord2D goal);
 

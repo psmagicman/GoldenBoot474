@@ -50,13 +50,13 @@
 
 <obstacles2Hmax>120</obstacles2Hmax>
 
-<obstacles2Smin>75</obstacles2Smin>
+<obstacles2Smin>150</obstacles2Smin>
 
-<obstacles2Smax>255</obstacles2Smax>
+<obstacles2Smax>200</obstacles2Smax>
 
-<obstacles2Vmin>100</obstacles2Vmin>
+<obstacles2Vmin>50</obstacles2Vmin>
 
-<obstacles2Vmax>255</obstacles2Vmax>
+<obstacles2Vmax>100</obstacles2Vmax>
 
 <obstacles2Amin>200</obstacles2Amin>
 

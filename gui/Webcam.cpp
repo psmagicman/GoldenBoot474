@@ -105,11 +105,8 @@ void Webcam::release()
 
 void Webcam::resetCalibrate()
 {
-	_calibrated = false;
 	_calibratedObstacles = false;
-	_robotPts.clear();
 	_obstaclesPts.clear();
-	_ballPts.clear();
 }
 
 void Webcam::calibrateArena(CvPoint topLeft, CvPoint topRight, CvPoint botLeft, CvPoint botRight)

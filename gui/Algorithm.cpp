@@ -21,6 +21,11 @@ vector<Coord2D> CAlgorithm::getPathToGoal(Robot robot, Coord2D goal)
 	return getPathToPoint(goal,75);
 }
 
+void CAlgorithm::setOpponent(Obstacle opponent)
+{
+	_obstacles[_obstacles.size()-1] = opponent;
+}
+
 void CAlgorithm::analyzeField(Robot robot, vector<Ball> balls)
 {
 	_closest = -1;
@@ -164,6 +169,7 @@ void CAlgorithm::analyzeObstacles()
 		tempObstacles.push_back(combinedObstacle);
 	}
 	_obstacles = tempObstacles;
+	_obstacles.resize(_obstacles.size()+1);
 }
 
 Coord2D CAlgorithm::getNewPointAroundObstacle(Obstacle obstacle, Coord2D beginPts, Coord2D endPts)

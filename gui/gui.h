@@ -73,14 +73,11 @@ private:
 
 	QProcess *		_arduino;
 	QLabel *		_progressLabel;
-	QProgressBar *	_progressBar;
 	QTimer *		_timer;
 	QTime			_time;
 	QString			_progressText;
 	int				_prevTime;
 	int				_prevFPS;
-	int				_prevStop;
-	int				_prevRun;
 	int				_prevTaskTime;
 	
 	CAlgorithm		_algorithm;
@@ -91,16 +88,17 @@ private:
 	bool _task2;
 	bool _task3;
 	bool _final;
+	
 	bool _run;
-
 	int _state;
+	int _prevState;
+	int _errorState;
 	// State 0 : Stoppin Robot
 	// State 1 : Waiting for Stop Confirmation
 	// State 2 : Looking for Ball
 	// State 3 : Looking for Ball Acquired Confirmation
 	// State 4 : Looking for Goal
 	// State 5 : Looking for Goal Confirmation
-
 	int _pathIndex;
 
 	int _ballsToScore;
@@ -141,8 +139,11 @@ private:
 	void taskInit();
 	void restartTask();
 
-	void getBall();
-	void score();
+	void calcPathToBall();
+	void sendBallCommand();
+
+	void calcPathToGoal();
+	void sendGoalCommand();
 
 	vector<Point2f> combinePts(vector<Point2f> pts1, vector<Point2f> pts2, double distLimit);
 	vector<Point2f> combineRobotPts(vector<Point2f> pts1, vector<Point2f> pts2);
