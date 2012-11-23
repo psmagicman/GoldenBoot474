@@ -11,8 +11,10 @@ void NEWkick(){
    pwm_2=255;
    abspos_1 =abs(pos_1)-(abs(pos_1)*0.08+1);
    abspos_2 = abs(pos_2)-(abs(pos_2)*0.08+1);
-   slowdown1 =abspos_1*0.9;                      
-   slowdown2 =abspos_2*0.9;
+   slowdown1 =abspos_1;                      
+   slowdown2 =abspos_2;
+   sumError1 =0;
+   sumError2 =0;
    while( enc1_Count < abspos_1 && enc2_Count < abspos_2 && flag ==0) 
    { 
      if( CheckforE() == TRUE){ 
@@ -21,11 +23,13 @@ void NEWkick(){
        }
        LeftTurn(pwm_1, pwm_2); 
        //Position();
-       logln(' ');
-       log1("Encoder1:  ");
-       log1(enc1_Count);
-       log1("Encoder2:  ");
-       log1(enc2_Count);
+       //logln(' ');
+       //log1("Encoder1:  ");
+       //log1(enc1_Count);
+       //log1("Encoder2:  ");
+       //log1(enc2_Count);
+       logln(pwm_1);
+       logln(pwm_2);
        }
    delay(300);
    
@@ -56,10 +60,13 @@ void NEWkick(){
          enc2_Count =0;
          pwm_1=255;
          pwm_2=255;
-         abspos_1 = abs(pos_1)-(abs(pos_1)*0.08+3);
-         abspos_2 = abs(pos_2)-(abs(pos_2)*0.08+3);
-         slowdown1 =abspos_1*0.9;
-         slowdown2 =abspos_2*0.9;
+         abspos_1 = abs(pos_1)-(abs(pos_1)*0.08+1);
+         abspos_2 = abs(pos_2)-(abs(pos_2)*0.08+1);
+         slowdown1 =abspos_1;
+         slowdown2 =abspos_2;
+         sumError1 =0;
+         sumError2 =0;
+         kick = TRUE;
          logln("Right Turn");
          
          delay(300);
@@ -70,13 +77,14 @@ void NEWkick(){
              flag = 1;
              break;
            }
-           RightTurn(pwm_1, pwm_2); 
-           //Position();
+           RightTurn(pwm_1, pwm_2);
            logln(' ');
-           log1("Encoder1:  ");
-           log1(enc1_Count);
-           log1("Encoder2:  ");
-           log1(enc2_Count);
+           //log1("Encoder1:  ");
+           //log1(enc1_Count);
+           //log1("Encoder2:  ");
+           //log1(enc2_Count);
+           logln(pwm_1);
+           logln(pwm_2);
           }
           if (flag ==0)
             {
@@ -95,6 +103,7 @@ void NEWkick(){
              }
             } 
       }
+      kick = FALSE;
       logln("Done with the ball kicking") ;   
       Serial.print(4);   
       enc1_Count =0;

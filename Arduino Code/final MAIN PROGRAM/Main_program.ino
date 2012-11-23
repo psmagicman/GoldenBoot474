@@ -114,6 +114,7 @@ volatile int sumError2 =0;
 int KI = 5;
 int KP = 70;
 int motor = 0;
+int kick = FALSE;
 
 void setup() {
 

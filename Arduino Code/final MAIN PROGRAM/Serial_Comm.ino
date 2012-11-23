@@ -1,7 +1,7 @@
 /*This code determines the serial communication
 */
 void serialEvent(){
-  logln("serialEvent");
+  //logln("serialEvent");
         CheckforE();
 }
 
@@ -15,20 +15,10 @@ boolean CheckforE(){
                  while(Serial.available()){
                    Serial.read();                   
                  }
-                 //state = 0;
-                 //enc1_Count=0;
-                 //enc2_Count=0;
                  Reset();
-                 //poslist =0;
-                 //poslistFlag = 1;
-                 //path.clear();
-                 //_path.clear();
-                 
                  return TRUE;
            }
           else return FALSE;
-        //}
-        //else return FALSE;
 }
 
 void ReadInput(){
@@ -55,21 +45,8 @@ void ReadInput(){
                         while(Serial.available()){
 		                Serial.read();
 			}
-                        //CatchtheBall();
-                       // CatchBallDirection();
                 }
-                
-                /*                if(Serial.peek() == 'L'){
-                        logln("Grabbing the ball to my left");
-                        GrabDir =LEFT;
-                        while(Serial.available()){
-		                Serial.read();
-			}
-                        CatchtheBall();
-                        //CatchBallDirection();
-                }*/
-                          
-                 else if(Serial.peek() == 'K'){
+                else if(Serial.peek() == 'K'){
                         logln("Kicking the ball ");
 
                         pos_1 = KICKFLAG;
@@ -83,7 +60,6 @@ void ReadInput(){
                         while(Serial.available()){
 		                Serial.read();
 			}
-                        //KicktheBall();
                 }
                 
 		else if(Serial.peek() == 'R'){
@@ -97,9 +73,7 @@ void ReadInput(){
                 else if (Serial.peek() == 'I'){
                         logln("Reading the input values ");
 		        Serial.read();
-			
                         Readposition();
-		       
                 }
          else 
           Serial.read();

@@ -74,11 +74,11 @@ void Check()
 // float adjustment = 0;
 	if( enc1_Count == enc2_Count){
             motor =0;
-            if (pos_1 != pos_2)
+            if (pos_1 != pos_2 && kick == FALSE)
               {
                 if( (enc1_Count >= slowdown1) && (enc2_Count >= slowdown2)){  //Slow down before stopping
-                  pwm_1 = 80;
-                  pwm_2 = 80;
+                  pwm_1 = 90;
+                  pwm_2 = 90;
                 }
                 else{
                   if(SenseDistance <= 5){
@@ -86,8 +86,8 @@ void Check()
                     pwm_2 = 150;
                   }
                   else{
-                    pwm_1 =100;
-                    pwm_2 =100;
+                    pwm_1 =130;
+                    pwm_2 =130;
                   }
                 }
               }
@@ -136,10 +136,10 @@ void Check()
 		pwm_1 = 255;
 	if (pwm_2 >= 255)
 		pwm_2 = 255;
-    if (pwm_1 <= 0)
-		pwm_1 = 0;
+    if (pwm_1 <= 50)
+		pwm_1 = 50;
     if (pwm_2 <= 0)
-		pwm_2 = 0;
+		pwm_2 = 50;
 }
 
 void Movement()
@@ -249,8 +249,8 @@ void MotorControl(){
                           //poslistFlag = 1;
                         }
                         else if( pos_1 == KICKFLAG && pos_2 == KICKFLAG){
-                          KicktheBall();
-                          //NEWkick();
+                          //KicktheBall();
+                          NEWkick();
                           logln("Finished Kicking");
                            
                         }
@@ -270,12 +270,12 @@ void MotorControl(){
                           }
                         else{
                           if(SenseDistance <= 5){
-                            abspos_1 =abs(pos_1)-(abs(pos_1)*0.08+1);
-                            abspos_2 = abs(pos_2)-(abs(pos_2)*0.08+1);
+                            abspos_1 =abs(pos_1)-(abs(pos_1)*0.08);
+                            abspos_2 = abs(pos_2)-(abs(pos_2)*0.08);
                           }
                           else{
-                          abspos_1 = abs(pos_1)-(abs(pos_1)*0.08+3);
-                          abspos_2 = abs(pos_2)-(abs(pos_2)*0.08+3);
+                          abspos_1 = abs(pos_1)-(abs(pos_1)*0.08+1);
+                          abspos_2 = abs(pos_2)-(abs(pos_2)*0.08+1);
                           }
                           //abspos_1 =abs(pos_1)-6;
                           //abspos_2 =abs(pos_2)-6;
