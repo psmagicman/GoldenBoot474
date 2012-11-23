@@ -90,6 +90,22 @@ void ThresholdFile::loadData()
 	_cam->_robot2Vmax = atoi(_xml["robot2Vmax"].c_str());
 	_cam->_robot2Amin = atoi(_xml["robot2Amin"].c_str());
 	_cam->_robot2Amax = atoi(_xml["robot2Amax"].c_str());
+	_cam->_opp1Hmin = atoi(_xml["opp1Hmin"].c_str());
+	_cam->_opp1Hmax = atoi(_xml["opp1Hmax"].c_str());
+	_cam->_opp1Smin = atoi(_xml["opp1Smin"].c_str());
+	_cam->_opp1Smax = atoi(_xml["opp1Smax"].c_str());
+	_cam->_opp1Vmin = atoi(_xml["opp1Vmin"].c_str());
+	_cam->_opp1Vmax = atoi(_xml["opp1Vmax"].c_str());
+	_cam->_opp1Amin = atoi(_xml["opp1Amin"].c_str());
+	_cam->_opp1Amax = atoi(_xml["opp1Amax"].c_str());
+	_cam->_opp2Hmin = atoi(_xml["opp2Hmin"].c_str());
+	_cam->_opp2Hmax = atoi(_xml["opp2Hmax"].c_str());
+	_cam->_opp2Smin = atoi(_xml["opp2Smin"].c_str());
+	_cam->_opp2Smax = atoi(_xml["opp2Smax"].c_str());
+	_cam->_opp2Vmin = atoi(_xml["opp2Vmin"].c_str());
+	_cam->_opp2Vmax = atoi(_xml["opp2Vmax"].c_str());
+	_cam->_opp2Amin = atoi(_xml["opp2Amin"].c_str());
+	_cam->_opp2Amax = atoi(_xml["opp2Amax"].c_str());
 }
 
 void ThresholdFile::saveData()
@@ -144,6 +160,22 @@ void ThresholdFile::saveData()
 	_xml.setValue("robot2Vmax",itoa(_cam->_robot2Vmax));
 	_xml.setValue("robot2Amin",itoa(_cam->_robot2Amin));
 	_xml.setValue("robot2Amax",itoa(_cam->_robot2Amax));
+	_xml.setValue("opp1Hmin",itoa(_cam->_opp1Hmin));
+	_xml.setValue("opp1Hmax",itoa(_cam->_opp1Hmax));
+	_xml.setValue("opp1Smin",itoa(_cam->_opp1Smin));
+	_xml.setValue("opp1Smax",itoa(_cam->_opp1Smax));
+	_xml.setValue("opp1Vmin",itoa(_cam->_opp1Vmin));
+	_xml.setValue("opp1Vmax",itoa(_cam->_opp1Vmax));
+	_xml.setValue("opp1Amin",itoa(_cam->_opp1Amin));
+	_xml.setValue("opp1Amax",itoa(_cam->_opp1Amax));
+	_xml.setValue("opp2Hmin",itoa(_cam->_opp2Hmin));
+	_xml.setValue("opp2Hmax",itoa(_cam->_opp2Hmax));
+	_xml.setValue("opp2Smin",itoa(_cam->_opp2Smin));
+	_xml.setValue("opp2Smax",itoa(_cam->_opp2Smax));
+	_xml.setValue("opp2Vmin",itoa(_cam->_opp2Vmin));
+	_xml.setValue("opp2Vmax",itoa(_cam->_opp2Vmax));
+	_xml.setValue("opp2Amin",itoa(_cam->_opp2Amin));
+	_xml.setValue("opp2Amax",itoa(_cam->_opp2Amax));
 	_xml.save();
 }
 

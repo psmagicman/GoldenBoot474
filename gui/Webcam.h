@@ -30,7 +30,7 @@ public:
 	void resetCalibrate();
 
 	void setThresholds(map<string, vector<int> > thresholds);
-	void calculateNormal(bool arena, bool balls, bool obstacles, bool robot, bool draw = false);
+	void calculateNormal(bool opponent, bool balls, bool obstacles, bool robot, bool draw = false);
 	void calculateThreshold(string type);
 	void calculateFinal();
 
@@ -44,6 +44,7 @@ public:
 	vector<Point2f> getBalls() {return _ballPts;};
 	vector<Point2f> getRobot() {return _robotPts;};
 	vector<Point2f> getObstacles() {return _obstaclesPts;};
+	vector<Point2f> getOpponent() {return _opponentPts;};
 	double getRobotAngle() {return _robotAngle;};
 	
 	void release();
@@ -102,6 +103,24 @@ public:
 	int _robot2Vmax;
 	int _robot2Amin;
 	int _robot2Amax;
+	// Opponent - 1
+	int _opp1Hmin;
+	int _opp1Smin;
+	int _opp1Vmin;
+	int _opp1Hmax;
+	int _opp1Smax;
+	int _opp1Vmax;
+	int _opp1Amin;
+	int _opp1Amax;
+	// Opponent - 2
+	int _opp2Hmin;
+	int _opp2Smin;
+	int _opp2Vmin;
+	int _opp2Hmax;
+	int _opp2Smax;
+	int _opp2Vmax;
+	int _opp2Amin;
+	int _opp2Amax;
 
 private:
 	int _ID;
@@ -139,6 +158,7 @@ private:
 	vector<Point2f> _ballPts;
 	vector<Point2f> _obstaclesPts;
 	vector<Point2f> _obstaclesPtsCam;
+	vector<Point2f>	_opponentPts;
 	vector<Point2f> _robotPts;
 	vector<Point2f> _robotFrontPts;
 	vector<Point2f> _robotBackPts;

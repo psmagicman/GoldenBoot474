@@ -79,6 +79,24 @@ void Webcam::init()
 	_robot2Amin = 100;
 	_robot2Amax = 1000;
 	_robotDist = 15;
+	// Opponent - 1
+	_opp1Hmin = 0;
+	_opp1Smin = 0;
+	_opp1Vmin = 0;
+	_opp1Hmax = 0;
+	_opp1Smax = 0;
+	_opp1Vmax = 0;
+	_opp1Amin = 0;
+	_opp1Amax = 0;
+	// Opponent - 2
+	_opp2Hmin = 0;
+	_opp2Smin = 0;
+	_opp2Vmin = 0;
+	_opp2Hmax = 0;
+	_opp2Smax = 0;
+	_opp2Vmax = 0;
+	_opp2Amin = 0;
+	_opp2Amax = 0;
 
 	_calibrated = false;
 	_calibratedObstacles = false;
@@ -192,15 +210,13 @@ void Webcam::calculateObstacles()
 	}
 }
 
-void Webcam::calculateNormal(bool arena, bool balls, bool obstacles, bool robot, bool draw)
+void Webcam::calculateNormal(bool opponent, bool balls, bool obstacles, bool robot, bool draw)
 {
-	if (arena) {
-		if (_calibrated) {
-			cvLine(_normal, _topLeftPts, _topRightPts, CV_RGB(0,0,255), 1, CV_AA, 0);
-			cvLine(_normal, _botLeftPts, _botRightPts, CV_RGB(0,0,255), 1, CV_AA, 0);
-		}
+	if (_calibrated) {
+		cvLine(_normal, _topLeftPts, _topRightPts, CV_RGB(0,0,255), 1, CV_AA, 0);
+		cvLine(_normal, _botLeftPts, _botRightPts, CV_RGB(0,0,255), 1, CV_AA, 0);
 	}
-
+	
 	if (balls) {
 		calculateThreshold("Balls");
 		CvSeq * contours;
@@ -258,7 +274,7 @@ void Webcam::calculateNormal(bool arena, bool balls, bool obstacles, bool robot,
 		}
 	}
 
-	if (robot) { // Detect Robot only if this is the main camera
+	if (robot) {
 		// Find Front of Robot
 		calculateThreshold("Robot1");
 		CvSeq * contoursFront;
@@ -273,7 +289,7 @@ void Webcam::calculateNormal(bool arena, bool balls, bool obstacles, bool robot,
 				double m_00 = cvGetSpatialMoment( &moment, 0, 0);
 				double m_10 = cvGetSpatialMoment( &moment, 1, 0);
 				double m_01 = cvGetSpatialMoment( &moment, 0, 1);
-				_robotFrontPts.push_back(cvPoint(m_10/m_00,(m_01/m_00+20)));
+				_robotFrontPts.push_back(cvPoint(m_10/m_00,m_01/m_00));
 			}
 		}
 		delete contoursFront;
@@ -292,10 +308,67 @@ void Webcam::calculateNormal(bool arena, bool balls, bool obstacles, bool robot,
 				double m_00 = cvGetSpatialMoment( &moment, 0, 0);
 				double m_10 = cvGetSpatialMoment( &moment, 1, 0);
 				double m_01 = cvGetSpatialMoment( &moment, 0, 1);
-				_robotBackPts.push_back(cvPoint(m_10/m_00,(m_01/m_00+20)));
+				_robotBackPts.push_back(cvPoint(m_10/m_00,m_01/m_00));
 			}
 		}
 		delete contoursBack;
+	}
+
+	if (opponent) {
+		calculateThreshold("Opponent1");
+		CvSeq * contoursFront;
+		cvFindContours(_threshold, _storage, &contoursFront, sizeof(CvContour), CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE, cvPoint(0,0));
+		vector<Point2f> opponent1;
+		for (;contoursFront != 0; contoursFront = contoursFront->h_next)
+		{
+			if (cvContourArea(contoursFront) > _opp2Amin && cvContourArea(contoursFront) < _opp2Amax) {
+				if (draw) cvDrawContours(_normal, contoursFront, CV_RGB(128,128,128), CV_RGB(128,128,128), -1, 1, 8, cvPoint(0,0));
+				CvMoments moment;
+				cvMoments(contoursFront, &moment, 0);
+				double m_00 = cvGetSpatialMoment( &moment, 0, 0);
+				double m_10 = cvGetSpatialMoment( &moment, 1, 0);
+				double m_01 = cvGetSpatialMoment( &moment, 0, 1);
+				opponent1.push_back(Point2f(m_10/m_00, m_01/m_00));
+			}
+		}
+
+		calculateThreshold("Opponent2");
+		CvSeq * contoursBack;
+		cvFindContours(_threshold, _storage, &contoursBack, sizeof(CvContour), CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE, cvPoint(0,0));
+		vector<Point2f> opponent2;
+		for (;contoursBack != 0; contoursBack = contoursBack->h_next)
+		{
+			if (cvContourArea(contoursBack) > _opp2Amin && cvContourArea(contoursBack) < _opp2Amax) {
+				if (draw) cvDrawContours(_normal, contoursBack, CV_RGB(128,128,128), CV_RGB(128,128,128), -1, 1, 8, cvPoint(0,0));
+				CvMoments moment;
+				cvMoments(contoursBack, &moment, 0);
+				double m_00 = cvGetSpatialMoment( &moment, 0, 0);
+				double m_10 = cvGetSpatialMoment( &moment, 1, 0);
+				double m_01 = cvGetSpatialMoment( &moment, 0, 1);
+				opponent2.push_back(Point2f(m_10/m_00, m_01/m_00));
+			}
+		}
+
+		int index_i = -1;
+		int index_j = -1;
+		double distance = WIDTH;
+		for (int i = 0; i < opponent1.size(); i++) {
+			for (int j = 0; i < opponent2.size(); j++) {
+				double tempDistance = dist(opponent1[i].x, opponent2[j].x, opponent1[i].y, opponent2[j].y);
+				if ( tempDistance < 200 && tempDistance < distance ) {
+					index_i = i;
+					index_j = j;
+				}
+			}
+		}
+
+		_opponentPts.clear();
+		if (index_i >= 0 && index_j >= 0) {
+			_opponentPts.push_back(
+				Point2f(	(opponent1[index_i].x + opponent2[index_j].x)/2.0,
+							(opponent1[index_i].y + opponent2[index_j].y)/2.0 )
+					);
+		}
 	}
 }
 
@@ -319,6 +392,12 @@ void Webcam::calculateThreshold(string type)
 	} else if (type == "Robot2") { // Robot - BACK
 		_thresholdMin = cvScalar(_robot2Hmin, _robot2Smin, _robot2Vmin);
 		_thresholdMax = cvScalar(_robot2Hmax, _robot2Smax, _robot2Vmax);
+	} else if (type == "Opponent1") {
+		_thresholdMin = cvScalar(_opp1Hmin, _opp1Smin, _opp1Vmin);
+		_thresholdMax = cvScalar(_opp1Hmax, _opp1Smax, _opp1Vmax);
+	} else if (type == "Opponent2") {
+		_thresholdMin = cvScalar(_opp2Hmin, _opp2Smin, _opp2Vmin);
+		_thresholdMax = cvScalar(_opp2Hmax, _opp2Smax, _opp2Vmax);
 	} else { // No Threshold
 		_thresholdMin = cvScalar(0,0,0);
 		_thresholdMax = cvScalar(0,0,0);
@@ -331,10 +410,12 @@ void Webcam::calculateFinal()
 {
 	// If Calibrated, Calculate Objects
 	if (_calibrated) {
-		calculateNormal(0,1,0,1);
+		calculateNormal(1,1,0,1);
 		
 		// Transform the Balls to plane
 		if (_ballPts.size() > 0) perspectiveTransform((Mat)_ballPts, (Mat)_ballPts, _homography);
+
+		if (_opponentPts.size() > 0) perspectiveTransform((Mat)_opponentPts, (Mat)_opponentPts, _homography);
 
 		// Transform the Robot to Plane, and find middle point + angle
 		_robotPts.clear();
@@ -375,6 +456,8 @@ void Webcam::calculateFinal()
 					}
 				}
 			}
+
+			
 		}
 	}
 }

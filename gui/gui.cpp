@@ -208,6 +208,8 @@ void GUI::display()
 				else if (ui.leftObstacles2Radio->isChecked()) type = "Obstacles2";
 				else if (ui.leftRobot1Radio->isChecked()) type = "Robot1";
 				else if (ui.leftRobot2Radio->isChecked()) type = "Robot2";
+				else if (ui.leftOpp1Radio->isChecked()) type = "Opponent1";
+				else if (ui.leftOpp2Radio->isChecked()) type = "Opponent2";
 				_cam1->calculateThreshold(type);
 				displayImage(_cam1->getThreshold(), ui.leftThreshold, 1);
 				readLeftThreshold();
@@ -228,6 +230,8 @@ void GUI::display()
 				else if (ui.rightObstacles2Radio->isChecked()) type = "Obstacles2";
 				else if (ui.rightRobot1Radio->isChecked()) type = "Robot1";
 				else if (ui.rightRobot2Radio->isChecked()) type = "Robot2";
+				else if (ui.rightOpp1Radio->isChecked()) type = "Opponent1";
+				else if (ui.rightOpp2Radio->isChecked()) type = "Opponent2";
 				_cam2->calculateThreshold(type);
 				displayImage(_cam2->getThreshold(), ui.rightThreshold, 1);
 				readRightThreshold();
@@ -375,6 +379,9 @@ void GUI::processRobot()
 			_goal.y = FINAL_HEIGHT;
 		}
 	}
+
+	_opponent = combinePts(_cam1->getOpponent(), _cam2->getOpponent(),20);
+
 }
 
 void GUI::processBalls()
@@ -785,14 +792,20 @@ void GUI::displayMain()
 	// Draw Robot
 	if (_robot.size() > 1) {
 		p.setPen(QPen(QColor(Qt::blue),5));
-		p.drawArc(_robot[1].x-_robotRadius, _robot[1].y-_robotRadius, _robotRadius*2, _robotRadius*2, 0, 16*360);
+		p.drawArc(_robot[0].x-_robotRadius, _robot[0].y-_robotRadius, _robotRadius*2, _robotRadius*2, 0, 16*360);
 		p.setPen(QPen(QColor(Qt::darkBlue),5));
-		p.drawLine(_robot[1].x, _robot[1].y, _robot[1].x + cos(_robotAngle)*20, _robot[1].y - sin(_robotAngle)*20);
+		p.drawLine(_robot[0].x, _robot[0].y, _robot[0].x + cos(_robotAngle)*20, _robot[0].y - sin(_robotAngle)*20);
+		p.setPen(QPen(QColor(Qt::white),2));
+		p.drawArc(_robot[0].x-1, _robot[0].y-1, 2, 2, 0, 16*360);
 
 		p.setPen(QPen(QColor(Qt::darkBlue),5));
 		p.drawArc(_goal.x-25, FINAL_HEIGHT - _goal.y - 25, 50, 50, 0, 16*360);
 	}
 	
+	// Draw Opponent
+	if (_opponent.size() > 0) {
+
+	}
 	p.end();
 	ui.topView->resize(FINAL_WIDTH, FINAL_HEIGHT);
 	ui.topView->setPixmap(QPixmap::fromImage(qimage));
@@ -914,6 +927,24 @@ void GUI::readLeftThreshold()
 		ui.spinLeftValMax->setValue(_cam1->_robot2Vmax);
 		ui.spinLeftAreaMin->setValue(_cam1->_robot2Amin);
 		ui.spinLeftAreaMax->setValue(_cam1->_robot2Amax);
+	} else if (ui.leftOpp1Radio->isChecked()) {
+		ui.spinLeftHueMin->setValue(_cam1->_opp1Hmin);
+		ui.spinLeftHueMax->setValue(_cam1->_opp1Hmax);
+		ui.spinLeftSatMin->setValue(_cam1->_opp1Smin);
+		ui.spinLeftSatMax->setValue(_cam1->_opp1Smax);
+		ui.spinLeftValMin->setValue(_cam1->_opp1Vmin);
+		ui.spinLeftValMax->setValue(_cam1->_opp1Vmax);
+		ui.spinLeftAreaMin->setValue(_cam1->_opp1Amin);
+		ui.spinLeftAreaMax->setValue(_cam1->_opp1Amax);
+	} else if (ui.leftOpp2Radio->isChecked()) {
+		ui.spinLeftHueMin->setValue(_cam1->_opp2Hmin);
+		ui.spinLeftHueMax->setValue(_cam1->_opp2Hmax);
+		ui.spinLeftSatMin->setValue(_cam1->_opp2Smin);
+		ui.spinLeftSatMax->setValue(_cam1->_opp2Smax);
+		ui.spinLeftValMin->setValue(_cam1->_opp2Vmin);
+		ui.spinLeftValMax->setValue(_cam1->_opp2Vmax);
+		ui.spinLeftAreaMin->setValue(_cam1->_opp2Amin);
+		ui.spinLeftAreaMax->setValue(_cam1->_opp2Amax);
 	}
 	ui.spinLeftHueMin->blockSignals(false);
 	ui.spinLeftHueMax->blockSignals(false);
@@ -989,6 +1020,24 @@ void GUI::readRightThreshold()
 		ui.spinRightValMax->setValue(_cam2->_robot2Vmax);
 		ui.spinRightAreaMin->setValue(_cam2->_robot2Amin);
 		ui.spinRightAreaMax->setValue(_cam2->_robot2Amax);
+	} else if (ui.rightOpp1Radio->isChecked()) {
+		ui.spinRightHueMin->setValue(_cam2->_opp1Hmin);
+		ui.spinRightHueMax->setValue(_cam2->_opp1Hmax);
+		ui.spinRightSatMin->setValue(_cam2->_opp1Smin);
+		ui.spinRightSatMax->setValue(_cam2->_opp1Smax);
+		ui.spinRightValMin->setValue(_cam2->_opp1Vmin);
+		ui.spinRightValMax->setValue(_cam2->_opp1Vmax);
+		ui.spinRightAreaMin->setValue(_cam2->_opp1Amin);
+		ui.spinRightAreaMax->setValue(_cam2->_opp1Amax);
+	} else if (ui.rightOpp2Radio->isChecked()) {
+		ui.spinRightHueMin->setValue(_cam2->_opp2Hmin);
+		ui.spinRightHueMax->setValue(_cam2->_opp2Hmax);
+		ui.spinRightSatMin->setValue(_cam2->_opp2Smin);
+		ui.spinRightSatMax->setValue(_cam2->_opp2Smax);
+		ui.spinRightValMin->setValue(_cam2->_opp2Vmin);
+		ui.spinRightValMax->setValue(_cam2->_opp2Vmax);
+		ui.spinRightAreaMin->setValue(_cam2->_opp2Amin);
+		ui.spinRightAreaMax->setValue(_cam2->_opp2Amax);
 	}
 	ui.spinRightHueMin->blockSignals(false);
 	ui.spinRightHueMax->blockSignals(false);
@@ -1056,8 +1105,26 @@ void GUI::writeLeftThreshold()
 		_cam1->_robot2Vmax = ui.spinLeftValMax->value();
 		_cam1->_robot2Amin = ui.spinLeftAreaMin->value();
 		_cam1->_robot2Amax = ui.spinLeftAreaMax->value();
+	} else if (ui.leftOpp1Radio->isChecked()) {
+		_cam1->_opp1Hmin = ui.spinLeftHueMin->value();
+		_cam1->_opp1Hmax = ui.spinLeftHueMax->value();
+		_cam1->_opp1Smin = ui.spinLeftSatMin->value();
+		_cam1->_opp1Smax = ui.spinLeftSatMax->value();
+		_cam1->_opp1Vmin = ui.spinLeftValMin->value();
+		_cam1->_opp1Vmax = ui.spinLeftValMax->value();
+		_cam1->_opp1Amin = ui.spinLeftAreaMin->value();
+		_cam1->_opp1Amax = ui.spinLeftAreaMax->value();
+	} else if (ui.leftOpp2Radio->isChecked()) {
+		_cam1->_opp2Hmin = ui.spinLeftHueMin->value();
+		_cam1->_opp2Hmax = ui.spinLeftHueMax->value();
+		_cam1->_opp2Smin = ui.spinLeftSatMin->value();
+		_cam1->_opp2Smax = ui.spinLeftSatMax->value();
+		_cam1->_opp2Vmin = ui.spinLeftValMin->value();
+		_cam1->_opp2Vmax = ui.spinLeftValMax->value();
+		_cam1->_opp2Amin = ui.spinLeftAreaMin->value();
+		_cam1->_opp2Amax = ui.spinLeftAreaMax->value();
 	}
-}
+} 
 
 void GUI::writeRightThreshold()
 {
@@ -1115,6 +1182,24 @@ void GUI::writeRightThreshold()
 		_cam2->_robot2Vmax = ui.spinRightValMax->value();
 		_cam2->_robot2Amin = ui.spinRightAreaMin->value();
 		_cam2->_robot2Amax = ui.spinRightAreaMax->value();
+	} else if (ui.rightOpp1Radio->isChecked()) {
+		_cam2->_opp1Hmin = ui.spinRightHueMin->value();
+		_cam2->_opp1Hmax = ui.spinRightHueMax->value();
+		_cam2->_opp1Smin = ui.spinRightSatMin->value();
+		_cam2->_opp1Smax = ui.spinRightSatMax->value();
+		_cam2->_opp1Vmin = ui.spinRightValMin->value();
+		_cam2->_opp1Vmax = ui.spinRightValMax->value();
+		_cam2->_opp1Amin = ui.spinRightAreaMin->value();
+		_cam2->_opp1Amax = ui.spinRightAreaMax->value();
+	} else if (ui.rightOpp2Radio->isChecked()) {
+		_cam2->_opp2Hmin = ui.spinRightHueMin->value();
+		_cam2->_opp2Hmax = ui.spinRightHueMax->value();
+		_cam2->_opp2Smin = ui.spinRightSatMin->value();
+		_cam2->_opp2Smax = ui.spinRightSatMax->value();
+		_cam2->_opp2Vmin = ui.spinRightValMin->value();
+		_cam2->_opp2Vmax = ui.spinRightValMax->value();
+		_cam2->_opp2Amin = ui.spinRightAreaMin->value();
+		_cam2->_opp2Amax = ui.spinRightAreaMax->value();
 	}
 }
 
