@@ -28,7 +28,17 @@ void ReadInput(){
                 //enc2_Count =0;
                 //Reset();
                 CheckforE();
-                
+                if(Serial.peek() == 'X'){
+                  if(DEBUG == 1){
+                    DEBUG = 0;
+                    Serial.println("Exiting Debug Mode");
+                  }
+                  else{ 
+                    DEBUG = 1;
+                    Serial.println("Entering Debug Mode");
+                    }
+                  Serial.read();
+                }
                 if(Serial.peek() == 'G'){
                         logln("Grabbing the ball");
                         

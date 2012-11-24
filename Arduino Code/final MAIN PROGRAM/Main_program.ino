@@ -13,13 +13,13 @@
 #include <pnew.cpp>
 
 
-#define DEBUG 0
+//#define DEBUG 1
 #define LOW 0
 #define HIGH 1
 #define rate 100
 #define MOVE 1
 #define STANDBY 0
-#define RETRACT 72
+#define RETRACT 81
 #define EXTEND 1023
 #define FALSE 0 
 #define TRUE 1
@@ -68,10 +68,10 @@ int actuator_input = A7;
 int actuator_enable = 11;
 
 // Pin numbers defined here
-int motor1_pin_1 = 2; // H-Bridge input pin 1 for Motor 1 (Right)
-int motor1_pin_2 = 4; // H-Bridge input pin 2 for Motor 1 
-int motor2_pin_1 = 5; // H-Bridge input pin 3 for Motor 2 (Left)
-int motor2_pin_2 = 7; // H-bridge input pin 4 for Motor 2
+int motor1_pin_1 = 4; // H-Bridge input pin 1 for Motor 1 (Right)
+int motor1_pin_2 = 2; // H-Bridge input pin 2 for Motor 1 
+int motor2_pin_1 = 7; // H-Bridge input pin 3 for Motor 2 (Left)
+int motor2_pin_2 = 5; // H-bridge input pin 4 for Motor 2
 int enablepin_1 = 6; // H-Bridge enable pin for Motor 1
 int enablepin_2 = 3; // H-Bridge enable pin for Motor 2
 int encoder1_in = A4;
@@ -115,6 +115,7 @@ int KI = 5;
 int KP = 70;
 int motor = 0;
 int kick = FALSE;
+int DEBUG = 0;
 
 void setup() {
 
@@ -149,6 +150,7 @@ void setup() {
         digitalWrite(actuator_input, HIGH);
         digitalWrite(actuator_enable, LOW);
         Reset();
+        DEBUG = 0;
         
         ActuatorControl(RETRACT);
 	
@@ -162,6 +164,9 @@ void setup() {
 
 void loop () 
 {
+  
+  
+  
        Sensor();
 	if(state == MOVE){
                 MotorControl();
@@ -169,6 +174,8 @@ void loop ()
 	else{
                 ReadInput();
         }
+        
+        
 } //Close the loop
 
 

@@ -68,7 +68,7 @@ void NEWkick(){
          sumError2 =0;
          kick = TRUE;
          logln("Right Turn");
-         
+         digitalWrite(actuator_enable, LOW); 
          delay(300);
          
          while( enc1_Count < abspos_1 && enc2_Count < abspos_2 && flag ==0) 
@@ -89,6 +89,7 @@ void NEWkick(){
           if (flag ==0)
             {
              logln("Ball just out of the caster ");
+             digitalWrite(actuator_enable, HIGH); 
              //  logln(SenseDistance);            
              Actuator_Read();
              while (actuator_length > RETRACT && flag == 0 )
