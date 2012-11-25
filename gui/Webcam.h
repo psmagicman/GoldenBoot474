@@ -1,3 +1,9 @@
+/*
+ *	Author: Wilbur Yu
+ *	Course: EECE478
+ *	Date: November 2012
+ */
+
 #ifndef WEBCAM
 #define WEBCAM
 
@@ -11,7 +17,6 @@
 #include <math.h>
 
 #include "GLOBALS.h"
-#include "QuickSort.h"
 
 using namespace std;
 using namespace cv;
@@ -134,8 +139,6 @@ private:
 	IplImage * _hsv;
 	IplImage * _threshold;
 	IplImage * _final;
-
-	QuickSort myQuickSort;
 
 	int _robotDist; // Used to threshold the distance between the two robot colours
 

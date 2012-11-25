@@ -100,7 +100,6 @@
     <ClCompile Include="ThresholdFile.cpp" />
     <ClCompile Include="Ticks.cpp" />
     <ClCompile Include="XMLReader.cpp" />
-    <ClCompile Include="QuickSort.cpp" />
     <ClCompile Include="tinyxml2.cpp" />
     <ClCompile Include="Webcam.cpp" />
   </ItemGroup>
@@ -137,7 +136,6 @@
     <ClInclude Include="ThresholdFile.h" />
     <ClInclude Include="Ticks.h" />
     <ClInclude Include="XMLReader.h" />
-    <ClInclude Include="QuickSort.h" />
     <ClInclude Include="tinyxml2.h" />
     <ClInclude Include="Webcam.h" />
   </ItemGroup>

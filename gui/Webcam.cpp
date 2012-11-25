@@ -1,3 +1,9 @@
+/*
+ *	Author: Wilbur Yu
+ *	Course: EECE478
+ *	Date: November 2012
+ */
+
 #include "Webcam.h"
 
 Webcam::Webcam(int ID)
