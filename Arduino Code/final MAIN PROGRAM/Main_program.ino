@@ -116,6 +116,7 @@ int KP = 70;
 int motor = 0;
 int kick = FALSE;
 int DEBUG = 0;
+int Kickdone = 0;
 
 void setup() {
 

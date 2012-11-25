@@ -4,6 +4,11 @@ void CatchtheBall()
   int caught =0;
   GrabDir =LEFTONE;
  //Reset();
+ enc1_Count = 0;
+ enc2_Count = 0;
+ sumError1 =0;
+ sumError2 =0;
+ 
   while(caught == 0){
         if( CheckforE() == TRUE){ 
           Reset();
@@ -19,6 +24,8 @@ void CatchtheBall()
             Stop();
             enc1_Count = 0;
             enc2_Count = 0;
+            sumError1 = 0;
+            sumError2 = 0;
             GrabDir = RIGHTONE;
             logln("Ball is on my right");
           }
@@ -131,6 +138,13 @@ void CatchtheBall()
         }
         
         if(SenseDistance <= 4){
+                enc1_Count = 0;
+                enc2_Count = 0;
+                sumError1 = 0;
+                sumError2 = 0;
+                while( enc1_Count <= 10 && enc2_Count <= 10){
+                  Accelerate(pwm_1, pwm_2);
+                }
                 Stop();
                 Serial.print(2);
                 logln("Ball in the caster .");

@@ -251,6 +251,7 @@ void MotorControl(){
                         else if( pos_1 == KICKFLAG && pos_2 == KICKFLAG){
                           //KicktheBall();
                           NEWkick();
+                          
                           logln("Finished Kicking");
                            
                         }

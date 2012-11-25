@@ -1,6 +1,12 @@
 void NEWkick(){
-  
-    //Reset();
+  Kickdone = 0;
+  logln("before while loop");
+  while( 1 ){
+    logln("kicking while loop");
+    if( Kickdone == 1){
+      break;
+    }
+   
    int flag = 0; 
    CheckforE();
    pos_1 = 48; 
@@ -86,6 +92,7 @@ void NEWkick(){
            logln(pwm_1);
            logln(pwm_2);
           }
+            
           if (flag ==0)
             {
              logln("Ball just out of the caster ");
@@ -105,10 +112,19 @@ void NEWkick(){
             } 
       }
       kick = FALSE;
-      logln("Done with the ball kicking") ;   
-      Serial.print(4);   
-      enc1_Count =0;
-      enc2_Count =0;
-      digitalWrite(actuator_enable, LOW); 
-      //Reset();
+      Sensor();
+      Sensor();
+      Sensor();
+      if( SenseDistance <= 10){
+          Kickdone = 0;
+      }
+      else{
+          Kickdone = 1;
+          logln("Done with the ball kicking") ;   
+          Serial.print(4);   
+          enc1_Count =0;
+          enc2_Count =0;
+          digitalWrite(actuator_enable, LOW); 
+      }
+}
 }
