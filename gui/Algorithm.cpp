@@ -18,7 +18,7 @@ CAlgorithm::CAlgorithm(vector<Obstacle> obstacles)
 vector<Coord2D> CAlgorithm::getPathToGoal(Robot robot, Coord2D goal)
 {
 	_robot = robot;	
-	return getPathToPoint(goal,75);
+	return getPathToPoint(goal,40);
 }
 
 void CAlgorithm::setOpponent(Obstacle opponent)
@@ -54,7 +54,7 @@ void CAlgorithm::analyzeField(Robot robot, vector<Ball> balls)
 		Coord2D ballPoint;
 		ballPoint.x = _balls[iBall].x;
 		ballPoint.y = _balls[iBall].y;
-		_paths.push_back(getPathToPoint(ballPoint,40));
+		_paths.push_back(getPathToPoint(ballPoint,35));
 	}
 }
 

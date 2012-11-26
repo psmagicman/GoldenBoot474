@@ -30,8 +30,10 @@ using namespace std;
 #define	BALL_RESPOND	4
 #define STP2_REQUEST	5
 #define STP2_RESPOND	6
-#define GOAL_REQUEST	7
-#define GOAL_RESPOND	8
+#define TOGOAL_REQUEST	7
+#define TOGOAL_RESPOND	8
+#define GOAL_REQUEST	9
+#define GOAL_RESPOND	10
 
 #define NO_ERRORS		0
 #define	ERR_PATHING		1

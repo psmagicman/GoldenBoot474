@@ -261,7 +261,7 @@ void GUI::display()
 			processRobot();
 
 			// Algorithm
-			//detectProblems();
+			detectProblems();
 			if (_task1 || _task2 || _task3 || _final) {
 				if (_balls.size() > 0 && _robot.size() > 1) {
 					if (_state == TASKS_READY) {
@@ -303,7 +303,7 @@ void GUI::display()
 		}
 	}
 	if (_state == EMERGENCY_STOP) {
-		if ((_time.elapsed() - _prevTaskTime) >= 100) {
+		if ((_time.elapsed() - _prevTaskTime) >= _commTime) {
 			writeProcess("STOP");
 			_prevTaskTime = _time.elapsed();
 		}
@@ -311,21 +311,21 @@ void GUI::display()
 	if (_state == EMERGENCY_ACT) {
 	}
 	if (_state == STP1_REQUEST) {
-		if ((_time.elapsed() - _prevTaskTime) >= 100) {
+		if ((_time.elapsed() - _prevTaskTime) >= _commTime) {
 			writeProcess("STOP");
 			_prevTaskTime = _time.elapsed();
 			calcPathToBall();
 		}
 	}
 	if (_state == STP2_REQUEST) {
-		if ((_time.elapsed() - _prevTaskTime) >= 100) {
+		if ((_time.elapsed() - _prevTaskTime) >= _commTime) {
 			writeProcess("STOP");
 			_prevTaskTime = _time.elapsed();
 			calcPathToGoal();
 		}
 	}
 	if (_run) {
-		if ((_time.elapsed() - _prevTaskTime) >= 100) {
+		if ((_time.elapsed() - _prevTaskTime) >= _commTime) {
 			writeProcess("RUN");
 			_run = false;
 		}
@@ -381,7 +381,6 @@ void GUI::processRobot()
 	}
 
 	_opponent = combinePts(_cam1->getOpponent(), _cam2->getOpponent(),20);
-
 }
 
 void GUI::processBalls()
@@ -529,10 +528,13 @@ void GUI::calcPathToBall()
 	_path.clear();
 	_path = _ticks.getPath();
 	for (int i = 0; i < _path.size(); i++) _path[i].y = FINAL_HEIGHT - _path[i].y;
+	_targetBall.x = _algorithm.getBalls()[_ticks.getClosestIndex()].x;
+	_targetBall.y = FINAL_HEIGHT - _algorithm.getBalls()[_ticks.getClosestIndex()].y;
 }
 
 void GUI::sendBallCommand()
 {
+	calcPathToBall();
 	QString tickMessage = "Ticks: ";
 	vector<Coord2D> tick = _ticks.getTicks();
 	for (int i = 0; i < tick.size(); i++) {
@@ -541,11 +543,11 @@ void GUI::sendBallCommand()
 		writeProcess("START");
 
 		char RTicksStr[5];
-		itoa(tick[i].y,RTicksStr,10);
+		itoa(tick[i].x,RTicksStr,10);
 		writeProcess((string)RTicksStr);
 
 		char LTicksStr[5];
-		itoa(tick[i].x,LTicksStr,10);
+		itoa(tick[i].y,LTicksStr,10);
 		writeProcess((string)LTicksStr);
 	}
 	if (tick.size() > 0) {
@@ -567,6 +569,7 @@ void GUI::calcPathToGoal()
 
 void GUI::sendGoalCommand()
 {
+	calcPathToGoal();
 	QString tickMessage = "Ticks: ";
 	vector<Coord2D> tick = _ticks.getTicks();
 	for (int i = 0; i < tick.size(); i++) {
@@ -575,15 +578,16 @@ void GUI::sendGoalCommand()
 		writeProcess("START");
 
 		char RTicksStr[5];
-		itoa(tick[i].y,RTicksStr,10);
+		itoa(tick[i].x,RTicksStr,10);
 		writeProcess((string)RTicksStr);
 
 		char LTicksStr[5];
-		itoa(tick[i].x,LTicksStr,10);
+		itoa(tick[i].y,LTicksStr,10);
 		writeProcess((string)LTicksStr);
 	}
 	if (tick.size() > 0) {
 		writeProcess("KICK");
+		_run = true;
 	}
 	ui.labelTicks->setText(tickMessage);
 }
@@ -616,9 +620,14 @@ void GUI::taskInit()
 
 void GUI::restartTask()
 {
+	ui.labelCommands->clear();
+	ui.labelPaths->clear();
+	ui.labelTicks->clear();
 	if (_state <= BALL_RESPOND) {
+		calcPathToBall();
 		_prevState = TASKS_READY;
 	} else if (_state <= GOAL_RESPOND) {
+		calcPathToGoal();
 		_prevState = BALL_RESPOND;
 	}
 	_state = EMERGENCY_STOP;
@@ -626,8 +635,9 @@ void GUI::restartTask()
 
 void GUI::detectProblems()
 {
-	if (_robot.size() == 2 && _errorState == NO_ERRORS && _state >= TASKS_READY) {
+	if (_robot.size() == 2 && _state >= TASKS_READY) {
 		// Detect Obstacles in Front
+		/*
 		for (int i = 0; i < _obstacles.size(); i++) {
 			double robotX = _robot[1].x;
 			double robotY = _robot[1].y;
@@ -647,7 +657,7 @@ void GUI::detectProblems()
 				}
 			}
 		}
-
+		*/
 		// Detect if Robot is still On-Route
 		// cosTheta = A DOT B / (LEN(A) * LEN(B))
 		if (_task1 || _task2 || _task3 || _final) {
@@ -669,16 +679,15 @@ void GUI::detectProblems()
 						double distanceFromLine = distFromLine(A,B,C);
 						double distanceFromB = dist(A.x, B.x, A.y, B.y);
 						double distanceFromC = dist(A.x, C.x, A.y, C.y);
-						if (distanceFromLine > 5 && distanceFromB > 5 && distanceFromC > 5) {
+						if (distanceFromLine > 10 && distanceFromB > 5 && distanceFromC > 5) {
 							log ("STOP - NO LONGER ON-ROUTE");
-							_errorState = ERR_PATHING;
 							restartTask();
 						}
 					}
 				}
 			}
-
-			if (_path.size() > 0) {
+			/*
+			if (_path.size() > 0 && _state < BALL_RESPOND) {
 				for (int i = 0; i < _balls.size(); i++) {
 					if ( dist(_targetBall.x, _balls[i].x, _targetBall.y, _balls[i].y) < 10 ) {
 						break;
@@ -690,6 +699,7 @@ void GUI::detectProblems()
 					}
 				}
 			}
+			*/
 		}
 	}
 	else {
@@ -1268,7 +1278,7 @@ void GUI::readProcess()
 	ui.testCommands->setText(ui.testCommands->toPlainText() + command);
 	if (_state == EMERGENCY_STOP) {
 		if (command.contains(":1")) {
-			_state = EMERGENCY_ACT;
+			_state = _prevState;
 			_prevTaskTime = _time.elapsed();
 		}
 	}
@@ -1299,4 +1309,13 @@ void GUI::readProcess()
 			_prevTaskTime = _time.elapsed();
 		}
 	}
+
+	if (command.contains(":5")) { // RUN IS READ
+		//_run = false;
+	}
+	/*
+	if (command.contains(":9")) {
+		_state = TASKS_READY;
+	}
+	*/
 }

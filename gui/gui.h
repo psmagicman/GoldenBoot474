@@ -12,12 +12,13 @@
 #include "ui_gui.h"
 
 #include "ArduinoCOMM.h"
-#include "MovementAlgorithm.h"
 #include "Webcam.h"
 #include "ThresholdFile.h"
 #include "Algorithm.h"
 #include "Ticks.h"
 #include "XMLReader.h"
+
+const int _commTime = 200;
 
 class GUI : public QMainWindow
 {

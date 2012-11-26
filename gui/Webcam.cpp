@@ -200,8 +200,9 @@ void Webcam::calculateObstacles()
 					abs(obstaclesTopPts[j].x - obstaclesBotPts[i].x) < 30 
 					) {
 					if (dist(obstaclesTopPts[j].x , obstaclesBotPts[i].x, obstaclesTopPts[j].y, obstaclesBotPts[i].y) < 75) {
+						double slope = (obstaclesTopPts[j].y - obstaclesBotPts[i].y)/(obstaclesTopPts[j].x - obstaclesBotPts[i].x);
 						_obstaclesPtsCam.push_back(Point2f(
-							2*obstaclesBotPts[i].x - obstaclesTopPts[j].x,
+							2*obstaclesBotPts[i].x - obstaclesTopPts[j].x - obstaclesTopHeight[j]/slope,
 							2*obstaclesBotPts[i].y - obstaclesTopPts[j].y - obstaclesTopHeight[j]
 							));
 							break;
@@ -266,7 +267,7 @@ void Webcam::calculateNormal(bool opponent, bool balls, bool obstacles, bool rob
 			for (;contoursTop != 0; contoursTop = contoursTop->h_next)
 			{
 				if (cvContourArea(contoursTop) > _obstacles2Amin && cvContourArea(contoursTop) < _obstacles2Amax) {
-					if (draw) cvDrawContours(_normal, contoursTop, CV_RGB(128,0,0), CV_RGB(255,0,0), -1, 1, 8, cvPoint(0,0));
+					if (draw) cvDrawContours(_normal, contoursTop, CV_RGB(128,0,0), CV_RGB(128,0,0), -1, 1, 8, cvPoint(0,0));
 				}
 			}
 			delete contoursTop;
@@ -289,7 +290,7 @@ void Webcam::calculateNormal(bool opponent, bool balls, bool obstacles, bool rob
 		for (;contoursFront != 0; contoursFront = contoursFront->h_next)
 		{
 			if (cvContourArea(contoursFront) > _robot1Amin && cvContourArea(contoursFront) < _robot1Amax) {
-				if (draw) cvDrawContours(_normal, contoursFront, CV_RGB(0,0,0), CV_RGB(0,0,0), -1, 1, 8, cvPoint(0,0));
+				if (draw) cvDrawContours(_normal, contoursFront, CV_RGB(0,0,0), CV_RGB(0,0,255), -1, 1, 8, cvPoint(0,0));
 				CvMoments moment;
 				cvMoments(contoursFront, &moment, 0);
 				double m_00 = cvGetSpatialMoment( &moment, 0, 0);
@@ -308,7 +309,7 @@ void Webcam::calculateNormal(bool opponent, bool balls, bool obstacles, bool rob
 		for (;contoursBack != 0; contoursBack = contoursBack->h_next)
 		{
 			if (cvContourArea(contoursBack) > _robot2Amin && cvContourArea(contoursBack) < _robot2Amax) {
-				if (draw) cvDrawContours(_normal, contoursBack, CV_RGB(128,128,128), CV_RGB(128,128,128), -1, 1, 8, cvPoint(0,0));
+				if (draw) cvDrawContours(_normal, contoursBack, CV_RGB(0,0,128), CV_RGB(0,0,128), -1, 1, 8, cvPoint(0,0));
 				CvMoments moment;
 				cvMoments(contoursBack, &moment, 0);
 				double m_00 = cvGetSpatialMoment( &moment, 0, 0);
@@ -328,7 +329,7 @@ void Webcam::calculateNormal(bool opponent, bool balls, bool obstacles, bool rob
 		for (;contoursFront != 0; contoursFront = contoursFront->h_next)
 		{
 			if (cvContourArea(contoursFront) > _opp2Amin && cvContourArea(contoursFront) < _opp2Amax) {
-				if (draw) cvDrawContours(_normal, contoursFront, CV_RGB(128,128,128), CV_RGB(128,128,128), -1, 1, 8, cvPoint(0,0));
+				if (draw) cvDrawContours(_normal, contoursFront, CV_RGB(256,128,0), CV_RGB(256,128,0), -1, 1, 8, cvPoint(0,0));
 				CvMoments moment;
 				cvMoments(contoursFront, &moment, 0);
 				double m_00 = cvGetSpatialMoment( &moment, 0, 0);
@@ -345,7 +346,7 @@ void Webcam::calculateNormal(bool opponent, bool balls, bool obstacles, bool rob
 		for (;contoursBack != 0; contoursBack = contoursBack->h_next)
 		{
 			if (cvContourArea(contoursBack) > _opp2Amin && cvContourArea(contoursBack) < _opp2Amax) {
-				if (draw) cvDrawContours(_normal, contoursBack, CV_RGB(128,128,128), CV_RGB(128,128,128), -1, 1, 8, cvPoint(0,0));
+				if (draw) cvDrawContours(_normal, contoursBack, CV_RGB(256,256,0), CV_RGB(256,256,0), -1, 1, 8, cvPoint(0,0));
 				CvMoments moment;
 				cvMoments(contoursBack, &moment, 0);
 				double m_00 = cvGetSpatialMoment( &moment, 0, 0);
@@ -359,9 +360,10 @@ void Webcam::calculateNormal(bool opponent, bool balls, bool obstacles, bool rob
 		int index_j = -1;
 		double distance = WIDTH;
 		for (int i = 0; i < opponent1.size(); i++) {
-			for (int j = 0; i < opponent2.size(); j++) {
+			for (int j = 0; j < opponent2.size(); j++) {
 				double tempDistance = dist(opponent1[i].x, opponent2[j].x, opponent1[i].y, opponent2[j].y);
 				if ( tempDistance < 200 && tempDistance < distance ) {
+					distance = tempDistance;
 					index_i = i;
 					index_j = j;
 				}
@@ -425,6 +427,7 @@ void Webcam::calculateFinal()
 
 		// Transform the Robot to Plane, and find middle point + angle
 		_robotPts.clear();
+		_robotAngle = -1;
 		if (_robotFrontPts.size() > 0 && _robotBackPts.size() > 0) {
 			perspectiveTransform((Mat)_robotFrontPts, (Mat)_robotFrontPts, _homography);
 			perspectiveTransform((Mat)_robotBackPts, (Mat)_robotBackPts, _homography);

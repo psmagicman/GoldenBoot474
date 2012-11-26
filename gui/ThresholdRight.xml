@@ -14,7 +14,7 @@
 
 <arenaAmax>0</arenaAmax>
 
-<ballHmin>25</ballHmin>
+<ballHmin>35</ballHmin>
 
 <ballHmax>50</ballHmax>
 
@@ -26,7 +26,7 @@
 
 <ballVmax>255</ballVmax>
 
-<ballAmin>100</ballAmin>
+<ballAmin>200</ballAmin>
 
 <ballAmax>1250</ballAmax>
 
@@ -50,21 +50,21 @@
 
 <obstacles2Hmax>120</obstacles2Hmax>
 
-<obstacles2Smin>200</obstacles2Smin>
+<obstacles2Smin>100</obstacles2Smin>
 
 <obstacles2Smax>255</obstacles2Smax>
 
 <obstacles2Vmin>100</obstacles2Vmin>
 
-<obstacles2Vmax>150</obstacles2Vmax>
+<obstacles2Vmax>200</obstacles2Vmax>
 
 <obstacles2Amin>200</obstacles2Amin>
 
 <obstacles2Amax>4000</obstacles2Amax>
 
-<robot1Hmin>60</robot1Hmin>
+<robot1Hmin>10</robot1Hmin>
 
-<robot1Hmax>80</robot1Hmax>
+<robot1Hmax>23</robot1Hmax>
 
 <robot1Smin>100</robot1Smin>
 
@@ -78,15 +78,15 @@
 
 <robot1Amax>2000</robot1Amax>
 
-<robot2Hmin>170</robot2Hmin>
+<robot2Hmin>160</robot2Hmin>
 
 <robot2Hmax>180</robot2Hmax>
 
-<robot2Smin>150</robot2Smin>
+<robot2Smin>100</robot2Smin>
 
 <robot2Smax>255</robot2Smax>
 
-<robot2Vmin>150</robot2Vmin>
+<robot2Vmin>100</robot2Vmin>
 
 <robot2Vmax>255</robot2Vmax>
 

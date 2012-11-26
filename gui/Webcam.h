@@ -39,8 +39,6 @@ public:
 	void calculateThreshold(string type);
 	void calculateFinal();
 
-	void changeThreshold(string type, int input[8]);
-
 	IplImage * getNormal() {return _normal;};
 	IplImage * getHSV() {return _hsv;};
 	IplImage * getThreshold() {return _threshold;};
