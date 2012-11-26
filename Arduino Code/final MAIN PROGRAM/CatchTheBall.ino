@@ -150,6 +150,7 @@ void CatchtheBall()
                 logln("Ball in the caster .");
                 logln(SenseDistance);
                 caught=1;
+                StillGotTheBall = 1;
          }
   } 
         //enc1_Count =0;
@@ -157,95 +158,4 @@ void CatchtheBall()
         Reset();
 }
 
-
-void CatchBallDistance()
-{ int distance_1,distance_2,distance_3;
-  int caught =0;
-  while(caught == 0)
-  {Sensor();
-   Sensor();
-   Sensor();
-   distance_1 = SenseDistance;
-   //Turn right 45 deg
-  enc1_Count = 0; 
-  enc2_Count = 0;
-  abspos_1 = 1;
-  abspos_2 = 1;
-   while((enc1_Count <= abspos_1) && (enc2_Count <= abspos_2))
-     {RightTurn(70,70);
-     }
-   Stop();
-   
-   Sensor();
-   Sensor();
-   Sensor(); 
-   distance_2 = SenseDistance; 
-   //Turn left 90 deg
-   enc1_Count = 0; 
-   enc2_Count = 0;
-   abspos_1 = 2;
-   abspos_2 = 2;
-    while((enc1_Count < abspos_1) && (enc2_Count < abspos_2))
-     {LeftTurn(70,70);
-     }
-   Stop();
- 
-   Sensor();
-   Sensor();
-   Sensor();
-   distance_3 = SenseDistance; 
-   
-    //Compare the distances 
-     if ((distance_1 <= distance_2) && (distance_1 <= distance_3))
-      {
-        log1("Shotest distance is :  ");
-        log1(distance_1);
-        logln(' ');
-        //distance_short = distance_1; 
-        //Turn right 45 degree
-       enc1_Count = 0; 
-       enc2_Count = 0;
-       abspos_1 = 23;
-       abspos_2 = 23;
-        while((enc1_Count < abspos_1) && (enc2_Count < abspos_2))
-         {RightTurn(100,100);
-         }
-        Stop(); 
-      }
-    else if ((distance_2 <= distance_1) && (distance_2 <= distance_3))
-      {
-        log1("Shotest distance is :  ");
-        log1(distance_2);
-        logln(' ');
-        //distance_short = distance_2; 
-         //Turn right 90 degree
-         enc1_Count = 0; 
-         enc2_Count = 0;
-         abspos_1 = 48;
-         abspos_2 = 48;
-        while((enc1_Count < abspos_1) && (enc2_Count < abspos_2))
-         {RightTurn(100,100);
-         }
-        Stop(); 
-      }
-    else
-     {log1("Shotest distance is :  ");
-      log1(distance_3);
-      logln(' ');
-     }
-     // distance_short = distance_3; 
-       //Stay in the same position  
-       
-      Accelerate(pwm_1, pwm_2);
-      Sensor();
-      Sensor();
-      Sensor();
-      if(SenseDistance <= 4){
-                Stop();
-                logln("Ball in the caster .");
-                logln(SenseDistance);
-                caught=1;
-         }
-  }
-}
 

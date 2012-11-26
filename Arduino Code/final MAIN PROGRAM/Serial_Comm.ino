@@ -16,6 +16,7 @@ boolean CheckforE(){
                    Serial.read();                   
                  }
                  Reset();
+                 StillGotTheBall = 0;
                  return TRUE;
            }
           else return FALSE;
@@ -74,6 +75,7 @@ void ReadInput(){
                 
 		else if(Serial.peek() == 'R'){
 			state = MOVE;
+                        Serial.print(5);
                         logln("Run");
 			while(Serial.available()){
 				Serial.read();

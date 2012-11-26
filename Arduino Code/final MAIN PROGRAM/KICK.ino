@@ -1,5 +1,7 @@
 void NEWkick(){
   Kickdone = 0;
+  StillGotTheBall = 0;
+  int KickDir = 0;
   logln("before while loop");
   while( 1 ){
     logln("kicking while loop");
@@ -27,7 +29,12 @@ void NEWkick(){
        flag = 1;
        break;
        }
-       LeftTurn(pwm_1, pwm_2); 
+       if(KickDir == 0){
+         LeftTurn(pwm_1, pwm_2); 
+       }
+       else{
+         RightTurn(pwm_1, pwm_2);
+       }
        //Position();
        //logln(' ');
        //log1("Encoder1:  ");
@@ -83,7 +90,12 @@ void NEWkick(){
              flag = 1;
              break;
            }
-           RightTurn(pwm_1, pwm_2);
+           if(KickDir == 0){
+             RightTurn(pwm_1, pwm_2);
+           }
+           else{
+             LeftTurn(pwm_1, pwm_2);
+           }
            logln(' ');
            //log1("Encoder1:  ");
            //log1(enc1_Count);
@@ -117,11 +129,18 @@ void NEWkick(){
       Sensor();
       if( SenseDistance <= 10){
           Kickdone = 0;
+          if(KickDir ==0){
+            KickDir = 1;
+          }
+          else
+          {
+            KickDir = 0;
+          }
       }
       else{
           Kickdone = 1;
           logln("Done with the ball kicking") ;   
-          Serial.print(4);   
+          Serial.print(4);
           enc1_Count =0;
           enc2_Count =0;
           digitalWrite(actuator_enable, LOW); 

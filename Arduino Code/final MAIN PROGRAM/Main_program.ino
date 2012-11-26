@@ -117,6 +117,7 @@ int motor = 0;
 int kick = FALSE;
 int DEBUG = 0;
 int Kickdone = 0;
+int StillGotTheBall = 0;
 
 void setup() {
 
@@ -169,6 +170,12 @@ void loop ()
   
   
        Sensor();
+        if( StillGotTheBall == 1 && SenseDistance > 5){
+          Stop();
+          Reset();
+          StillGotTheBall = 0;
+          Serial.print(9);
+        }
 	if(state == MOVE){
                 MotorControl();
         }

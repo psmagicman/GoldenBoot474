@@ -22,7 +22,7 @@ void Reset(){
         slowdown1 =0;
         slowdown2 =0;
         
-        ActuatorControl(RETRACT);
+        //ActuatorControl(RETRACT);
         logln("Robot Reset()");
         while (Serial.available())
         {Serial.read();
