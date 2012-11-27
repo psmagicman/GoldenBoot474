@@ -7,7 +7,9 @@ void serialEvent(){
 
 boolean CheckforE(){
         //if(Serial.available() > 0){
-         
+           if( state ==  MOVE && Serial.peek() == 'R'){
+             Serial.read();
+           }
            if( Serial.peek() == 'E'){
                  emergency = 1;
                  logln("Emergency");
@@ -19,7 +21,10 @@ boolean CheckforE(){
                  StillGotTheBall = 0;
                  return TRUE;
            }
-          else return FALSE;
+          else{
+            //Serial.read();
+            return FALSE;
+          }
 }
 
 void ReadInput(){
