@@ -94,15 +94,15 @@
 
 <robot2Amax>2000</robot2Amax>
 
-<opp1Hmin>60</opp1Hmin>
+<opp1Hmin>110</opp1Hmin>
 
-<opp1Hmax>85</opp1Hmax>
+<opp1Hmax>120</opp1Hmax>
 
-<opp1Smin>100</opp1Smin>
+<opp1Smin>150</opp1Smin>
 
 <opp1Smax>255</opp1Smax>
 
-<opp1Vmin>50</opp1Vmin>
+<opp1Vmin>100</opp1Vmin>
 
 <opp1Vmax>255</opp1Vmax>
 

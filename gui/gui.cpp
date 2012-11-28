@@ -578,25 +578,37 @@ bool GUI::sendBallCommand()
 	if (calcPathToBall()) {
 		QString tickMessage = "Ticks: ";
 		vector<Coord2D> tick = _ticks.getTicks();
+		bool verify = true;
 		for (int i = 0; i < tick.size(); i++) {
-			tickMessage += "(" + QString::number((int)tick[i].x) + "," + QString::number((int)tick[i].y) + ")";
-
-			writeProcess("START");
-
-			char RTicksStr[5];
-			itoa(tick[i].x,RTicksStr,10);
-			writeProcess((string)RTicksStr);
-
-			char LTicksStr[5];
-			itoa(tick[i].y,LTicksStr,10);
-			writeProcess((string)LTicksStr);
+			if (!(tick[i].x > -9999 && tick[i].x < 99999 &&
+				tick[i].y > -9999 && tick[i].y < 99999)) {
+				verify = false;
+			}
 		}
-		if (tick.size() > 0) {
-			writeProcess("GRAB");
-			_run = true;
+		if (verify) {
+			for (int i = 0; i < tick.size(); i++) {
+				tickMessage += "(" + QString::number((int)tick[i].x) + "," + QString::number((int)tick[i].y) + ")";
+
+				writeProcess("START");
+
+				char RTicksStr[5];
+				itoa(tick[i].x,RTicksStr,10);
+				writeProcess((string)RTicksStr);
+
+				char LTicksStr[5];
+				itoa(tick[i].y,LTicksStr,10);
+				writeProcess((string)LTicksStr);
+			}
+			if (tick.size() > 0) {
+				writeProcess("GRAB");
+				_run = true;
+			}
+			ui.labelTicks->setText(tickMessage);
+			return true;
 		}
-		ui.labelTicks->setText(tickMessage);
-		return true;
+		else {
+			return false;
+		}
 	}
 	return false;
 }
@@ -619,25 +631,37 @@ bool GUI::sendGoalCommand()
 	if (calcPathToGoal()) {
 		QString tickMessage = "Ticks: ";
 		vector<Coord2D> tick = _ticks.getTicks();
+		bool verify = true;
 		for (int i = 0; i < tick.size(); i++) {
-			tickMessage += "(" + QString::number((int)tick[i].x) + "," + QString::number((int)tick[i].y) + ")";
-
-			writeProcess("START");
-
-			char RTicksStr[5];
-			itoa(tick[i].x,RTicksStr,10);
-			writeProcess((string)RTicksStr);
-
-			char LTicksStr[5];
-			itoa(tick[i].y,LTicksStr,10);
-			writeProcess((string)LTicksStr);
+			if (!(tick[i].x > -9999 && tick[i].x < 99999 &&
+				tick[i].y > -9999 && tick[i].y < 99999)) {
+				verify = false;
+			}
 		}
-		if (tick.size() > 0) {
-			writeProcess("KICK");
-			_run = true;
+		if (verify) {
+			for (int i = 0; i < tick.size(); i++) {
+				tickMessage += "(" + QString::number((int)tick[i].x) + "," + QString::number((int)tick[i].y) + ")";
+
+				writeProcess("START");
+
+				char RTicksStr[5];
+				itoa(tick[i].x,RTicksStr,10);
+				writeProcess((string)RTicksStr);
+
+				char LTicksStr[5];
+				itoa(tick[i].y,LTicksStr,10);
+				writeProcess((string)LTicksStr);
+			}
+			if (tick.size() > 0) {
+				writeProcess("KICK");
+				_run = true;
+			}
+			ui.labelTicks->setText(tickMessage);
+			return true;
 		}
-		ui.labelTicks->setText(tickMessage);
-		return true;
+		else {
+			return false;
+		}
 	}
 	return false;
 }

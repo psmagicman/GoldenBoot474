@@ -44,6 +44,7 @@ private:
 
 	int _closest; // Index of Closest Path/Ticks
 
+	void				calcSafety();
 	Coord2D				getNewPointAroundObstacle(Obstacle obstacle, Coord2D beginPts, Coord2D endPts);
 	vector<Coord2D>		getTangentPointOfObstacle(Obstacle obstacle, Coord2D point);
 	vector<Coord2D>		getPathToPoint(Coord2D point, double distance = 0);

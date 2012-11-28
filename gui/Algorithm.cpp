@@ -28,32 +28,9 @@ vector<Coord2D> CAlgorithm::getPathToGoal(Robot robot, Coord2D goal)
 		goal.x += 15;
 	}
 
-	
-	int obstacleIndex = -1;
-	for (int i = 0; i < _obstacles.size(); i++) {
-		if (dist(robot.x, _obstacles[i].x, robot.y, _obstacles[i].y) < (_obstacles[i].rad + _robotRadius))
-		{
-			obstacleIndex = i;
-			break;
-		}
-	}
-
-	if (obstacleIndex > -1) {
-		double safetyRadius = dist(robot.x, _obstacles[obstacleIndex].x, robot.y, _obstacles[obstacleIndex].y);
-		double slope = abs((robot.y - _obstacles[obstacleIndex].y) / (robot.x - _obstacles[obstacleIndex].x));
-		if (_robot.x < _obstacles[obstacleIndex].x ) _safetyCoord.x = _obstacles[obstacleIndex].x-safetyRadius*1.5*cos(slope);
-		else if (_robot.x == _obstacles[obstacleIndex].x) _safetyCoord.x = _obstacles[obstacleIndex].x;
-		else _safetyCoord.x = _obstacles[obstacleIndex].x+safetyRadius*1.5*cos(slope);
-		
-		if (_robot.y < _obstacles[obstacleIndex].y ) _safetyCoord.y = _obstacles[obstacleIndex].y-safetyRadius*1.5*sin(slope);
-		else if (_robot.y == _obstacles[obstacleIndex].y) _safetyCoord.y = _obstacles[obstacleIndex].y;
-		else _safetyCoord.y = _obstacles[obstacleIndex].y+safetyRadius*1.5*sin(slope);
-		_safetyFlag = true;
-	} else {
-		_safetyFlag = false;
-	}
-
+	calcSafety();
 	vector<Coord2D> path = getPathToPoint(goal,0);
+
 	if (goal.y > FINAL_HEIGHT/2) {
 		goal.y += 10;
 	} else {
@@ -75,29 +52,7 @@ void CAlgorithm::analyzeField(Robot robot, vector<Ball> balls)
 	_balls = balls;
 	_paths.clear();
 
-	int obstacleIndex = -1;
-	for (int i = 0; i < _obstacles.size(); i++) {
-		if (dist(robot.x, _obstacles[i].x, robot.y, _obstacles[i].y) < (_obstacles[i].rad + _robotRadius))
-		{
-			obstacleIndex = i;
-			break;
-		}
-	}
-
-	if (obstacleIndex > -1) {
-		double safetyRadius = dist(robot.x, _obstacles[obstacleIndex].x, robot.y, _obstacles[obstacleIndex].y);
-		double slope = abs((robot.y - _obstacles[obstacleIndex].y) / (robot.x - _obstacles[obstacleIndex].x));
-		if (_robot.x < _obstacles[obstacleIndex].x ) _safetyCoord.x = _obstacles[obstacleIndex].x-safetyRadius*1.5*cos(slope);
-		else if (_robot.x == _obstacles[obstacleIndex].x) _safetyCoord.x = _obstacles[obstacleIndex].x;
-		else _safetyCoord.x = _obstacles[obstacleIndex].x+safetyRadius*1.5*cos(slope);
-		
-		if (_robot.y < _obstacles[obstacleIndex].y ) _safetyCoord.y = _obstacles[obstacleIndex].y-safetyRadius*1.5*sin(slope);
-		else if (_robot.y == _obstacles[obstacleIndex].y) _safetyCoord.y = _obstacles[obstacleIndex].y;
-		else _safetyCoord.y = _obstacles[obstacleIndex].y+safetyRadius*1.5*sin(slope);
-		_safetyFlag = true;
-	} else {
-		_safetyFlag = false;
-	}
+	calcSafety();
 
 	// Remove Balls that are outside of "Dangerous Fields"
 	for (int i = 0; i < _balls.size(); i++) {
@@ -109,7 +64,8 @@ void CAlgorithm::analyzeField(Robot robot, vector<Ball> balls)
 			}
 		}
 		if (i < _balls.size()) {
-			if (_balls[i].x < 10 || _balls[i].x > FINAL_WIDTH - 10 || _balls[i].y < 10 || _balls[i].y > FINAL_HEIGHT - 10) {
+			int distanceFromWall = 15;
+			if (_balls[i].x < distanceFromWall || _balls[i].x > FINAL_WIDTH - distanceFromWall || _balls[i].y < distanceFromWall || _balls[i].y > FINAL_HEIGHT - distanceFromWall) {
 				_balls.erase(_balls.begin()+i);
 				i--;
 			}
@@ -144,7 +100,9 @@ vector<Coord2D> CAlgorithm::getPathToPoint(Coord2D point, double distance)
 	// If there are obstacles in the field, detect if there are any obstacles in the way
 	if (_obstacles.size() > 0) {
 		// Loop through the path (Look at pop_back and push_back at the bottom. If there are obstacles detected along the way, then a newPath will be pushed
-		for (int iPath = path.size()-2; iPath < path.size()-1; iPath++) {
+		int iPath = 0;
+		if (_safetyFlag) iPath = 1;
+		for (; iPath < path.size()-1; iPath++) {
 			// Select Obstacles that are between the Robot to the Ball
 			beginPts = path[iPath]; // Reassign Beginning Coordinates to the last saved path coordinate
 			// Create a Obstacle variable that is far outside of the arena
@@ -355,4 +313,31 @@ vector<Coord2D> CAlgorithm::getTangentPointOfObstacle(Obstacle obstacle, Coord2D
 	newPoints.push_back(newPoint);
 
 	return newPoints;
+}
+
+void CAlgorithm::calcSafety()
+{
+	int obstacleIndex = -1;
+	for (int i = 0; i < _obstacles.size(); i++) {
+		if (dist(_robot.x, _obstacles[i].x, _robot.y, _obstacles[i].y) < (_obstacles[i].rad + _robotRadius))
+		{
+			obstacleIndex = i;
+			break;
+		}
+	}
+
+	if (obstacleIndex > -1) {
+		double safetyRadius = _obstacles[obstacleIndex].rad;
+		double slope = abs((_robot.y - _obstacles[obstacleIndex].y) / (_robot.x - _obstacles[obstacleIndex].x));
+		if (_robot.x < _obstacles[obstacleIndex].x ) _safetyCoord.x = _obstacles[obstacleIndex].x-safetyRadius*1.2*cos(slope);
+		else if (abs(_robot.x - _obstacles[obstacleIndex].x) < 5) _safetyCoord.x = _obstacles[obstacleIndex].x;
+		else _safetyCoord.x = _obstacles[obstacleIndex].x+safetyRadius*1.2*cos(slope);
+		
+		if (_robot.y < _obstacles[obstacleIndex].y ) _safetyCoord.y = _obstacles[obstacleIndex].y-safetyRadius*1.2*sin(slope);
+		else if (abs(_robot.y - _obstacles[obstacleIndex].y) < 5) _safetyCoord.y = _obstacles[obstacleIndex].y;
+		else _safetyCoord.y = _obstacles[obstacleIndex].y+safetyRadius*1.2*sin(slope);
+		_safetyFlag = true;
+	} else {
+		_safetyFlag = false;
+	}
 }
