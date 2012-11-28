@@ -18,7 +18,7 @@
 #include "Ticks.h"
 #include "XMLReader.h"
 
-const int _commTime = 200;
+const int _commTime = 50;
 
 class GUI : public QMainWindow
 {
@@ -138,14 +138,14 @@ private:
 	void doTask3();
 	void doFinal();
 	void stopRobot();
-	void taskInit();
+	bool taskInit();
 	void restartTask();
 
-	void calcPathToBall();
-	void sendBallCommand();
+	bool calcPathToBall();
+	bool sendBallCommand();
 
-	void calcPathToGoal();
-	void sendGoalCommand();
+	bool calcPathToGoal();
+	bool sendGoalCommand();
 
 	vector<Point2f> combinePts(vector<Point2f> pts1, vector<Point2f> pts2, double distLimit);
 	vector<Point2f> combineRobotPts(vector<Point2f> pts1, vector<Point2f> pts2);

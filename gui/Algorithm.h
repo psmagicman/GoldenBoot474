@@ -37,6 +37,8 @@ private:
 	vector<vector<Coord2D> > _ticks;
 
 	Ball				_closestBall;
+	Coord2D				_safetyCoord;
+	bool				_safetyFlag;
 
 	int _closest; // Index of Closest Path/Ticks
 

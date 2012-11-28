@@ -18,7 +18,17 @@ CAlgorithm::CAlgorithm(vector<Obstacle> obstacles)
 vector<Coord2D> CAlgorithm::getPathToGoal(Robot robot, Coord2D goal)
 {
 	_robot = robot;	
-	return getPathToPoint(goal,40);
+	if (goal.y > FINAL_HEIGHT/2) {
+		goal.y -= 40;
+	} else
+		goal.y += 40;
+	vector<Coord2D> path = getPathToPoint(goal,0);
+	if (goal.y > FINAL_HEIGHT/2) {
+		goal.y += 10;
+	} else
+		goal.y -= 10;
+	path.push_back(goal);
+	return path;
 }
 
 void CAlgorithm::setOpponent(Obstacle opponent)
@@ -33,12 +43,24 @@ void CAlgorithm::analyzeField(Robot robot, vector<Ball> balls)
 	_balls = balls;
 	_paths.clear();
 
+	int obstacleIndex = -1;
 	for (int i = 0; i < _obstacles.size(); i++) {
 		if (dist(robot.x, _obstacles[i].x, robot.y, _obstacles[i].y) < _safetyRadius)
 		{
-			_balls.clear();
+			obstacleIndex = i;
+			break;
 		}
 	}
+
+	if (obstacleIndex > -1) {
+		double slope = (robot.y - _obstacles[obstacleIndex].y) / (robot.x - _obstacles[obstacleIndex].x);
+		_safetyCoord.x = _obstacles[obstacleIndex].x + _safetyRadius*1.1 * cos(slope);
+		_safetyCoord.y = _obstacles[obstacleIndex].y + _safetyRadius*1.1 * sin(slope);
+		_safetyFlag = true;
+	} else {
+		_safetyFlag = false;
+	}
+
 	// Remove Balls that are outside of "Dangerous Fields"
 	for (int i = 0; i < _balls.size(); i++) {
 		for (int j = 0; j < _obstacles.size(); j++) {
@@ -70,12 +92,15 @@ vector<Coord2D> CAlgorithm::getPathToPoint(Coord2D point, double distance)
 
 	vector<Coord2D> path;
 	path.push_back(beginPts);
+	if (_safetyFlag) {
+		path.push_back(_safetyCoord);
+	}
 	path.push_back(endPts);
 
 	// If there are obstacles in the field, detect if there are any obstacles in the way
 	if (_obstacles.size() > 0) {
 		// Loop through the path (Look at pop_back and push_back at the bottom. If there are obstacles detected along the way, then a newPath will be pushed
-		for (int iPath = 0; iPath < path.size()-1; iPath++) {
+		for (int iPath = path.size()-2; iPath < path.size()-1; iPath++) {
 			// Select Obstacles that are between the Robot to the Ball
 			beginPts = path[iPath]; // Reassign Beginning Coordinates to the last saved path coordinate
 			// Create a Obstacle variable that is far outside of the arena
@@ -132,7 +157,7 @@ void CAlgorithm::analyzeObstacles()
 		vector<Obstacle> combinedObstacles;
 		combinedObstacles.push_back(_obstacles[i]);
 		// Combine Obstacles that does not have enough gap in-between for the robot to fit through
-		for (int j = 0; j < _obstacles.size(); j++) 
+		for (int j = 0; j < _obstacles.size() && _obstacles[j].rad != 0; j++) 
 		{
 			if (i != j) {
 				double obstacleDistance = dist(_obstacles[i].x, _obstacles[j].x, _obstacles[i].y, _obstacles[j].y);

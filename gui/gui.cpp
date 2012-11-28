@@ -327,7 +327,7 @@ void GUI::display()
 	if (_run) {
 		if ((_time.elapsed() - _prevTaskTime) >= _commTime) {
 			writeProcess("RUN");
-			_run = false;
+			//_run = false;
 		}
 	}
 	writeProcess("CHECK");
@@ -468,8 +468,8 @@ void GUI::doTask2()
 		stopRobot();
 		_state = STP1_REQUEST; // Stopping
 	} else if (_state == STP1_RESPOND) {
-		sendBallCommand();
-		_state = BALL_REQUEST; // Waiting for Ball to be Caught
+		if (sendBallCommand())
+			_state = BALL_REQUEST; // Waiting for Ball to be Caught
 	} else if (_state == BALL_RESPOND) {
 		_task2 = false;
 	}
@@ -481,14 +481,14 @@ void GUI::doTask3()
 		stopRobot();
 		_state = STP1_REQUEST; // Stopping
 	} else if (_state == STP1_RESPOND) {
-		sendBallCommand();
-		_state = BALL_REQUEST; // Waiting for Ball to be Caught
+		if (sendBallCommand())
+			_state = BALL_REQUEST; // Waiting for Ball to be Caught
 	} else if (_state == BALL_RESPOND) {
 		stopRobot();
 		_state = STP2_REQUEST; // Stopping
 	} else if (_state == STP2_RESPOND) {
-		sendGoalCommand();
-		_state = GOAL_REQUEST; // Waiting for Goal to be Scored
+		if (sendGoalCommand())
+			_state = GOAL_REQUEST; // Waiting for Goal to be Scored
 	} else if (_state == GOAL_RESPOND) {
 		_task3 = false;
 	}
@@ -503,14 +503,14 @@ void GUI::doFinal()
 			stopRobot();
 			_state = STP1_REQUEST; // Stopping
 		} else if (_state == STP1_RESPOND) {
-			sendBallCommand();
-			_state = BALL_REQUEST; // Waiting for Ball to be Caught
+			if (sendBallCommand())
+				_state = BALL_REQUEST; // Waiting for Ball to be Caught
 		} else if (_state == BALL_RESPOND) {
 			stopRobot();
 			_state = STP2_REQUEST; // Stopping
 		} else if (_state == STP2_RESPOND) {
-			sendGoalCommand();
-			_state = GOAL_REQUEST; // Waiting for Goal to be Scored
+			if (sendGoalCommand())
+				_state = GOAL_REQUEST; // Waiting for Goal to be Scored
 		} else if (_state == GOAL_RESPOND) {
 			_ballsScored++;
 			_state = TASKS_READY;
@@ -520,76 +520,93 @@ void GUI::doFinal()
 	}
 }
 
-void GUI::calcPathToBall()
+bool GUI::calcPathToBall()
 {
-	taskInit();
-	_algorithm.analyzeField(_algoRobot, _algoBalls);
-	_ticks.compareTicks(_algorithm.getAllPaths());
-	_path.clear();
-	_path = _ticks.getPath();
-	for (int i = 0; i < _path.size(); i++) _path[i].y = FINAL_HEIGHT - _path[i].y;
-	_targetBall.x = _algorithm.getBalls()[_ticks.getClosestIndex()].x;
-	_targetBall.y = FINAL_HEIGHT - _algorithm.getBalls()[_ticks.getClosestIndex()].y;
+	if (taskInit()) {
+		_algorithm.analyzeField(_algoRobot, _algoBalls);
+		_ticks.compareTicks(_algorithm.getAllPaths());
+		_path.clear();
+		_path = _ticks.getPath();
+		for (int i = 0; i < _path.size(); i++) _path[i].y = FINAL_HEIGHT - _path[i].y;
+		if (_algorithm.getBalls().size() > 0) {
+			_targetBall.x = _algorithm.getBalls()[_ticks.getClosestIndex()].x;
+			_targetBall.y = FINAL_HEIGHT - _algorithm.getBalls()[_ticks.getClosestIndex()].y;
+		} else {
+			_targetBall.x = -1;
+			_targetBall.y = -1;
+		}
+		return true;
+	}
+	return false;
 }
 
-void GUI::sendBallCommand()
+bool GUI::sendBallCommand()
 {
-	calcPathToBall();
-	QString tickMessage = "Ticks: ";
-	vector<Coord2D> tick = _ticks.getTicks();
-	for (int i = 0; i < tick.size(); i++) {
-		tickMessage += "(" + QString::number((int)tick[i].x) + "," + QString::number((int)tick[i].y) + ")";
+	if (calcPathToBall()) {
+		QString tickMessage = "Ticks: ";
+		vector<Coord2D> tick = _ticks.getTicks();
+		for (int i = 0; i < tick.size(); i++) {
+			tickMessage += "(" + QString::number((int)tick[i].x) + "," + QString::number((int)tick[i].y) + ")";
 
-		writeProcess("START");
+			writeProcess("START");
 
-		char RTicksStr[5];
-		itoa(tick[i].x,RTicksStr,10);
-		writeProcess((string)RTicksStr);
+			char RTicksStr[5];
+			itoa(tick[i].x,RTicksStr,10);
+			writeProcess((string)RTicksStr);
 
-		char LTicksStr[5];
-		itoa(tick[i].y,LTicksStr,10);
-		writeProcess((string)LTicksStr);
+			char LTicksStr[5];
+			itoa(tick[i].y,LTicksStr,10);
+			writeProcess((string)LTicksStr);
+		}
+		if (tick.size() > 0) {
+			writeProcess("GRAB");
+			_run = true;
+		}
+		ui.labelTicks->setText(tickMessage);
+		return true;
 	}
-	if (tick.size() > 0) {
-		writeProcess("GRAB");
-		_run = true;
-	}
-	ui.labelTicks->setText(tickMessage);
+	return false;
 }
 
-void GUI::calcPathToGoal()
+bool GUI::calcPathToGoal()
 {
-	taskInit();
-	_path = _algorithm.getPathToGoal(_algoRobot,_goal);
-	vector<vector<Coord2D> > tempPath;
-	tempPath.push_back(_path);
-	_ticks.compareTicks(tempPath);
-	for (int i = 0; i < _path.size(); i++) _path[i].y = FINAL_HEIGHT - _path[i].y;
+	if (taskInit()) {
+		_path = _algorithm.getPathToGoal(_algoRobot,_goal);
+		vector<vector<Coord2D> > tempPath;
+		tempPath.push_back(_path);
+		_ticks.compareTicks(tempPath);
+		for (int i = 0; i < _path.size(); i++) _path[i].y = FINAL_HEIGHT - _path[i].y;
+		return true;
+	}
+	return false;
 }
 
-void GUI::sendGoalCommand()
+bool GUI::sendGoalCommand()
 {
-	calcPathToGoal();
-	QString tickMessage = "Ticks: ";
-	vector<Coord2D> tick = _ticks.getTicks();
-	for (int i = 0; i < tick.size(); i++) {
-		tickMessage += "(" + QString::number((int)tick[i].x) + "," + QString::number((int)tick[i].y) + ")";
+	if (calcPathToGoal()) {
+		QString tickMessage = "Ticks: ";
+		vector<Coord2D> tick = _ticks.getTicks();
+		for (int i = 0; i < tick.size(); i++) {
+			tickMessage += "(" + QString::number((int)tick[i].x) + "," + QString::number((int)tick[i].y) + ")";
 
-		writeProcess("START");
+			writeProcess("START");
 
-		char RTicksStr[5];
-		itoa(tick[i].x,RTicksStr,10);
-		writeProcess((string)RTicksStr);
+			char RTicksStr[5];
+			itoa(tick[i].x,RTicksStr,10);
+			writeProcess((string)RTicksStr);
 
-		char LTicksStr[5];
-		itoa(tick[i].y,LTicksStr,10);
-		writeProcess((string)LTicksStr);
+			char LTicksStr[5];
+			itoa(tick[i].y,LTicksStr,10);
+			writeProcess((string)LTicksStr);
+		}
+		if (tick.size() > 0) {
+			writeProcess("KICK");
+			_run = true;
+		}
+		ui.labelTicks->setText(tickMessage);
+		return true;
 	}
-	if (tick.size() > 0) {
-		writeProcess("KICK");
-		_run = true;
-	}
-	ui.labelTicks->setText(tickMessage);
+	return false;
 }
 
 void GUI::stopRobot()
@@ -601,21 +618,25 @@ void GUI::stopRobot()
 	_prevTaskTime = _time.elapsed();
 }
 
-void GUI::taskInit()
+bool GUI::taskInit()
 {
-	processRobot();
-	_algoRobot.x = _robot[1].x;
-	_algoRobot.y = FINAL_HEIGHT - _robot[1].y; // Flip the Y-axis
-	_algoRobot.angle = _robotAngle;
+	if (_robot.size() > 0) {
+		processRobot();
+		_algoRobot.x = _robot[1].x;
+		_algoRobot.y = FINAL_HEIGHT - _robot[1].y; // Flip the Y-axis
+		_algoRobot.angle = _robotAngle;
 
-	processBalls();
-	_algoBalls.resize(_balls.size());
-	for (int i = 0; i < _balls.size(); i++) {
-		_algoBalls[i].x = _balls[i].x;
-		_algoBalls[i].y = FINAL_HEIGHT - _balls[i].y; // Flip the Y-axis
+		processBalls();
+		_algoBalls.resize(_balls.size());
+		for (int i = 0; i < _balls.size(); i++) {
+			_algoBalls[i].x = _balls[i].x;
+			_algoBalls[i].y = FINAL_HEIGHT - _balls[i].y; // Flip the Y-axis
+		}
+		_pathIndex = 0;
+		_ticks = Ticks(_algoRobot);
+		return true;
 	}
-	_pathIndex = 0;
-	_ticks = Ticks(_algoRobot);
+	return false;
 }
 
 void GUI::restartTask()
@@ -1311,11 +1332,10 @@ void GUI::readProcess()
 	}
 
 	if (command.contains(":5")) { // RUN IS READ
-		//_run = false;
+		_run = false;
 	}
-	/*
+	
 	if (command.contains(":9")) {
 		_state = TASKS_READY;
 	}
-	*/
 }
