@@ -61,7 +61,7 @@ void main(int argc, char * argv[])
 					cout << motorChar << " ";
 			}
 
-			// Right Motor
+			// Left Motor
 			cin >> input;
 			motorDigit = atoi(input.c_str());
 			if (motorDigit != 0) {
