@@ -546,6 +546,7 @@ bool GUI::calcPathToBall()
 		}
 		_algorithm.analyzeObstacles();
 		_algorithm.analyzeField(_algoRobot, _algoBalls);
+		/*
 		vector<vector<Coord2D> > paths;
 		for (int i = 0; i < paths.size(); i++) {
 			for (int j = 0; j < paths[i].size(); j++) {
@@ -555,6 +556,7 @@ bool GUI::calcPathToBall()
 				}
 			}
 		}
+		*/
 		_ticks.compareTicks(_algorithm.getAllPaths());
 		_path.clear();
 		_path = _ticks.getPath();
@@ -688,7 +690,7 @@ void GUI::restartTask()
 void GUI::detectProblems()
 {
 	if (_robot.size() == 2) {
-		if (_state > TASKS_READY && _time.elapsed() - _prevTaskTime < 1000) {
+		if (_state > TASKS_READY && _time.elapsed() - _prevTaskTime < 5000) {
 			_prevRobot = _robot[0];
 		}
 		if (_state > TASKS_READY && _time.elapsed() - _prevTaskTime > 10000 && dist(_prevRobot.x, _robot[0].x, _prevRobot.y, _robot[0].y) < 30) {

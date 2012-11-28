@@ -27,6 +27,32 @@ vector<Coord2D> CAlgorithm::getPathToGoal(Robot robot, Coord2D goal)
 		goal.y += 40;
 		goal.x += 15;
 	}
+
+	
+	int obstacleIndex = -1;
+	for (int i = 0; i < _obstacles.size(); i++) {
+		if (dist(robot.x, _obstacles[i].x, robot.y, _obstacles[i].y) < (_obstacles[i].rad + _robotRadius))
+		{
+			obstacleIndex = i;
+			break;
+		}
+	}
+
+	if (obstacleIndex > -1) {
+		double safetyRadius = dist(robot.x, _obstacles[obstacleIndex].x, robot.y, _obstacles[obstacleIndex].y);
+		double slope = abs((robot.y - _obstacles[obstacleIndex].y) / (robot.x - _obstacles[obstacleIndex].x));
+		if (_robot.x < _obstacles[obstacleIndex].x ) _safetyCoord.x = _obstacles[obstacleIndex].x-safetyRadius*1.5*cos(slope);
+		else if (_robot.x == _obstacles[obstacleIndex].x) _safetyCoord.x = _obstacles[obstacleIndex].x;
+		else _safetyCoord.x = _obstacles[obstacleIndex].x+safetyRadius*1.5*cos(slope);
+		
+		if (_robot.y < _obstacles[obstacleIndex].y ) _safetyCoord.y = _obstacles[obstacleIndex].y-safetyRadius*1.5*sin(slope);
+		else if (_robot.y == _obstacles[obstacleIndex].y) _safetyCoord.y = _obstacles[obstacleIndex].y;
+		else _safetyCoord.y = _obstacles[obstacleIndex].y+safetyRadius*1.5*sin(slope);
+		_safetyFlag = true;
+	} else {
+		_safetyFlag = false;
+	}
+
 	vector<Coord2D> path = getPathToPoint(goal,0);
 	if (goal.y > FINAL_HEIGHT/2) {
 		goal.y += 10;

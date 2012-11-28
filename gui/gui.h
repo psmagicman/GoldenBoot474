@@ -80,6 +80,7 @@ private:
 	int				_prevTime;
 	int				_prevFPS;
 	int				_prevTaskTime;
+	int				_prevCompareTime;
 	
 	CAlgorithm		_algorithm;
 	Ticks			_ticks;
