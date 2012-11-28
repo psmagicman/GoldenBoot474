@@ -20,6 +20,7 @@ public:
 	
 	void setOpponent(Obstacle opponent);
 	void analyzeField(Robot robot, vector<Ball> balls);
+	void analyzeObstacles(); 
 	vector<Coord2D>		getPathToGoal(Robot robot, Coord2D goal);
 
 	Robot				getRobot(){return _robot;};
@@ -33,6 +34,7 @@ private:
 	Robot				_robot;
 	vector<Ball>		_balls;
 	vector<Obstacle>	_obstacles;
+	vector<Obstacle>	_originalObstacles;
 	vector<vector<Coord2D> > _paths;
 	vector<vector<Coord2D> > _ticks;
 
@@ -42,7 +44,6 @@ private:
 
 	int _closest; // Index of Closest Path/Ticks
 
-	void analyzeObstacles(); 
 	Coord2D				getNewPointAroundObstacle(Obstacle obstacle, Coord2D beginPts, Coord2D endPts);
 	vector<Coord2D>		getTangentPointOfObstacle(Obstacle obstacle, Coord2D point);
 	vector<Coord2D>		getPathToPoint(Coord2D point, double distance = 0);

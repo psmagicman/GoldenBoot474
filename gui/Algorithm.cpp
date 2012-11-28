@@ -7,10 +7,12 @@ CAlgorithm::CAlgorithm()
 
 CAlgorithm::CAlgorithm(vector<Obstacle> obstacles)
 {
-	_obstacles = obstacles;
-	for (int i = 0; i < _obstacles.size(); i++) {
-		_obstacles[i].rad = _safetyRadius;
+	_originalObstacles = obstacles;
+	for (int i = 0; i < _originalObstacles.size(); i++) {
+		_originalObstacles[i].rad = _safetyRadius;
 	}
+	_originalObstacles.resize(_originalObstacles.size()+1);
+	_originalObstacles[_originalObstacles.size()-1].rad = 0;
 	analyzeObstacles();
 	_closest = -1;
 }
@@ -20,20 +22,24 @@ vector<Coord2D> CAlgorithm::getPathToGoal(Robot robot, Coord2D goal)
 	_robot = robot;	
 	if (goal.y > FINAL_HEIGHT/2) {
 		goal.y -= 40;
-	} else
+		goal.x -= 15;
+	} else {
 		goal.y += 40;
+		goal.x += 15;
+	}
 	vector<Coord2D> path = getPathToPoint(goal,0);
 	if (goal.y > FINAL_HEIGHT/2) {
 		goal.y += 10;
-	} else
+	} else {
 		goal.y -= 10;
+	}
 	path.push_back(goal);
 	return path;
 }
 
 void CAlgorithm::setOpponent(Obstacle opponent)
 {
-	_obstacles[_obstacles.size()-1] = opponent;
+	_originalObstacles[_originalObstacles.size()-1] = opponent;
 }
 
 void CAlgorithm::analyzeField(Robot robot, vector<Ball> balls)
@@ -45,7 +51,7 @@ void CAlgorithm::analyzeField(Robot robot, vector<Ball> balls)
 
 	int obstacleIndex = -1;
 	for (int i = 0; i < _obstacles.size(); i++) {
-		if (dist(robot.x, _obstacles[i].x, robot.y, _obstacles[i].y) < _safetyRadius)
+		if (dist(robot.x, _obstacles[i].x, robot.y, _obstacles[i].y) < (_obstacles[i].rad + _robotRadius))
 		{
 			obstacleIndex = i;
 			break;
@@ -53,9 +59,15 @@ void CAlgorithm::analyzeField(Robot robot, vector<Ball> balls)
 	}
 
 	if (obstacleIndex > -1) {
-		double slope = (robot.y - _obstacles[obstacleIndex].y) / (robot.x - _obstacles[obstacleIndex].x);
-		_safetyCoord.x = _obstacles[obstacleIndex].x + _safetyRadius*1.1 * cos(slope);
-		_safetyCoord.y = _obstacles[obstacleIndex].y + _safetyRadius*1.1 * sin(slope);
+		double safetyRadius = dist(robot.x, _obstacles[obstacleIndex].x, robot.y, _obstacles[obstacleIndex].y);
+		double slope = abs((robot.y - _obstacles[obstacleIndex].y) / (robot.x - _obstacles[obstacleIndex].x));
+		if (_robot.x < _obstacles[obstacleIndex].x ) _safetyCoord.x = _obstacles[obstacleIndex].x-safetyRadius*1.5*cos(slope);
+		else if (_robot.x == _obstacles[obstacleIndex].x) _safetyCoord.x = _obstacles[obstacleIndex].x;
+		else _safetyCoord.x = _obstacles[obstacleIndex].x+safetyRadius*1.5*cos(slope);
+		
+		if (_robot.y < _obstacles[obstacleIndex].y ) _safetyCoord.y = _obstacles[obstacleIndex].y-safetyRadius*1.5*sin(slope);
+		else if (_robot.y == _obstacles[obstacleIndex].y) _safetyCoord.y = _obstacles[obstacleIndex].y;
+		else _safetyCoord.y = _obstacles[obstacleIndex].y+safetyRadius*1.5*sin(slope);
 		_safetyFlag = true;
 	} else {
 		_safetyFlag = false;
@@ -68,6 +80,12 @@ void CAlgorithm::analyzeField(Robot robot, vector<Ball> balls)
 				_balls.erase(_balls.begin()+i);
 				i--;
 				break;
+			}
+		}
+		if (i < _balls.size()) {
+			if (_balls[i].x < 10 || _balls[i].x > FINAL_WIDTH - 10 || _balls[i].y < 10 || _balls[i].y > FINAL_HEIGHT - 10) {
+				_balls.erase(_balls.begin()+i);
+				i--;
 			}
 		}
 	}
@@ -128,7 +146,11 @@ vector<Coord2D> CAlgorithm::getPathToPoint(Coord2D point, double distance)
 			}
 			// If an obstacle is detected to be in-between the path, add a new point to the path
 			if (obstaclePts.x >= 0 && obstaclePts.y >= 0) {
-				Coord2D newPath = getNewPointAroundObstacle(obstaclePts,beginPts,endPts);
+				Coord2D newPath;
+				if (_safetyFlag) 
+					newPath = getNewPointAroundObstacle(obstaclePts,path[1],endPts);
+				else 
+					newPath = getNewPointAroundObstacle(obstaclePts,beginPts,endPts);
 				path[path.size()-1] = newPath;
 				path.push_back(endPts);
 			}
@@ -152,49 +174,51 @@ vector<Coord2D> CAlgorithm::getPathToPoint(Coord2D point, double distance)
 void CAlgorithm::analyzeObstacles()
 {
 	vector<Obstacle> tempObstacles;
-	for (int i = 0; i < _obstacles.size() && _obstacles[i].rad != 0; i++) 
+	_obstacles = _originalObstacles;
+	for (int i = 0; i < _obstacles.size(); i++) 
 	{
-		vector<Obstacle> combinedObstacles;
-		combinedObstacles.push_back(_obstacles[i]);
-		// Combine Obstacles that does not have enough gap in-between for the robot to fit through
-		for (int j = 0; j < _obstacles.size() && _obstacles[j].rad != 0; j++) 
-		{
-			if (i != j) {
-				double obstacleDistance = dist(_obstacles[i].x, _obstacles[j].x, _obstacles[i].y, _obstacles[j].y);
-				// If the distance between 2 obstacles are smaller than the size of robot, add the obstacle to to-be combined list
-				if (obstacleDistance < (_obstacles[i].rad + _obstacles[j].rad))
-				{
-					combinedObstacles.push_back(_obstacles[j]);
-					_obstacles[j].rad = 0;
+		if (_obstacles[i].rad > 0) {
+			vector<Obstacle> combinedObstacles;
+			combinedObstacles.push_back(_obstacles[i]);
+			// Combine Obstacles that does not have enough gap in-between for the robot to fit through
+			for (int j = 0; j < _obstacles.size(); j++) 
+			{
+				if (i != j && _obstacles[j].rad > 0) {
+					double obstacleDistance = dist(_obstacles[i].x, _obstacles[j].x, _obstacles[i].y, _obstacles[j].y);
+					// If the distance between 2 obstacles are smaller than the size of robot, add the obstacle to to-be combined list
+					if (obstacleDistance < (_obstacles[i].rad + _obstacles[j].rad))
+					{
+						combinedObstacles.push_back(_obstacles[j]);
+						_obstacles[j].rad = 0;
+					}
 				}
 			}
-		}
-		Obstacle combinedObstacle;
-		combinedObstacle.x = 0;
-		combinedObstacle.y = 0;
-		// Find Center Point of Close-Obstacles
-		for (int j = 0; j < combinedObstacles.size(); j++) 
-		{
-			combinedObstacle.x += combinedObstacles[j].x;
-			combinedObstacle.y += combinedObstacles[j].y;
-		}
-		combinedObstacle.x /= combinedObstacles.size();
-		combinedObstacle.y /= combinedObstacles.size();
-
-		// Find Radius of new Obstacle
-		// New Radius = largest distance between new center with all associated obstacle centers plus obstacle radius
-		combinedObstacle.rad = 0;
-		for (int j = 0; j < combinedObstacles.size(); j++) 
-		{
-			if (combinedObstacle.rad < dist(combinedObstacles[j].x, combinedObstacle.x, combinedObstacles[j].y, combinedObstacle.y)) {
-				combinedObstacle.rad = dist(combinedObstacles[j].x, combinedObstacle.x, combinedObstacles[j].y, combinedObstacle.y); 
+			Obstacle combinedObstacle;
+			combinedObstacle.x = 0;
+			combinedObstacle.y = 0;
+			// Find Center Point of Close-Obstacles
+			for (int j = 0; j < combinedObstacles.size(); j++) 
+			{
+				combinedObstacle.x += combinedObstacles[j].x;
+				combinedObstacle.y += combinedObstacles[j].y;
 			}
+			combinedObstacle.x /= combinedObstacles.size();
+			combinedObstacle.y /= combinedObstacles.size();
+
+			// Find Radius of new Obstacle
+			// New Radius = largest distance between new center with all associated obstacle centers plus obstacle radius
+			combinedObstacle.rad = 0;
+			for (int j = 0; j < combinedObstacles.size(); j++) 
+			{
+				if (combinedObstacle.rad < dist(combinedObstacles[j].x, combinedObstacle.x, combinedObstacles[j].y, combinedObstacle.y)) {
+					combinedObstacle.rad = dist(combinedObstacles[j].x, combinedObstacle.x, combinedObstacles[j].y, combinedObstacle.y); 
+				}
+			}
+			combinedObstacle.rad += combinedObstacles[0].rad;
+			tempObstacles.push_back(combinedObstacle);
 		}
-		combinedObstacle.rad += combinedObstacles[0].rad;
-		tempObstacles.push_back(combinedObstacle);
 	}
 	_obstacles = tempObstacles;
-	_obstacles.resize(_obstacles.size()+1);
 }
 
 Coord2D CAlgorithm::getNewPointAroundObstacle(Obstacle obstacle, Coord2D beginPts, Coord2D endPts)

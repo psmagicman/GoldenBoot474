@@ -18,7 +18,7 @@
 #include "Ticks.h"
 #include "XMLReader.h"
 
-const int _commTime = 50;
+const int _commTime = 500;
 
 class GUI : public QMainWindow
 {
@@ -112,6 +112,7 @@ private:
 	Point2f				_targetBall;
 	vector<Point2f>		_obstacles;
 	vector<Point2f>		_robot;
+	Point2f				_prevRobot;
 	vector<Point2f>		_opponent;
 	vector<Coord2D>		_path;
 	double				_robotAngle;

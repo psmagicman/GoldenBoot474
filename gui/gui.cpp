@@ -302,6 +302,7 @@ void GUI::display()
 			log ("ERROR: No Cameras Detected");
 		}
 	}
+	writeProcess("CHECK");
 	if (_state == EMERGENCY_STOP) {
 		if ((_time.elapsed() - _prevTaskTime) >= _commTime) {
 			writeProcess("STOP");
@@ -312,9 +313,10 @@ void GUI::display()
 	}
 	if (_state == STP1_REQUEST) {
 		if ((_time.elapsed() - _prevTaskTime) >= _commTime) {
-			writeProcess("STOP");
+			//writeProcess("STOP");
 			_prevTaskTime = _time.elapsed();
 			calcPathToBall();
+			_state = STP1_RESPOND;
 		}
 	}
 	if (_state == STP2_REQUEST) {
@@ -330,7 +332,6 @@ void GUI::display()
 			//_run = false;
 		}
 	}
-	writeProcess("CHECK");
 	log("");
 }
 
@@ -380,7 +381,7 @@ void GUI::processRobot()
 		}
 	}
 
-	_opponent = combinePts(_cam1->getOpponent(), _cam2->getOpponent(),20);
+	_opponent = combinePts(_cam1->getOpponent(), _cam2->getOpponent(),50);
 }
 
 void GUI::processBalls()
@@ -484,7 +485,7 @@ void GUI::doTask3()
 		if (sendBallCommand())
 			_state = BALL_REQUEST; // Waiting for Ball to be Caught
 	} else if (_state == BALL_RESPOND) {
-		stopRobot();
+		//stopRobot();
 		_state = STP2_REQUEST; // Stopping
 	} else if (_state == STP2_RESPOND) {
 		if (sendGoalCommand())
@@ -496,34 +497,64 @@ void GUI::doTask3()
 
 void GUI::doFinal()
 {
+	/*
 	_ballsToScore = 3; // 3 Balls to Score
 	_ballsScored = 0;
-	if (_ballsScored < _ballsToScore) {
+	*/
+	/*
+	if (true) {
 		if (_state == TASKS_READY) {
 			stopRobot();
 			_state = STP1_REQUEST; // Stopping
 		} else if (_state == STP1_RESPOND) {
-			if (sendBallCommand())
+			if (_time.elapsed() - _prevTaskTime < _commTime && sendBallCommand())
 				_state = BALL_REQUEST; // Waiting for Ball to be Caught
 		} else if (_state == BALL_RESPOND) {
 			stopRobot();
 			_state = STP2_REQUEST; // Stopping
 		} else if (_state == STP2_RESPOND) {
-			if (sendGoalCommand())
+			if (_time.elapsed() - _prevTaskTime < _commTime && sendGoalCommand())
 				_state = GOAL_REQUEST; // Waiting for Goal to be Scored
 		} else if (_state == GOAL_RESPOND) {
-			_ballsScored++;
 			_state = TASKS_READY;
 		}
 	} else {
 		_final = false;
+	}
+	*/
+	_task3 = true;
+	if (_state == GOAL_RESPOND) {
+		_state = TASKS_READY;
 	}
 }
 
 bool GUI::calcPathToBall()
 {
 	if (taskInit()) {
+		if (_opponent.size() > 0) {
+			Obstacle opponent;
+			opponent.x = _opponent[0].x;
+			opponent.y = FINAL_HEIGHT - _opponent[0].y;
+			opponent.rad = _robotRadius*2;
+			_algorithm.setOpponent(opponent);
+		} else {
+			Obstacle opponent;
+			opponent.x = 0;
+			opponent.y = 0;
+			opponent.rad = 0;
+			_algorithm.setOpponent(opponent);
+		}
+		_algorithm.analyzeObstacles();
 		_algorithm.analyzeField(_algoRobot, _algoBalls);
+		vector<vector<Coord2D> > paths;
+		for (int i = 0; i < paths.size(); i++) {
+			for (int j = 0; j < paths[i].size(); j++) {
+				if (paths[i][j].x < 0 || paths[i][j].x > FINAL_WIDTH || paths[i][j].y < 0 || paths[i][j].y > FINAL_HEIGHT) {
+					paths[i].erase(paths[i].begin()+j);
+					j--;
+				}
+			}
+		}
 		_ticks.compareTicks(_algorithm.getAllPaths());
 		_path.clear();
 		_path = _ticks.getPath();
@@ -656,71 +687,62 @@ void GUI::restartTask()
 
 void GUI::detectProblems()
 {
-	if (_robot.size() == 2 && _state >= TASKS_READY) {
-		// Detect Obstacles in Front
-		/*
-		for (int i = 0; i < _obstacles.size(); i++) {
-			double robotX = _robot[1].x;
-			double robotY = _robot[1].y;
-			if (dist(robotX, _obstacles[i].x, robotY, _obstacles[i].y) < _safetyRadius*7/8) {
-				Coord2D robotCoord;
-				robotCoord.x = robotX;
-				robotCoord.y = robotY;
-				Coord2D obstacleCoord;
-				obstacleCoord.x = _obstacles[i].x;
-				obstacleCoord.y = _obstacles[i].y;
-				double obstacleAngle = angleRelative2(obstacleCoord, robotCoord);
-				double angleThreshold = CV_PI/2;
-				if (abs(obstacleAngle - _robotAngle) < angleThreshold || abs(obstacleAngle - _robotAngle) > (2*CV_PI-angleThreshold)) {
-					log("STOP - OBSTACLE IN FRONT");
-					_errorState = ERR_OBSTACLE;
-					restartTask();
-				}
-			}
+	if (_robot.size() == 2) {
+		if (_state > TASKS_READY && _time.elapsed() - _prevTaskTime < 1000) {
+			_prevRobot = _robot[0];
 		}
-		*/
-		// Detect if Robot is still On-Route
-		// cosTheta = A DOT B / (LEN(A) * LEN(B))
-		if (_task1 || _task2 || _task3 || _final) {
-			if (_path.size() > 1) {
-				if (_pathIndex < _path.size() && _pathIndex >= 0) {
-					if ( dist(_robot[1].x, _path[_pathIndex].x, _robot[1].y, _path[_pathIndex].y) < 10 ) {
-						_pathIndex++;
-					}
-					if (_pathIndex < _path.size() && _pathIndex > 0) {
-						Coord2D A;
-						A.x = _robot[1].x;
-						A.y = _robot[1].y;
-						Coord2D B;
-						B.x = _path[_pathIndex].x;
-						B.y = _path[_pathIndex].y;
-						Coord2D C;
-						C.x = _path[_pathIndex-1].x;
-						C.y = _path[_pathIndex-1].y;
-						double distanceFromLine = distFromLine(A,B,C);
-						double distanceFromB = dist(A.x, B.x, A.y, B.y);
-						double distanceFromC = dist(A.x, C.x, A.y, C.y);
-						if (distanceFromLine > 10 && distanceFromB > 5 && distanceFromC > 5) {
-							log ("STOP - NO LONGER ON-ROUTE");
-							restartTask();
+		if (_state > TASKS_READY && _time.elapsed() - _prevTaskTime > 10000 && dist(_prevRobot.x, _robot[0].x, _prevRobot.y, _robot[0].y) < 30) {
+			log ("RESTART - Took too long to do task");
+			restartTask();
+		}
+		if (_state >= TASKS_READY && _path.size() > 0) {
+			// Detect if Robot is still On-Route
+			// cosTheta = A DOT B / (LEN(A) * LEN(B))
+			if (_task1 || _task2 || _task3 || _final) {
+				if (_path.size() > 1) {
+					if (_pathIndex < _path.size() && _pathIndex >= 0) {
+						if ( dist(_robot[1].x, _path[_pathIndex].x, _robot[1].y, _path[_pathIndex].y) < 10 ) {
+							_pathIndex++;
+						}
+						if (_pathIndex < _path.size() && _pathIndex > 0) {
+							Coord2D A;
+							A.x = _robot[1].x;
+							A.y = _robot[1].y;
+							Coord2D B;
+							B.x = _path[_pathIndex].x;
+							B.y = _path[_pathIndex].y;
+							Coord2D C;
+							C.x = _path[_pathIndex-1].x;
+							C.y = _path[_pathIndex-1].y;
+							double distanceFromLine = distFromLine(A,B,C);
+							double distanceFromB = dist(A.x, B.x, A.y, B.y);
+							double distanceFromC = dist(A.x, C.x, A.y, C.y);
+							if (distanceFromLine > 10 && distanceFromB > 5 && distanceFromC > 5) {
+								log ("STOP - NO LONGER ON-ROUTE");
+								restartTask();
+							}
 						}
 					}
 				}
-			}
-			/*
-			if (_path.size() > 0 && _state < BALL_RESPOND) {
-				for (int i = 0; i < _balls.size(); i++) {
-					if ( dist(_targetBall.x, _balls[i].x, _targetBall.y, _balls[i].y) < 10 ) {
-						break;
-					}
-					if (i == _balls.size() -1) {
-						log ("STOP - TARGET BALL LOCATION MOVED");
-						_errorState = ERR_BALL;
+
+				if (_state < BALL_RESPOND) {
+					if (_opponent.size() > 0 && dist(_targetBall.x, _opponent[0].x, _targetBall.y, _opponent[0].y) < _robotRadius*2) {
+						log("STOP - OPPONENT ROBOT HAS OUR BALL");
 						restartTask();
 					}
+					/*
+					for (int i = 0; i < _balls.size(); i++) {
+						if (dist(_targetBall.x, _balls[i].x, _targetBall.y, _balls[i].y) < 20) {
+							break;
+						}
+						if (i == _balls.size() - 1) {
+							log ("STOP - TARGET BALL MOVED");
+							restartTask();
+						}
+					}
+					*/
 				}
 			}
-			*/
 		}
 	}
 	else {
@@ -835,7 +857,8 @@ void GUI::displayMain()
 	
 	// Draw Opponent
 	if (_opponent.size() > 0) {
-
+		p.setPen(QPen(QColor(Qt::red),5));
+		p.drawArc(_opponent[0].x - _robotRadius, _opponent[0].y - _robotRadius, _robotRadius*2, _robotRadius*2, 0, 16*360);
 	}
 	p.end();
 	ui.topView->resize(FINAL_WIDTH, FINAL_HEIGHT);
