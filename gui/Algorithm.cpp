@@ -42,6 +42,7 @@ vector<Coord2D> CAlgorithm::getPathToGoal(Robot robot, Coord2D goal)
 
 void CAlgorithm::setOpponent(Obstacle opponent)
 {
+	opponent.rad = _robotRadius*2;
 	_originalObstacles[_originalObstacles.size()-1] = opponent;
 }
 

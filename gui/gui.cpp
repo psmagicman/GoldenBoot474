@@ -721,6 +721,17 @@ void GUI::detectProblems()
 			log ("RESTART - Took too long to do task");
 			restartTask();
 		}
+
+		for (int i = 0; i < _obstacles.size(); i++) {
+			if (_path.size() > 0 &&
+				dist(_robot[0].x, _obstacles[i].x, _robot[0].y, _obstacles[i].y) < _safetyRadius &&
+				dist(_robot[0].x, _path[0].x, _robot[0].y, _path[0].y) > _safetyRadius ) {
+					log("STOP - ROBOT TOO CLOSE TO OBSTACLE");
+					_path.clear();
+					restartTask();
+			}
+		}
+
 		if (_state >= TASKS_READY && _path.size() > 0) {
 			// Detect if Robot is still On-Route
 			// cosTheta = A DOT B / (LEN(A) * LEN(B))
@@ -756,17 +767,6 @@ void GUI::detectProblems()
 						log("STOP - OPPONENT ROBOT HAS OUR BALL");
 						restartTask();
 					}
-					/*
-					for (int i = 0; i < _balls.size(); i++) {
-						if (dist(_targetBall.x, _balls[i].x, _targetBall.y, _balls[i].y) < 20) {
-							break;
-						}
-						if (i == _balls.size() - 1) {
-							log ("STOP - TARGET BALL MOVED");
-							restartTask();
-						}
-					}
-					*/
 				}
 			}
 		}
@@ -1344,7 +1344,7 @@ void GUI::readProcess()
 {
 	QString command = QString::fromLocal8Bit(_arduino->readAllStandardOutput());
 
-	ui.labelCommands->setText(ui.labelCommands->text() + command);
+	//ui.labelCommands->setText(ui.labelCommands->text() + command);
 	ui.testCommands->setText(ui.testCommands->toPlainText() + command);
 	if (_state == EMERGENCY_STOP) {
 		if (command.contains(":1")) {
@@ -1384,7 +1384,9 @@ void GUI::readProcess()
 		_run = false;
 	}
 	
+	/*
 	if (command.contains(":9")) {
 		_state = TASKS_READY;
 	}
+	*/
 }
