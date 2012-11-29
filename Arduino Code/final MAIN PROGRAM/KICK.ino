@@ -2,10 +2,13 @@ void NEWkick(){
   Kickdone = 0;
   StillGotTheBall = 0;
   int KickDir = 0;
+  int KickCount = 0;
+
   logln("before while loop");
   while( 1 ){
     logln("kicking while loop");
     if( Kickdone == 1){
+      Serial.print(4);
       break;
     }
    
@@ -109,7 +112,8 @@ void NEWkick(){
             {
              logln("Ball just out of the caster ");
              digitalWrite(actuator_enable, HIGH); 
-             //  logln(SenseDistance);            
+             //  logln(SenseDistance);    
+             if(SenseDistance > 10){        
              Actuator_Read();
              while (actuator_length > RETRACT && flag == 0 )
              { 
@@ -122,6 +126,7 @@ void NEWkick(){
                //flag = 0; 
              }
             } 
+            }
       }
       kick = FALSE;
       Sensor();
@@ -129,6 +134,7 @@ void NEWkick(){
       Sensor();
       if( SenseDistance <= 10){
           Kickdone = 0;
+          KickCount++;
           if(KickDir ==0){
             KickDir = 1;
           }
@@ -136,11 +142,34 @@ void NEWkick(){
           {
             KickDir = 0;
           }
+      if(KickCount > 2){
+        while(SenseDistance <10){
+          Sensor();
+          RightTurn(255,255);
+        }
+        Kickdone = 1;
+        logln("Done with the ball kicking") ;   
+        //Serial.print(4);
+        enc1_Count =0;
+        enc2_Count =0;
+        digitalWrite(actuator_enable, HIGH); 
+        Actuator_Read();
+        while (actuator_length > RETRACT && flag == 0 )
+             { 
+              if( CheckforE() == TRUE){ 
+                  flag =1; 
+                  break;
+                }
+              Actuator_Deactivate();               
+              Actuator_Read();
+            }
+        digitalWrite(actuator_enable, LOW); 
+      }
       }
       else{
           Kickdone = 1;
           logln("Done with the ball kicking") ;   
-          Serial.print(4);
+          //Serial.print(4);
           enc1_Count =0;
           enc2_Count =0;
           digitalWrite(actuator_enable, LOW); 

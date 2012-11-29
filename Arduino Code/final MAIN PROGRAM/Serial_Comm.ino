@@ -7,7 +7,7 @@ void serialEvent(){
 
 boolean CheckforE(){
         //if(Serial.available() > 0){
-           if( state ==  MOVE && Serial.peek() == 'R'){
+           if( state ==  MOVE && Serial.peek() != 'E'){
              Serial.read();
            }
            if( Serial.peek() == 'E'){

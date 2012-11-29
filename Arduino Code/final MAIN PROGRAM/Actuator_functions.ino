@@ -57,7 +57,9 @@ void ActuatorControl(int length)
                 {
                  //logln("Current length :  ");
                  // log1(actuator_length); 
-                 CheckforE();
+                 if(CheckforE() ==TRUE){
+                   break;
+                 }
                  
                  Actuator_Deactivate(); 
                  Actuator_Read(); 

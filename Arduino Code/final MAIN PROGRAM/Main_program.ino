@@ -170,12 +170,12 @@ void loop ()
   
   
        Sensor();
-        if( StillGotTheBall == 1 && SenseDistance > 5){
+        /*if( StillGotTheBall == 1 && SenseDistance > 5){
           Stop();
-          Reset();
-          StillGotTheBall = 0;
+          CheckforE();
+          //StillGotTheBall = 0;
           Serial.print(9);
-        }
+        }*/
 	if(state == MOVE){
                 MotorControl();
         }
