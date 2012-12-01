@@ -42,7 +42,7 @@ vector<Coord2D> CAlgorithm::getPathToGoal(Robot robot, Coord2D goal)
 
 void CAlgorithm::setOpponent(Obstacle opponent)
 {
-	opponent.rad = _robotRadius*2;
+	opponent.rad = _robotRadius*3;
 	_originalObstacles[_originalObstacles.size()-1] = opponent;
 }
 
@@ -329,14 +329,13 @@ void CAlgorithm::calcSafety()
 
 	if (obstacleIndex > -1) {
 		double safetyRadius = _obstacles[obstacleIndex].rad;
-		double slope = abs((_robot.y - _obstacles[obstacleIndex].y) / (_robot.x - _obstacles[obstacleIndex].x));
-		if (_robot.x < _obstacles[obstacleIndex].x ) _safetyCoord.x = _obstacles[obstacleIndex].x-safetyRadius*1.2*cos(slope);
+		if (_robot.x < _obstacles[obstacleIndex].x ) _safetyCoord.x = _obstacles[obstacleIndex].x-safetyRadius*1.2;
 		else if (abs(_robot.x - _obstacles[obstacleIndex].x) < 5) _safetyCoord.x = _obstacles[obstacleIndex].x;
-		else _safetyCoord.x = _obstacles[obstacleIndex].x+safetyRadius*1.2*cos(slope);
+		else _safetyCoord.x = _obstacles[obstacleIndex].x+safetyRadius*1.2;
 		
-		if (_robot.y < _obstacles[obstacleIndex].y ) _safetyCoord.y = _obstacles[obstacleIndex].y-safetyRadius*1.2*sin(slope);
+		if (_robot.y < _obstacles[obstacleIndex].y ) _safetyCoord.y = _obstacles[obstacleIndex].y-safetyRadius*1.2;
 		else if (abs(_robot.y - _obstacles[obstacleIndex].y) < 5) _safetyCoord.y = _obstacles[obstacleIndex].y;
-		else _safetyCoord.y = _obstacles[obstacleIndex].y+safetyRadius*1.2*sin(slope);
+		else _safetyCoord.y = _obstacles[obstacleIndex].y+safetyRadius*1.2;
 		_safetyFlag = true;
 	} else {
 		_safetyFlag = false;

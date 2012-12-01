@@ -21,6 +21,7 @@ using namespace std;
 #define BOT_WIDTH 0.172244
 #define ONE_TICK 0.0113
 
+#define EMERGENCY_TWO	-3
 #define EMERGENCY_ACT	-2
 #define	EMERGENCY_STOP	-1
 #define TASKS_READY		0

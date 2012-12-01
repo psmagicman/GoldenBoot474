@@ -81,6 +81,7 @@ private:
 	int				_prevFPS;
 	int				_prevTaskTime;
 	int				_prevCompareTime;
+	int				_checkTime;
 	
 	CAlgorithm		_algorithm;
 	Ticks			_ticks;
@@ -117,6 +118,7 @@ private:
 	vector<Point2f>		_opponent;
 	vector<Coord2D>		_path;
 	double				_robotAngle;
+	double				_prevAngle;
 	vector<double>		_robotAngles;
 	Coord2D				_goal;
 
@@ -156,6 +158,8 @@ private:
 	
 	void writeProcess(string command);
 	void log(QString text);
+
+	void reverse();
 };
 
 #endif // GUI_H

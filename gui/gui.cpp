@@ -101,6 +101,8 @@ void GUI::init()
 	_arenaRight = new XMLReader("ArenaRight.xml");
 	initRightArena();
 
+	_checkTime = _time.elapsed();
+
 	// Initalize Labels
 	ui.labelCommands->clear();
 	ui.labelPaths->clear();
@@ -310,6 +312,16 @@ void GUI::display()
 		}
 	}
 	if (_state == EMERGENCY_ACT) {
+		if ((_time.elapsed() - _prevTaskTime) >= _commTime) {
+			writeProcess("STOP");
+			_prevTaskTime = _time.elapsed();
+		}
+	}
+	if (_state == EMERGENCY_TWO) {
+		if ((_time.elapsed() - _prevTaskTime) >= _commTime*4) {
+			_state = _prevState;
+			_prevTaskTime = _time.elapsed();
+		}
 	}
 	if (_state == STP1_REQUEST) {
 		if ((_time.elapsed() - _prevTaskTime) >= _commTime) {
@@ -546,17 +558,6 @@ bool GUI::calcPathToBall()
 		}
 		_algorithm.analyzeObstacles();
 		_algorithm.analyzeField(_algoRobot, _algoBalls);
-		/*
-		vector<vector<Coord2D> > paths;
-		for (int i = 0; i < paths.size(); i++) {
-			for (int j = 0; j < paths[i].size(); j++) {
-				if (paths[i][j].x < 0 || paths[i][j].x > FINAL_WIDTH || paths[i][j].y < 0 || paths[i][j].y > FINAL_HEIGHT) {
-					paths[i].erase(paths[i].begin()+j);
-					j--;
-				}
-			}
-		}
-		*/
 		_ticks.compareTicks(_algorithm.getAllPaths());
 		_path.clear();
 		_path = _ticks.getPath();
@@ -567,6 +568,12 @@ bool GUI::calcPathToBall()
 		} else {
 			_targetBall.x = -1;
 			_targetBall.y = -1;
+		}
+		
+		for (int i = 0; i < _path.size(); i++) {
+			if (!(_path[i].x > 0 && _path[i].y > 0 && _path[i].x < FINAL_WIDTH && _path[i].y < FINAL_HEIGHT)) {
+				return false;
+			}
 		}
 		return true;
 	}
@@ -616,12 +623,30 @@ bool GUI::sendBallCommand()
 bool GUI::calcPathToGoal()
 {
 	if (taskInit()) {
+		if (_opponent.size() > 0) {
+			Obstacle opponent;
+			opponent.x = _opponent[0].x;
+			opponent.y = FINAL_HEIGHT - _opponent[0].y;
+			opponent.rad = _robotRadius*2;
+			_algorithm.setOpponent(opponent);
+		} else {
+			Obstacle opponent;
+			opponent.x = 0;
+			opponent.y = 0;
+			opponent.rad = 0;
+			_algorithm.setOpponent(opponent);
+		}
+		_algorithm.analyzeObstacles();
 		_path = _algorithm.getPathToGoal(_algoRobot,_goal);
 		vector<vector<Coord2D> > tempPath;
 		tempPath.push_back(_path);
 		_ticks.compareTicks(tempPath);
 		for (int i = 0; i < _path.size(); i++) _path[i].y = FINAL_HEIGHT - _path[i].y;
-		return true;
+		
+		if (_path.size() > 0)
+			return true;
+		else
+			return false;
 	}
 	return false;
 }
@@ -657,6 +682,11 @@ bool GUI::sendGoalCommand()
 				_run = true;
 			}
 			ui.labelTicks->setText(tickMessage);
+			for (int i = 0; i < _path.size(); i++) {
+				if (!(_path[i].x > 0 && _path[i].y > 0 && _path[i].x < FINAL_WIDTH && _path[i].y < FINAL_HEIGHT)) {
+					return false;
+				}
+			}
 			return true;
 		}
 		else {
@@ -714,6 +744,7 @@ void GUI::restartTask()
 void GUI::detectProblems()
 {
 	if (_robot.size() == 2) {
+		/*
 		if (_state > TASKS_READY && _time.elapsed() - _prevTaskTime < 5000) {
 			_prevRobot = _robot[0];
 		}
@@ -721,14 +752,39 @@ void GUI::detectProblems()
 			log ("RESTART - Took too long to do task");
 			restartTask();
 		}
+		*/
+
+		if (_state > TASKS_READY && dist(_prevRobot.x, _robot[0].x, _prevRobot.y, _robot[0].y) > 10) {
+			_prevRobot = _robot[0];
+			//_prevAngle = _robotAngle;
+			_checkTime = _time.elapsed();
+		}
+
+		if (_state > TASKS_READY && _time.elapsed() - _checkTime > 10000) {
+			_checkTime = _time.elapsed();
+			log ("RESTART - Took too long to do task");
+			restartTask();
+		}
 
 		for (int i = 0; i < _obstacles.size(); i++) {
 			if (_path.size() > 0 &&
 				dist(_robot[0].x, _obstacles[i].x, _robot[0].y, _obstacles[i].y) < _safetyRadius &&
-				dist(_robot[0].x, _path[0].x, _robot[0].y, _path[0].y) > _safetyRadius ) {
+				dist(_robot[0].x, _path[0].x, _robot[0].y, _path[0].y) > _safetyRadius &&
+				_state > EMERGENCY_ACT) {
 					log("STOP - ROBOT TOO CLOSE TO OBSTACLE");
 					_path.clear();
-					restartTask();
+					
+					ui.labelCommands->clear();
+					ui.labelPaths->clear();
+					ui.labelTicks->clear();
+					if (_state <= BALL_RESPOND) {
+						_prevState = TASKS_READY;
+					} else if (_state <= GOAL_RESPOND) {
+						_prevState = BALL_RESPOND;
+					}
+					_state = EMERGENCY_ACT;
+					writeProcess("STOP");
+					_prevTaskTime = _time.elapsed();
 			}
 		}
 
@@ -761,13 +817,14 @@ void GUI::detectProblems()
 						}
 					}
 				}
-
+				/*
 				if (_state < BALL_RESPOND) {
 					if (_opponent.size() > 0 && dist(_targetBall.x, _opponent[0].x, _targetBall.y, _opponent[0].y) < _robotRadius*2) {
 						log("STOP - OPPONENT ROBOT HAS OUR BALL");
 						restartTask();
 					}
 				}
+				*/
 			}
 		}
 	}
@@ -1344,7 +1401,7 @@ void GUI::readProcess()
 {
 	QString command = QString::fromLocal8Bit(_arduino->readAllStandardOutput());
 
-	//ui.labelCommands->setText(ui.labelCommands->text() + command);
+	ui.labelCommands->setText(ui.labelCommands->text() + command);
 	ui.testCommands->setText(ui.testCommands->toPlainText() + command);
 	if (_state == EMERGENCY_STOP) {
 		if (command.contains(":1")) {
@@ -1352,7 +1409,7 @@ void GUI::readProcess()
 			_prevTaskTime = _time.elapsed();
 		}
 	}
-	if (_state == STP1_REQUEST || _state == STP2_REQUEST) {
+	if (_state == STP1_REQUEST || _state == STP2_REQUEST || _state == EMERGENCY_ACT) {
 		if (command.contains(":1")) { // STOPPED
 			if (_state == STP1_REQUEST){ 
 				_state = STP1_RESPOND; 
@@ -1360,6 +1417,11 @@ void GUI::readProcess()
 			}
 			if (_state == STP2_REQUEST){ 
 				_state = STP2_RESPOND; 
+				_prevTaskTime = _time.elapsed();
+			}
+			if (_state == EMERGENCY_ACT) {
+				_state = EMERGENCY_TWO;
+				reverse();
 				_prevTaskTime = _time.elapsed();
 			}
 		}
@@ -1389,4 +1451,17 @@ void GUI::readProcess()
 		_state = TASKS_READY;
 	}
 	*/
+}
+
+void GUI::reverse()
+{
+	writeProcess("START");
+	char RTicksStr[5];
+	itoa(-50,RTicksStr,10);
+	writeProcess((string)RTicksStr);
+
+	char LTicksStr[5];
+	itoa(-50,LTicksStr,10);
+	writeProcess((string)LTicksStr);
+	_run = true;
 }
